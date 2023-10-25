@@ -1,0 +1,36 @@
+!! Go to the end of this file to see the ZnetDK 4 Mobile installation procedure !!
+
+-----------------------------
+ZnetDK installation procedure
+-----------------------------
+To install ZnetDK for the first time, just copy the 'znetdk' directory into your
+web publication directory ('www/', 'localweb/', 'htdocs' according you WAMP, LAMP
+or MAMP distribution), then launch the Application Wizard to generate your first
+application, entering the 'http://127.0.0.1/znetdk?tool=appwiz' URL into the
+address bar of your web browser.
+
+If you already installed a previous version of ZnetDK:
+1. First, backup the 'znetdk/applications' directory containing the
+   applications you've already developed. Optionnaly, backup your 
+   'znetdk/.htaccess' file if you've customized the one shipped with a previous
+   version of ZnetDK.
+2. Next, install ZnetDK in a new empty directory or in your original ZnetDK
+   directory after having removing all existing files and directories.
+3. Restore your original 'znetdk/applications' directory and the 
+   'znetdk/.htaccess' file in the new installed directory.
+4. Finally, read the CHANGELOG.TXT file to apply the changes required for
+   ensuring compatibility with your application developed in a previous version.
+
+To get the full detailed installation procedure, go to the website znetdk.fr
+(https://www.znetdk.fr/installation).
+
+
+--------------------------------------
+ZnetDK 4 Mobile installation procedure
+--------------------------------------
+To install ZnetDK 4 Mobile for the first time, just copy the 'znetdk4m'
+directory into your web publication directory ('www/', 'localweb/', 'htdocs' 
+according you WAMP, LAMP or MAMP distribution).
+
+To get the full detailed installation procedure, go to the website at 
+mobile.znetdk.fr (https://mobile.znetdk.fr/getting-started).

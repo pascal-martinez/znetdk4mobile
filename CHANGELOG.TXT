@@ -1,0 +1,2017 @@
+ZnetDK 3.0.0, 2023-09-10
+------------------------
+- CHANGE (all): new \Convert::toISO88591() method to convert a string from UTF-8
+  to ISO-8859-1. This method requires 'mbstring', 'iconv' or 'intl' PHP
+  extension and can replace the PHP utf8_decode() function which is deprecated
+  in PHP version 8.2.
+- CHANGE (all): new parameter CFG_DISPLAY_ERROR_DETAIL to hide technical error
+  details from the end user. This parameter is FALSE by default.
+- CHANGE (all): new parameter CFG_SESSION_ONLY_ONE_PER_USER which limits the
+  number of sessions allowed per user login to one when set to TRUE (default).
+  Thus, a user is automatically disconnected from their first user session when
+  they connect a second time to the application with the same login ID.
+- CHANGE (ZnetDK 4 mobile only): the logout button is moved from the banner to
+  the user panel when the application is viewed on small and medium-sized
+  devices.
+- CHANGE (all): token added to AJAX requests to prevent CSRF attacks. When
+  CFG_AUTHENT_REQUIRED parameter is FALSE, new \UserSession::isUITokenValid()
+  method can be called to check if the token sent by the AJAX request matches
+  the one stored in the user's session.
+- CHANGE (all): for security purpose, ZnetDK controller actions
+  controller\Users and controller\Profiles are no longer executable if the
+  logged in user does not have permission(via user profiles) to access the users
+  or profiles view. This restriction is also applied when no authentication is
+  required (CFG_AUTHENT_REQUIRED = FALSE) and the users or profiles view is not
+  declared within the 'menu.php' script of the application.
+- CHANGE (all): new \AppController::setRequiredMenuItemForAction() method to
+  call within the \AppController::setAllowedActions() method in order to
+  restrict execution to controller's actions if the logged in user does not have
+  permission (via user profiles) to access a given menu item.
+- CHANGE (all): the \AppController::isActionAllowed() method can be implemented
+  within an Application controller to specify whether a given action is allowed
+  or not according to custom conditions.
+- CHANGE (ZnetDK 4 mobile only): the A2HS installation prompt is now only
+  shown on the first view displayed once the application is loaded.
+- CHANGE (ZnetDK 4 mobile only): z4m.footer.adjustPosition() method is
+  deprecated because the footer is now positioned through CSS styles.
+- CHANGE (ZnetDK 4 mobile only): new z4m.ajax.setCustomAjaxURL() method to set
+  a custom AJAX URL when the z4m.ajax.request() is called, especially from an
+  application that is not a ZnetDK 4 Mobile application (for example from a CMS
+  like WordPress).
+- CHANGE (ZnetDK 4 mobile only): the ZnetDK 4 Mobile JS library now can be
+  loaded in a CMS like WordPress, even if the the jQuery library is initialized
+  in 'noConflict' mode (variable $ not declared).
+- CHANGE (all): the '.htaccess' root file is now automatically generated if
+  missing and configured based on the ZnetDK installation directory relative to
+  the Apache web server's 'DocumentRoot' folder. The other '.htaccess' files,
+  usually located in the 'app/' and 'mod/' subdirectories, are no longer needed.
+- BUG FIXING (all): an HTTP error 403 is now returned when executing a
+  controller action which is explicitely forbidden through the definition of the
+  \AppController::setAllowedActions() and \AppController::isActionAllowed()
+  methods within the custom application controller.
+- BUG FIXING (ZnetDK 4 mobile only): "E_WARNING - filemtime(): stat failed for
+  ... engine\core\Dependencies.php(210)" when the CFG_PAGE_LAYOUT is set to
+  a page layout other than 'mobile'.
+- BUG FIXING (all): when the view 'httperror' was displayed on error HTTP 403,
+  404 or 500, the HTTP status code was always 200 instead of 403, 404 or 500.
+- BUG FIXING (all): error "E_DEPRECATED - Function utf8_decode() is deprecated"
+  in PHP 8.2 when downloading a document or a CSV file after calling the
+  \Response::setFileToDownload() or \Response::setDataForCsv() method.
+- BUG FIXING (ZnetDK only): error "E_DEPRECATED - Using ${var} in strings is
+  deprecated, use {$var} instead - engine\tools\appwiz\app\uploadedfile.php(77)"
+  in PHP 8.2 when uploading the App logo from the App Wizard.
+- BUG FIXING (ZnetDK only): error "E_DEPRECATED - Function utf8_encode() is
+  deprecated" in PHP 8.2 when executing the step 2 of the App Wizard.
+- BUG FIXING (all): when a critical PHP error occurred for an HTTP GET request,
+  a blank HTML page was displayed instead of an explicit error message.
+- BUG FIXING (all): the HTTP 403 error code was not managed by the
+  \Response::doHttpError() ZnetDK method.
+- BUG FIXING (all): the TCP/IP port other than 80 and 443 was missing in the
+  URL returned by the \General::getApplicationURI() method.
+- BUG FIXING (ZnetDK 4 mobile only): the w3-theme-light CSS class was missing
+  for the Notification and Confirmation dialogs.
+- BUG FIXING (all): The button labeled in English "Connect" on the login form
+  and "Connection" title on user edit form are replaced by "Login".
+- BUG FIXING (ZnetDK 4 mobile only): extra bottom space added to the "forgotten
+  password?" link displayed on the login page.
+- BUG FIXING (all) : error CTL-003 displayed when the CFG_VIEW_PAGE_RELOAD
+  parameter was set to TRUE.
+- BUG FIXING (ZnetDK 4 mobile only): flash effect is removed when refreshing
+  rows of a Data list.
+- BUG FIXING (ZnetDK 4 mobile only): the rows of the JS Data list were not
+  automatically loaded on z4m.list.make() method call if the application was
+  configured with the CFG_VIEW_PAGE_RELOAD PHP parameter set to TRUE.
+- BUG FIXING (ZnetDK 4 mobile only): JS error message in Chrome browser console
+  "The keyword 'searchfield-cancel-button' specified to an 'appearance' property
+  is not standardized. It will be removed in the future.".
+- BUG FIXING (ZnetDK only): the user's profiles were not selected in the User
+  modal dialog when it was displayed for the first time since the application
+  loading.
+- BUG FIXING (all): the General::callRemoteAction() method could not be called
+  because it was wrongly declared private.
+- BUG FIXING (all): error "E_WARNING - key_exists() expects parameter 2 to be
+  array, null given - \engine\core\Response.php(68)" reported when trying to
+  read a \Response object property when no value has yet been set.
+- BUG FIXING (all): no exception was thrown by \General::reducePictureSize()
+  when imagecreatefrompng() or imagecreatefromjpeg() PHP functions failed.
+  Now a 'GEN-009' ZDKException is thrown.
+- BUG FIXING (all): the user phone and user notes were not returned by the
+  \UserManager::getUsersHavingProfile() ZnetDK PHP method.
+- BUG FIXING (all): error "CTL-003: the controller '' and the action '' does not
+  exist!" returned when sending a POST request with controller and action
+  specified as GET parameters.
+- BUG FIXING (all): error E_WARNING - Undefined array key "HTTP_ACCEPT_LANGUAGE"
+  \Request.php(311) when a controller action was called as a web service while
+  the 'Accept-Language' was not specified in the HTTP header.
+
+ZnetDK 2.9.0, 2023-04-07
+------------------------
+- CHANGE (ZnetDK 4 mobile only): new z4m global variable which is a shorten
+  alias of the znetdkMobile global variable.
+- CHANGE (ZnetDK 4 mobile only): new 'beforehide' and 'afterhide' JS events
+  triggered before and after closing a modal dialog.
+- CHANGE (ZnetDK only): new 'photoReductionPercent' and
+  'minPhotoSizeForReduction' options added to the 'zdkinputfile' and
+  'zdkmultiupload' ZnetDK widgets to reduce before upload the selected photo.
+  These new options can be set in HTML by declaring the
+  'data-zdk-photoreductpercent' and 'data-zdk-minphotosizetoreduct' HTML
+  attributes to the "file" input element.
+- CHANGE (ZnetDK only): new znetdk.reducePhotoSizePercent() and
+  znetdk.reducePhotoSize() JavaScript methods to reduce the size of a photo in
+  number of pixels or in percent.
+- CHANGE (ZnetDK 4 mobile only): the onAdd and onEdit callback functions
+  specified when calling the znetdkMobile.list.setModal() method, can return
+  false to prevent the modal dialog from being opened. So, the modal dialog is
+  opened by the callback function at the appropriate time.
+- CHANGE (all): the \Convert::toUTF8() method accepts now an optional second
+  parameter named '$fromEncoding' to specify the character encoding of the
+  string passed as first parameter. The default value for '$fromEncoding' is
+  'ISO-8859-1'.
+- CHANGE (all): extra locales were added by default to the LC_LOCALE_ALL
+  constant for the English, French and Spanish languages in order to increase
+  the chance to target a locale installed on the webserver.
+- CHANGE (ZnetDK 4 mobile only): the znetdkMobile.form.getInputValue() method
+  now returns an array containing the multiple selected values of the checkboxes
+  having the same name in a form (i.e the HTML attribute name is defined with
+  the same string value for several checkbox elements).
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.action.removeCustomButton()
+  method to remove a custom action button and unregister it from the views.
+- CHANGE (ZnetDK 4 mobile only): new 'afterpageloaded' events triggered by the
+  Data List 'ul' element each time a new page of rows is loaded. The data sent
+  with the event are the ZnetDK Data List object, the number of rows loaded and
+  the data page number.
+- CHANGE (all): when hovering a user profile from the ZnetDK user form, its
+  description is now displayed as a tooltip on desktop computer.
+- CHANGE (all): the \ProfileManager::getProfiles() method now returns the
+  profile's description through the 'description' array key.
+- CHANGE (all): for optimization purpose, new \UserSession::hasFullMenuAccess()
+  method to know if logged in user has a full menu access without requesting the
+  database.
+- CHANGE (all): for optimization purpose, new \UserSession::getUserEmail()
+  method to get logged in user email without requesting the database.
+- CHANGE (all): for optimization purpose, new \UserSession::getUserName()
+  method to get logged in user name without requesting the database.
+- CHANGE (all): for optimization purpose, new \UserSession::getUserProfiles()
+  and \UserSession::hasUserProfile() methods to get access to the authenticated
+  user's profiles without requesting the database.
+- CHANGE (all): the \Convert::toDecimalForDB() method accepts mixed type (float,
+  int, string) for the '$number' parameter. In previous version, an empty string
+  was returned if the specified number was not a string.
+- BUG FIXING (ZnetDK 4 Mobile only): a JS error "Invalid regular expression" was
+  displayed when the searched string in an autocomplete field contained a
+  character having a special meaning in a regular expression (for example an
+  opening parenthesis).
+- BUG FIXING (all): in PHP 8.1, error E_DEPRECATED - str_replace(): Passing null
+  to parameter #2 ($replace) of type array|string is deprecated when calling the
+  \General::getFilledMessage() with a null value as argument.
+- BUG FIXING (all): the \ProfileManager::storeProfile() method did not return
+  the user profile's internal database identifier once stored.
+- BUG FIXING (all): the \Convert::toLocaleDate() method returned a long date
+  instead of a short date with the intl extension loaded and the
+  LC_LOCALE_DATE_FORMAT constant set to NULL.
+- BUG FIXING (all): with the LC_LOCALE_CURRENCY_SYMBOL set to NULL, the
+  \api\Locale::getCurrencySymbol() method returned an incorrect character
+  when the currency symbol was not encoded in UTF-8. Now, if the currency symbol
+  is not encoded in UTF-8, it is decoded from the Windows-1252 character set.
+- BUG FIXING (all): with the LC_LOCALE_THOUSANDS_SEPARATOR set to NULL, the
+  \api\Locale::getThousandsSeparator() method returned a space character which
+  does not match the ASCII space character (value 20 in Hexadecimal).
+- BUG FIXING (all): according to the PHP server configuration, the
+  \Request::getAcceptLanguage() could return a NULL value while the
+  HTTP_ACCEPT_LANGUAGE server variable was properly defined.
+- BUG FIXING (all): \Convert::valuesToAnsi() method uses now the Windows-1252
+  encoding instead of the ISO-8859-1 encoding, in particular to correctly
+  convert the euro character.
+- BUG FIXING (all): \Convert::valuesToAnsi() and \Convert::toUTF8() methods are
+  no longer based on the utf8_decode() and utf8_encode() PHP functions for they
+  are deprecated in PHP 8.2. If no encoding/decoding function is installed (i.e.
+  iconv function or mbstring and intl extensions), then an exception is thrown.
+- BUG FIXING (all): in PHP 8.2 version, a DEPRECATED error was generated by the
+  \Validator::__construct() method when the VAL-003 exception was thrown because
+  string variable interpolation is deprecated in this version.
+- BUG FIXING (all): the thousands separator comma (i.e. ',') was wrongly
+  converted to a dot character (i.e. '.') when calling the
+  \Convert::toDecimalForDB() method while the language of the application was
+  configured with the comma character as thousands separator.
+- BUG FIXING (ZnetDK 4 Mobile only): the 'ui-widget', 'ui-widget-content' and
+  'ui-corner-all' CSS classes were removed from the 'mobile' page layout as they
+  were not used.
+- BUG FIXING (ZnetDK 4 Mobile only): the modal object was not initialized by the
+  znetdkMobile.modal.open() method when the 'aftershow' event was triggered.
+- BUG FIXING (all): when displaying the list of user profiles, as many SQL
+  queries as user profiles displayed were executed in the database. Now, only
+  one SQL query is executed.
+- BUG FIXING (ZnetDK only): when displaying for the first time the ZnetDK user
+  list, an unnecessary AJAX request was sent to the 'users' controller and
+  'profiles' action.
+- BUG FIXING (ZnetDK only): when calling the zdkdropdown.selectValue(), if the
+  specified value did not match any option of the select element, an error was
+  displayed in the browser's console (error message "value 'xx' does not exist
+  in dropdown list named 'my_select_name'."). A JS error will be thrown in a
+  future version.
+- BUG FIXING (ZnetDK only): when calling the zdkdropdown.selectValue(), if no
+  option existed for the select element and the 'data-zdk-loadoncreate'
+  attribute was not set to 'no', an error was displayed in the browser's console
+  (error message "no option is defined for the dropdown list named
+  'my_select_name'."). A JS error will be thrown in a future version.
+- BUG FIXING (ZnetDK only): when calling the zdkdropdown.selectValue(), the last
+  value of the dropdownlist was wrongly selected if the value did not match any
+  option. Now, no option is selected and a JS error is thrown (the value does
+  not exists).
+- BUG FIXING (ZnetDK only): when calling the zdklistbox.selectItemByValue()
+  method with a value containing a single quote (for example "John's dog"), the
+  following JS error was displayed: "Uncaught Error: Syntax error, unrecognized
+  expression: [value='John's dog']".
+- BUG FIXING (all): when executing \General::encrypt() or \General::decrypt(),
+  an exception is now thrown if the 'openssl' extension is not installed.
+- BUG FIXING (all): exceptions were not correctly catched by the ZnetDK
+  \SimpleDAO::getSuggestions() method.
+- BUG FIXING (all): dash characters (i.e. ' - ') were filtered out of the view
+  name when the view was called in AJAX, causing a CTL-001 ZnetDK error.
+
+ZnetDK 2.8.0, 2022-12-12
+------------------------
+- CHANGE (all): class names now conform to the PSR-4 autoloading standard. This
+  means that a PHP script named MyClass.php corresponding to the definition of
+  MyClass is now loaded automatically. In the previous version of ZnetDK, the
+  same PHP script had to be named myclass.php to be automatically loaded.
+- CHANGE (all): new \DAO::setAmountColumns(), \DAO::setMoneyColumns() and
+  \DAO::setDateColumns() to set up the SQL table columns to format according to
+  locale settings when retrieving data rows via \SimpleDAO::getRows().
+- CHANGE (all): the phone and notes specified for a user are now displayed on the
+  user list.
+- CHANGE (all): new \Response::setCustomContent() method to return custom
+  content (HTML, XML, text, ...) from a controller action in response of an http
+  request.
+- CHANGE (all): calling a web service with http GET method is now accepted when
+  the corresponding controller and action are authorized by setting the
+  CFG_ACTIONS_ALLOWED_FOR_WEBSERVICE_USERS parameter. In previous version, only
+  controller's actions named 'download' could be called with the http GET
+  method. This possibility can be particularly useful when a controller action
+  is to be executed from a webcron service.
+- CHANGE (all): new optional parameter '$sanitize' added to the
+  \UserSession::setCustomValue() and \UserSession::getCustomValue() methods.
+  When this parameter is set to TRUE (FALSE by default), the custom value is
+  sanitized before being stored in user session or returned from user session.
+- CHANGE (all): \General::isPictureTooBig() private method is converted to a
+  public method to check if a photo is too big to be reduced in regards of
+  the available memory in the PHP process. Initially only called by the
+  \General::reducePictureSize() method to avoid memory allocation error,
+  \General::isPictureTooBig(), now can be called with a custom $tweakFactor
+  value (set by defaut to 1.65 in previous version of ZnetDK, this value has
+  been increased to 2) before reducing a photo.
+- CHANGE (all): \General::reducePictureSize() method no longer returns FALSE on
+  error. Instead, a ZDKException is thrown ('GEN-003' to 'GEN-006').
+- CHANGE (all): new $tweakFactor parameter (set to 2 by default) added to the
+  \General::reducePictureSize() method.
+- CHANGE (all): new CFG_IS_IN_MAINTENANCE parameter to close access to the
+  application. A message is then displayed to inform users that the application
+  is temporarily in maintenance. The LC_MSG_ERR_MAINTENANCE constant can be
+  overloaded in the 'locale.php' script of the application to customize the
+  message.
+- CHANGE (all): the date format set through the LC_LOCALE_DATE_FORMAT must now
+  conform to that used by the DateTime::format() PHP method. The previous
+  supported format was the one used by the strftime() PHP function which is
+  deprecated in PHP version 8.1.
+- CHANGE (all): Http request data filtering can be globally disabled by setting
+  'NONE' to the CFG_REQUEST_VARIABLE_FILTERING_LEVEL parameter. In addition,
+  the \Request::setVariableFilteringLevel() method accepts the value 'NONE' as
+  parameter to disable value filtering for a specific Http request only.
+- CHANGE (all): \Request::setTrimedCharacters() method now returns a boolean
+  value. If the '$trimedCharacters' parameter is not NULL or is not a string
+  then a FALSE value is returned.
+- CHANGE (all): controller\Users::notify() method removed as it was not useful.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.list.loadedCallback property to
+  define a custom function to call after list's rows are fully loaded. This
+  function has two parameters which contain the number of rows loaded and the
+  data page number loaded.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.list.afterInsertRowCallback
+  property to define a custom function to call after a row has been inserted in
+  a list. This function has one parameter which contains the new inserted list
+  item as a jQuery element. This callback function can be useful for example to
+  set draggable the list item once added to the list.
+- CHANGE (ZnetDK 4 mobile only): new 'topspacechange' event triggered when the
+  space between the top of the view container and the top of the page change,
+  for example when the secondary menu is shown on multiple lines, when a
+  message is displayed through the znetdkMobile.messages.add() method, or when
+  the "Install the App?" message is cleared.
+- CHANGE (ZnetDK 4 mobile only): a column header is now displayed on top of the
+  user and profile lists when the screen is a large screen.
+- BUG FIXING (all): the MainController::getControllerName() method now is able
+  to find a specific controller method amoung multiple modules overloading the
+  same controller.
+- BUG FIXING (all): the 'maxlength' attribute of the 'profile_name' input field
+  was wrongly set to 100 instead of 50.
+- BUG FIXING (all): the 'maxlength' attribute of the 'profile_description' input
+  field was wrongly set to 100 instead of 200.
+- BUG FIXING (all): in PHP 8.1, integers and floats in result sets are by
+  default returned using native PHP types instead of strings. To restore the
+  behavior of earlier versions of PHP, the PDO::ATTR_STRINGIFY_FETCHES option is
+  now forced to true.
+- BUG FIXING (all): in PHP 8.1, error "E_DEPRECATED - Function strftime() is
+  deprecated - engine\core\convert.php(116)".
+- BUG FIXING (all): in PHP 8.1, error "E_DEPRECATED - Constant
+  FILTER_SANITIZE_STRING is deprecated".
+- BUG FIXING (all): in PHP 8.1, error "E_DEPRECATED - php_function_name():
+  Passing null to parameter #X ($parametername) of type string is deprecated"
+  where 'php_function_name' is an internal PHP function name, '#X' is the
+  parameter position and '$parametername' is the concerned function parameter
+  name.
+- BUG FIXING (all): in PHP 8.1, error "E_DEPRECATED - Implicit conversion from
+  float to int loses precision" when executing \General::reducePictureSize()
+  method.
+- BUG FIXING (ZnetDK 4 mobile only): on HTTP error 403 or 404, the page
+  reloading confirmation message ('beforeunload' JS event) was shown
+  unnecessarily after clicking the link to return to the home page.
+- BUG FIXING (ZnetDK 4 mobile only): on HTTP error 403 or 404, the installation
+  panel "Install the App?" was shown unnecessarily.
+- BUG FIXING (ZnetDK 4 mobile only): the confirmation message
+ "A confirmation email has been sent to you." was not displayed after submitting
+ the email address on new password request (clicking the "forgotten password?"
+ link).
+- BUG FIXING (ZnetDK 4 mobile only): the znetdkMobile.form.getInputValue()
+  method returned false and the error message "The input type='undefined' is not
+  supported!" was displayed in the browser's console when an input field was
+  declared in a form without specifying the type attribute. Now, if the type
+  attribute is not specified for an input field, it is considered to be of type
+  "text".
+
+ZnetDK 2.7.0, 2022-08-18
+------------------------
+- CHANGE (ZnetDK 4 mobile only): input fields are now surrounded by a red border
+  in case of form validation error.
+- CHANGE (ZnetDK 4 mobile only): new jQuery events triggered before (beforeshow)
+  and after (aftershow) displaying a modal dialog. If the beforeshow event
+  handler returns false, the modal dialog is not displayed.
+- CHANGE (ZnetDK 4 mobile only): server-side errors are now displayed using the
+  HTML5 JS Validation API (setCustomValidity method) when an input field value
+  is incorrect.
+- CHANGE (ZnetDK only): the login name is memorized in the local storage if
+  user connects in 'private' access mode.
+- CHANGE (ZnetDK only): 'fa-unlock-alt' icon added to login dialog title bar.
+- CHANGE (ZnetDK 4 mobile only): the message displayed after the user changes
+  their password is now a "snackbar" type message rather than a message in a
+  blue panel.
+- CHANGE (ZnetDK 4 mobile only): the message displayed after editing a user's
+  information or deleting a user is now a "snackbar" type message rather than a
+  message in a blue panel.
+- CHANGE (all): new "My user rights" button added to the user panel to display
+  the user profiles assigned to the connected user and to indicate whether she
+  or he has a full menu access or not.
+- CHANGE (ZnetDK 4 mobile only): when 'Remember me' is checked on the login
+  form, the user's login name is stored in the browser's local storage and is
+  pre-populated on subsequent displays of the login form.
+- CHANGE (ZnetDK 4 mobile only): new "Installation" and "Uninstallation" buttons
+  added to the user panel in order to help users to install the Application on
+  their devices and to uninstall it. The modal dialogs shown when clicking
+  these new buttons can also be displayed by calling the two following methods:
+  znetdkMobile.install.showInstallView() and
+  znetdkMobile.install.showUninstallView().
+- CHANGE (ZnetDK 4 mobile only): new CFG_MOBILE_INSTALL_MESSAGE_DISPLAY_AUTO
+  parameter to enable or disable automatic display of a message to install the
+  application (Add 2 Home Screen). Set to TRUE by default, this value can be
+  changed to FALSE in the 'config.php' script of the application.
+  This message can also be displayed on demand by calling the
+  znetdkMobile.install.showInstallableMessage() method.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.install.isAppInstallable() and
+  znetdkMobile.install.isAppInstalled() methods respectively to know if the
+  application is installable and if it is already installed.
+- CHANGE (ZnetDK 4 mobile only): new 'viewName' and 'onViewLoaded' optional
+  parameters added to the znetdkMobile.modal.make() method in order to load in
+  Ajax the modal dialog from the specified ZnetDK view before instantiating it.
+  If the modal dialog already exists in the DOM, it is not loaded again when the
+  method is called next times.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.serviceWorker.isRegistered
+  property that is set to true once the service worker registration has
+  succeeded.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.browser.doPhoneCall() method
+  to dial the specified phone number on cell phone.
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.browser.sendSMS() method
+  to open the screen for sending an SMS and pre-fill phone number and message
+  from the specified values passed in parameters.
+- CHANGE (all): special characters are now allowed by default when entering a
+  new password for app authentication (see CFG_CHECK_PWD_VALIDITY and
+  LC_MSG_ERR_PASSWORD_BADLENGTH PHP constants for customization purpose).
+- CHANGE (ZnetDK only) : pagination added to user profile list.
+- CHANGE (all): new $includeArchived parameter (set to TRUE by default) added
+  to the \UserManager::getUsersHavingProfile() method. When set to FALSE,
+  archived users are excluded from the returned users.
+- CHANGE (ZnetDK only): for optimization purpose, AJAX requests are no
+  longer sent by a 'zdkautocomplete' widget when the previously entered keyword
+  does not match any suggestions.
+- CHANGE (ZnetDK only): for performance purpose, suggestions returned by AJAX
+  requests when entering a keyword in a 'zdkautocomplete' widget can be cached
+  in memory to reduce network traffic. To enable caching, set a value greater
+  than zero (set to zero by default) to the 'maxNumberOfCachedItems' widget's
+  option or to the 'data-zdk-maxcacheditems' HTML input's attribute. To clear
+  the cache once a suggestion is selected, set the value 'selection' to the
+  'cacheLifetime' widget's option or to the 'data-zdk-cachelifetime' HTML
+  input's attribute ('page' is set by default, meaning that cache is kept until
+  user leaves the application).
+- CHANGE (ZnetDK 4 mobile only): new znetdkMobile.list.beforeInsertRowCallback
+  property to define a custom function to call each time a row is inserted in a
+  list. This function has one parameter which contains the data to display for
+  the row. This data can be modified within the function before displaying the
+  row. This callback function can be useful to format data before row insertion.
+- CHANGE (ZnetDK 4 mobile only): for optimization purpose, AJAX requests are no
+  longer sent by a znetdkMobile.autocomplete input field when the previously
+  entered keyword does not match any suggestions.
+- CHANGE (ZnetDK 4 mobile only): for performance purpose, suggestions returned
+  by AJAX requests when entering a keyword in a znetdkMobile.autocomplete input
+  field can be cached in memory to reduce network traffic. To enable caching,
+  set znetdkMobile.autocomplete.maxNumberOfCachedItems to a value greater than
+  zero (set to zero by default). To clear the cache once a suggestion is
+  selected, change the value znetdkMobile.autocomplete.cacheLifetime to
+  'selection' ('page' is set by default, meaning that cache is kept until user
+  leaves the application).
+- BUG FIXING (all): when calling the DAO::store() method with an empty row id
+  value (i.e. '') and the $emptyValuesToNull parameter is FALSE (default case),
+  then the SQL statement generated is no longer an UPDATE but an INSERT
+  instead.
+- BUG FIXING (all): for optimization purpose, the user profile list displayed
+  for each user in the user list (menu Authorizations | Users) is no longer
+  created by querying profiles in SQL for each user (now, only one SQL query is
+  executed for all displayed users).
+- BUG FIXING (ZnetDK 4 mobile only): multiples clicks are prevented on anchor
+  and button elements of the application (disabling during 500 ms).
+- BUG FIXING (ZnetDK 4 mobile only): messages displayed through the
+  znetdkMobile.messages.add() method were not hidden after the user logged out.
+- BUG FIXING (all): the first parameter named "$loginName" is renamed to
+  "$userId" for the \UserManager::getUserProfiles() method because the expected
+  parameter value was the user internal identifier.
+- BUG FIXING (all): Javascript error displayed in web browser console on service
+  worker registration when the App's URL is redirected:
+  "The script resource is behind a redirect, which is disallowed.".
+- BUG FIXING (ZnetDK 4 mobile only): user profiles were displayed twice when
+  the number of defined profiles exceeded 20 profiles.
+- BUG FIXING (ZnetDK 4 mobile only): when activating the "Users" tab from the
+  "Profiles" tab, the user list was not reloaded when applying "Enabled",
+  "Disabled" or "Archived" filter and the profile list was reloaded instead.
+- BUG FIXING (ZnetDK 4 mobile only): ajax requests could be executed twice after
+  the user's session expired if a JS error occurred while executing them from
+  the queue.
+- BUG FIXING (ZnetDK 4 mobile only): the login name was not displayed in the
+  login field after reloading of the application once session was expired.
+- BUG FIXING (ZnetDK 4 mobile only): JS error message "TypeError: Cannot read
+  properties of undefined (reading 'replace')" was displayed when the rendering
+  callback function passed to the znetdkMobile.autocomplete.make() method did
+  not returned a string value.
+- BUG FIXING (ZnetDK 4 mobile only): JS error message displayed in web browser
+  console about 'znetdkMobile.log.e$()' function that is not defined when a JS
+  error is detected after a view loading through the
+  znetdkMobile.ajax.loadView() method (issue in minification of 'mobile-min.js'
+  version 2.6).
+
+ZnetDK 2.6.0, 2022-06-03
+------------------------
+- CHANGE (all): downloaded documents (photos, pdf, etc.) are now stored in cache
+  by the service worker if the 'cache=true' GET parameter is added to the
+  download url.
+- CHANGE (all): new ZnetDK \General::reducePictureSize() method that resizes a
+  JPEG or PNG picture by specifying a maximum width and height.
+- CHANGE (all): new CFG_APPLICATION_VERSION parameter to specify the current
+  application's version (integer value, 1 by default). When this version is set
+  into the 'config.php' of the application, the client-side application is
+  automatically reloaded on user's session expiration if the application version
+  on the server-side is higher than the one currently loaded in the user's web
+  browser.
+- CHANGE (all): new \Convert::binaryToBase64Url() ZnetDK method to convert a
+  binary file content to base64 URL.
+- CHANGE (all): new \Convert::base64UrlToBinary() ZnetDK method to convert a
+  base64 URL to binary file content.
+- CHANGE (all): new \Request::setTrimedCharacters() to specify the characters to
+  trim when retrieving the sanitized value of a request parameter. By default,
+  the trimed characters are " \n\r\t\v\x00". This method can be useful to
+  preserve the newline characters of the beginning and the end of a text.
+- CHANGE (all): new CFG_REQUEST_VARIABLE_FILTERING_LEVEL parameter to specify
+  the filtering level applied by default when reading HTTP request variables by
+  calling the \Request() getter method (i.e $request->my_var). Value 'HIGH'
+  is set by default (PHP filter_var() function is applied with
+  FILTER_SANITIZE_STRING filter and FILTER_FLAG_NO_ENCODE_QUOTES option). Other
+  allowed value is 'LOW' (PHP strip_tags() function is applied and the string
+  '<=' is preserved if exists in the text to filter).
+- CHANGE (all): new \Request::setVariableFilteringLevel() to change the default
+  value set through the CFG_REQUEST_VARIABLE_FILTERING_LEVEL parameter. Allowed
+  parameters are 'LOW' and 'HIGH'.
+- CHANGE (all): Flash Of Unstyled Content (FOUC) is now prevented on application
+  loading.
+- CHANGE (ZnetDK only): when calling the znetdk.showModalDialog() method, if the
+  callback function specified for the "beforeShow" parameter returns false, then
+  the modal dialog is not finally displayed. So the dialog is displayed under
+  control of the calling JavaScript code.
+- CHANGE (ZnetDK only) : new znetdk.notifyUser() method to display a simple
+  notification message in a dialog box.
+- CHANGE (ZnetDK only): new 'zdk-form-notrim' CSS class to apply to an input or
+  textarea element declared within a ZnetDK form if its value must not be trimed
+  on form submit and on zdkform widget 'getFormData' method call.
+  This class can be for example applied to a textarea element if the newline
+  characters of the beginning and the end of a text must be preserved.
+- CHANGE (ZnetDK only): jQuery upgrade from version 1.9.1 to version 1.12.4
+ (see CFG_JQUERY_JS PHP constant).
+- CHANGE (ZnetDK 4 mobile only): jQuery upgrade from version 3.5.1 to version
+  3.6.0 (see CFG_MOBILE_JQUERY_JS PHP constant).
+- CHANGE (ZnetDK 4 mobile only): the znetdkMobile.setInputValue() method now
+  allows to check multiple checkboxes having the same name (generally ended with
+  double brackets, for example "mycheckboxes[]"). The values of the checkboxes
+  to check are passed in parameter of the method as an array.
+- CHANGE (ZnetDK 4 mobile only): the znetdkMobile.getInputValue() method now
+  allows to retrieve as a JS array, the selected values for a SELECT HTML
+  element set with the 'multiple' property.
+- BUG FIXING (ZnetDK only): in jQuery version 1.12.4, error
+  "JQMIGRATE: Can't change the 'type' of an input or button in IE 6/7/8"
+  displayed in the browser console by the jQuery migrate 4.1 developmement JS
+  library when ZnetDK 'zdkinputdate' and 'zdkactionbar' widgets are
+  instantiated.
+- BUG FIXING (ZnetDK only): in jQuery version 1.12.4, error
+  "JQMIGRATE: Attribute selector with '#' must be quoted"  displayed in the
+  browser console by the jQuery migrate 4.1 developmement JS library when the
+  application is configured with ZnetDK 'office' page layout.
+- BUG FIXING (ZnetDK 4 mobile only): jQuery syntax error calling
+  znetdkMobile.getInputValue() method when the input name passed in parameter
+  contains "bracket" symbols.
+- BUG FIXING (ZnetDK 4 mobile only): when more than 20 users were declared in
+  the application, the list of users (view 'z4musers.php') was not properly
+  paginated (same users were displayed several times).
+
+ZnetDK 2.5, 2021-09-29
+----------------------
+- CHANGE: the ZnetDK user and profile dialogs are enlarged for future display
+  of the application with a font increased to 14 pixels.
+- CHANGE: the ZnetDK connection dialog is enlarged to 380 pixels.
+- CHANGE: new ZnetDK \General::callRemoteAction() PHP method usefull to invoke
+  a controller action exposed as web service by a remote ZnetDK application.
+- CHANGE: new 'isHtml' column property added to the ZnetDK zdkdatatable widget
+  (derived from puidatatable) to parse HTML data of the specified columns.
+- CHANGE: the lightest background color of the "z-mono-*" color themes used by
+  the 'classic' and 'office' page layouts is replaced by white (#FFF) for better
+  readability.
+- CHANGE: concerning the 'classic', 'office' and 'custom' page layouts, the
+  <meta name="viewport"> tag is added to the <head> tag.
+- CHANGE: concerning the 'classic', 'office' and 'custom' page layouts, the
+  icons displayed on the right on the application banner to diplay help,
+  to logout and to change password are replaced by fontawesome icons.
+  Transition effect is added on hover on banner anchors.
+- CHANGE: concerning the 'classic' and 'office' page layouts, the text font is
+  changed to 'nunito' for the following color themes: 'z-mono-icedcoffee',
+  'z-mono-taupe' and 'z-mono-lushmedow'.
+- CHANGE: concerning the 'classic', 'office' and 'custom' page layouts, the
+  choosen access mode ('public' or 'private') on login is now memorized in the
+  browser local storage.
+- CHANGE: when calling method znetdk.request(), any JavaScript error detected
+  while executing the custom callback method defined as option is now catched
+  and the 'zdkrequestcallbackjserror' event is triggered for managing the error
+  (for example to log JavaScript errors on the server-side).
+- CHANGE: new CFG_SQL_TRACE_ENABLED parameter which traces in the system log all
+  SQL statements executed through the ZnetDK \DAO class.
+- CHANGE: new \UserSession::getUserId() ZnetDK method that returns the user ID
+  of the connected user. The user ID is automatically memorized in session by a
+  call to the new \UserSession::setUserId() method once user has been
+  successfully authenticated.
+- CHANGE: new \UserManager::getUserInfosByEmail() ZnetDK method to retrieve
+  user's information from their email address.
+- CHANGE: new 'zdk_user_pwd_resets' ZnetDK SQL table for tracing reset password
+  requests. The database schema can be upgraded for applications deployed
+  in a previous version of ZnetDK by executing the following DDL statement:
+  CREATE TABLE `zdk_user_pwd_resets` (
+   `email` VARCHAR(100) NOT NULL COMMENT 'Email address',
+   `request_date_time` DATETIME NOT NULL COMMENT 'Request date time',
+   `reset_key` VARCHAR(100) NOT NULL COMMENT 'Reset key',
+   UNIQUE `email` (`email`)
+  ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci
+  COMMENT = 'Password reset';
+  For any new applications, just download the 'znetdk-security-1.6.zip' archive
+  from the ZnetDK download page to install the security SQL tables corresponding
+  to this version.
+- CHANGE: new \UserManager::getResetPasswordConfirmationUrl() ZnetDK method that
+  returns a dynamically generated URL of the application to confirm that a new
+  password is requested for an email address in case of forgotten password.
+- CHANGE: new 'resetpwd.php' view displayed to confirm a password reset when the
+  URL returned by the \UserManager::getResetPasswordConfirmationUrl() method is
+  clicked.
+- CHANGE: new \UserManager::resetPassword() ZnetDK method that generates a new
+  temporary password for the specified user email after password reset request
+  in case of forgotten password.
+- CHANGE: new \controller\Users::getAutoGeneratedPassword() ZnetDK method that
+  generates a new password. This method can be overloaded by the application or
+  a module if necessary.
+- CHANGE: new CFG_FORGOT_PASSWORD_ENABLED parameter to display a link labeled
+  'Forgot password?' on the login form. When clicked, the ZnetDK
+  modal dialog corresponding to the view 'forgotpassword.php' is shown to
+  request a new password from a user email address.
+  The ZnetDK 'forgotpassword.php' view can be customized by copying it to the
+  'view' folder of the application or a module.
+- CHANGE: new ZnetDK controller\ForgotPassword class in charge of displaying
+  the 'forgotpassword.php' view when the 'Forgot password?' link is clicked (see
+  'action_show' method). In addition, the controller processes the
+  requests for getting a new password (see 'action_requestpassword' method) and
+  for resetting the user's password (see 'action_resetpassword' method).
+  This controller can be overloaded by the application or a module for
+  customization purpose.
+- CHANGE: new CFG_FORGOT_PASSWORD_REQUEST_TRACE_ENABLED parameter to trace the
+  requests for a new password to the ZnetDK system log file.
+- CHANGE: ZnetDK modal dialog display is forced to the maximized state when the
+  'zdk-modal-maximizable' CSS class is set for the dialog and the dialog height
+  is higher than the viewport height.
+- CHANGE: new 'Archived' user's status and new 'Status' datatable filter to
+  limit display to users matching a given status ('Enabled', 'Disabled' or
+  'Archived'). An archived user is not allowed to log in to the application and
+  can't request a new password through the 'Forgot password?' link.
+- CHANGE: the verification of the login name during authentication process is
+  now case sensitive. This means that a user declared for example with the login
+  name 'JohnDoe' can no longer log in if he enters 'JOHNdoe'.
+- CHANGE: new CFG_NON_MOBILE_PWA_ENABLED parameter to enable PWA features
+  (favicons and service worker) on non-mobile apps. This parameter is dedicated
+  to applications configured with the CFG_PAGE_LAYOUT parameter set to
+  'standard', 'office' and 'custom'. It is ignored for applications with the
+  CFG_PAGE_LAYOUT parameter set to 'mobile'.
+- BUG FIXING: the filename defined for the \Response::setFileToDownload() method
+  was not properly displayed by the web browser when it contained accents.
+- BUG FIXING (for mobile only): when the znetdkMobile.setInputValue() method was
+  called for a checkbox element with a non-empty value different than the one
+  set for the checkbox element, it was not unchecked.
+- BUG FIXING (for mobile only): 'Remember me' checkbox state change event
+  handler was incorrectly declared each time the login form was displayed for
+  the user's session renewal.
+- BUG FIXING (for mobile only): focus wrongly applied to the show/hide password
+  button instead of the password entry field.
+- BUG FIXING: E_NOTICE - Trying to access array offset on value of type null
+  in profilemanager.php(126) when the user profile view (profile.php) is
+  displayed in PHP 7.4.
+- BUG FIXING: when calling method znetdk.request(), the ajax loading image
+  could remain displayed on Javascript error thrown while executing the
+  success callback method.
+- BUG FIXING: Too long words in a message displayed via the znetdk.message()
+  method overflowed the message box.
+- BUG FIXING (for mobile only): the callback function specified for the
+  znetdkMobile.messages.ask() method could be executed twice wrongly.
+- BUG FIXING: FontAwesome icon added to title bar of ZnetDK modal dialog
+  'zdkmodal' via HTML attribute 'data-icon' was not left aligned.
+- BUG FIXING (for mobile only): the Phone and Note labels of the 'z4musers.php'
+  view were not displayed in bold.
+- BUG FIXING: the rows of zdkdatatable widget were not displayed in alternate
+  colors for the 'z-mono-serenity' and 'z-mono-bodacious' color themes.
+- BUG FIXING (for mobile only): concerning the 'mobile' page layout, when the
+  page header is hidden after calling the
+  znetdkMobile.header.events.handleHideHeaderOnScroll() method, no extra space
+  is longer added to the page's anchors through the inline '#zdk-anchor-adjust'
+  CSS style (bug finally not fixed in version 2.4).
+
+ZnetDK 2.4, 2021-04-15
+------------------------
+- CHANGE: the \DAO::remove() method now returns the number of rows removed.
+- CHANGE: "Phone" and "Notes" fields added to the user form.
+  The database schema must also be upgraded for applications deployed in a
+  previous version of ZnetDK by executing the following DML statement:
+  ALTER TABLE `zdk_users`
+  ADD `user_phone` VARCHAR(50) NULL COMMENT 'Phone number' AFTER `user_email`,
+  ADD `notes` VARCHAR(100) NULL COMMENT 'Notes' AFTER `user_phone`;
+  For any new applications, just download the 'znetdk-security-1.5.zip' archive
+  from the ZnetDK download page to install the security SQL tables corresponding
+  to this version.
+- CHANGE: new znetdkMobile.navigation.clearRowCountFromHorizontalMenuItem()
+  method to clear the counter displayed on the right of the menu item (see
+  znetdkMobile.navigation.addRowCountToHorizontalMenuItem() method).
+- CHANGE: new \DAO::doesTableExist() method to check if the table specified as
+  property of the DAO exists or not.
+- BUG FIXING: when the page header is hidden after calling the
+  znetdkMobile.header.events.handleHideHeaderOnScroll() method, no extra space
+  is longer added to the page's anchors through the inline '#zdk-anchor-adjust'
+  CSS style.
+- BUG FIXING: the suggestions were not automatically hidden after pressing the
+  TAB key from a ZnetDK 4 Mobile autocomplete input field.
+- BUG FIXING: error message PFL-012 when calling DAO::remove() with a row ID
+  passed as a parameter while the 'zdk_profile_rows' ZnetDK security SQL table
+  is missing.
+- BUG FIXING: checkbox and radio inputs could be modified after calling the
+  znetdkMobile.form.setReadOnly() method.
+- BUG FIXING: a JS error occured calling znetdkMobile.form.setInputValue()
+  when the value specified for a radio button contained a space character.
+- BUG FIXING: znetdkMobile.form.getInputValue() called for a checkbox input
+  wrongly returned the element's value while the checkbox was not checked.
+  Now, an empty string is returned if the checkbox is not checked.
+- BUG FIXING: in the 'mobile.php' page layout, the title attribute is added to
+  the '#zdk-side-nav-button' anchor for a better accessibility.
+
+ZnetDK 2.3, 2020-10-09
+----------------------
+- CHANGE: the regular expression set by default to the CFG_CHECK_PWD_VALIDITY
+  parameter in order to check the strength of a new password is changed to
+  impose the user to input a minimum of 8 characters with at least 1 uppercase
+  letter, 1 lowercase letter and 1 number.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  custom action button can be added to the page calling the new
+  znetdkMobile.action.addCustomButton() method.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  the page header can be hidden on scroll calling the new
+  znetdkMobile.header.events.handleHideHeaderOnScroll() method.
+- CHANGE: new optional 'classSelector' parameter added to the
+  znetdkMobile.modal.getInnerForm() method to select a specific form in case
+  more than one form exists in the modal dialog.
+- CHANGE: new optional 'parentContainer' parameter added to the
+  znetdkMobile.messages.showSnackbar() method to force display of a snackbar
+  message into a specific container (for example a modal dialog).
+- CHANGE: new optional 'renderCallback' parameter added to the
+  znetdkMobile.autocomplete.make() method to customize the display of the
+  suggestions.
+- CHANGE: new znetdkMobile.form.setDataModifiedState() method to indicate
+  whether form data are modified or not by a user input. This method is called
+  by the znetdkMobile.form.reset() and znetdkMobile.form.events.handleAllInput()
+  methods.
+- CHANGE: new znetdkMobile.form.isModified() method to know if form data have
+  been modified or not by a user input.
+- CHANGE: new 'checkDataFormsModified' parameter added to the
+  znetdkMobile.modal.close() method to check whether the inner form data have
+  been modified or not by a user input. If so, a confirmation is aked to user
+  before closing the modal dialog.
+- CHANGE: when the 'question' parameter is set to null calling the
+  znetdkMobile.messages.ask() method, then the LC_MSG_ASK_CANCEL_CHANGES php
+  constant message is displayed as default question.
+- CHANGE: the display width of the 'z4musers.php' and 'z4mprofiles.php' views is
+  enlarged for best display on mobile devices.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'), if
+  an anchor with 'href' attribute starting with 'mailto:' or 'tel:' is clicked,
+  then no unload confirmation message is longer prompted by the web browser.
+- CHANGE: the 'engine/log/autoexec.sync' file created by ZnetDK to synchronize
+  the execution in background of an 'autoexec' controller action is now
+  automatically deleted and recreated if it is corrupted or if its execution
+  time exceeds one hour.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  the jQuery library is updated to version 3.5.1 (previous version was 3.4.1).
+- CHANGE: values stored in the web browser local storage using the
+  znetdk.storeLocalSettings() and znetdkMobile.browser.storeLocalData() methods
+  are no longer overwritten by another ZnetDK application installed on the same
+  internet domain name.
+- CHANGE: when calling znetdkMobile.list.setCustomSortCriteria() method with
+  a property named '_default' as sort definition for the sortCriteria parameter,
+  then no sort is applied when this sort field is choosen from the search modal
+  dialog, including if reverse sort has been selected.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  the local storage key used to memorize the custom sort criteria of a data list
+  (see znetdkMobile.list) is now suffixed with the view ID. So the sort criteria
+  are no longer applied when a data list, with the same element ID, exists in
+  different "reloaded on display" views (with the 'zdk-viewreload' CSS class).
+- CHANGE: the onAdd parameter of the znetdkMobile.list.setModal() now accepts to
+  be set to false in order to hide the 'Add' action button.
+- CHANGE: for the custom and mobile page layout only (CFG_PAGE_LAYOUT set to
+  'custom' or 'mobile'), the HTML title attribute is added to the menu item
+  anchor of the navigation menu and is set to menu item label.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  labels that are too long in the vertical navigation menu are cut off on the
+  right and suffixed by 3 dots (i.e. '...').
+- CHANGE: when calling znetdkMobile.modal.getInnerForm() method, if more than
+  one form exist in the modal, the first one is now returned instead of a
+  boolean false value.
+- CHANGE: new znetdkMobile.list.searchedKeywordAsJson property. When set to
+  true, extra 'keyword_json' POST parameter is sent to the PHP controller's
+  action on search by keyword, for loading a ZnetDK Mobile Data List (see
+  'data-zdk-load' HTML5 property). This 'keyword_json' parameter contains each
+  searched keywords in JSON format including the extra properties of the
+  selected keyword suggestions (see 'data-zdk-autocomplete' HTML5 property).
+- CHANGE: keyboard selection added to the suggestions displayed by a
+  znetdkMobile.autocomplete input field.
+- BUG FIXING: error message "E_WARNING - file_exists(): open_basedir restriction
+  in effect." when the README.TXT file existed into the 'engine/modules'
+  subdirectory.
+- BUG FIXING: error message "The input with name='input_name' is not supported!"
+  was displayed into the browser console when calling the
+  znetdkMobile.form.getInputValue() method passing as parameter an input name
+  matching a <textarea> HTML element.
+- BUG FIXING: the form's previous error message displayed could be wrongly
+  displayed again when submitting a form with a ZnetDK Dropdown widget set with
+  the 'required' HTML property while no dropdown item was selected.
+- BUG FIXING: the 'beforesubmit' events of the ZnetDK form widget were wrongly
+  sent before the ZnetDK Dropdown, Date, Multiupload and InputHtml widgets being
+  validated.
+- BUG FIXING: the znetdkMobile.list.refresh() method could be called multiple
+  times on view display when the view was set to be reloaded on each of its
+  displays ('zdk-viewreload' CSS class applied to a HTML element of the view).
+- BUG FIXING: after znetdkMobile.navigation.addRowCountToHorizontalMenuItem()
+  method call, the horizontal menu items could be displayed on an extra line and
+  so they could hide the view content.
+- BUG FIXING: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  after removing a filter tag applied to a znetdkMobile.list element, the space
+  was not totally released at the top of the list.
+- BUG FIXING: after calling the \Response::setFileToDownload() method, the
+  response header Content-Type was not set properly for downloaded pictures when
+  its file extension was in upper case and when the '$downloadedFilename'
+  parameter was not specified.
+- BUG FIXING: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  when saving a user profile, the parent menu items of the selected menu items
+  were not stored. As a result, parent menu items were not displayed in the
+  navigation verticial menu for users who were assigned the profile.
+- BUG FIXING: select HTML element did not gain focus when calling
+  znetdkMobile.form.setFocus() method.
+
+ZnetDK 2.2, 2020-05-25
+-----------------------
+- CHANGE: extra logs added to the /engine/log/system.log file when the
+  CFG_AUTOEXEC_LOG_ENABLED parameter is set to TRUE. Now, the command line
+  executed as background process, the console output and the result code are
+  also traced.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'), if
+  a view contains a HTML element with the 'zdk-viewreload' CSS class, then the
+  content of the view is reloaded each time the view is displayed.
+- CHANGE: the 'znetdkMobile.form' setFocus() and setFocusOnFirstInput() methods
+  now set focus to html textarea and select elements in addition to input
+  elements.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile') when
+  adding a new user, the expiration date is set to the today date by default and
+  the user is enabled by default.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'),
+  users and profiles can be removed now through the new 'Remove' button.
+- CHANGE: for the mobile page layout only (CFG_PAGE_LAYOUT set to 'mobile'), a
+  Fontawesome warning icon is added to the form error messages. In addition, the
+  form is scrolled to top to ensure the visibility of the form error message.
+- BUG FIXING: in PHP version 7.2, E_WARNING errors were traced into the
+  ./engine/log/errors.log when calling the \Request::getUploadedFileInfos().
+  The error message were as below:
+  count(): Parameter must be an array or an object that implements Countable -
+  ..\engine\core\request.php(351).
+- BUG FIXING: in PHP version 7.3, when the CFG_AUTO_MINIFICATION_METHOD
+  parameter was set into the 'config.php' of the application, the error message
+  "Access to undeclared static property... in ..\dependencies.php on line 164"
+  was displayed on main page loading.
+- BUG FIXING: E_WARNING errors were traced into the ./engine/log/errors.log on
+  PHP 'include' by the ZnetDK 'response.php' script when the view to include
+  called the ZnetDK \ErrorHandler::restart() method.
+- BUG FIXING: the 'textarea' and 'select' HTML fields were wrongly editable
+  after calling the znetdkMobile.form.setReadOnly() method.
+- BUG FIXING: when displaying the user form of the 'mobile' page layout (see
+  'z4musers.php'), the list of profiles was loaded twice through AJAX request
+  instead of once.
+- BUG FIXING: the decimal separator of a float number stored in session through
+  the \UserSession::setCustomValue() method, was missing next when retrieving
+  the float number value calling the \UserSession::getCustomValue() method.
+- BUG FIXING: JavaScript exception thrown when the value returned by the remote
+  PHP controller for a checkbox or radio button input is empty, on calling the
+  znetdkMobile.form.load() method.
+- BUG FIXING: the 'selectItemByValue' method of the zdklistbox widget selected
+  the last item of the list when the specified value was missing. Now, no item
+  is selected if the specified value does not exist.
+- BUG FIXING: the selected value of a zdklistbox widget was not read and set
+  by the ZnetDK form widget when the listbox was declared in HTML without the
+  'multiple' property (case of unique selection).
+- BUG FIXING: on the ZnetDK Demo 'try theme' page, the application theme can't
+  be longer changed. In addition, the 'asphalt', 'flat-blue', 'flat-two' and
+  'greensea' themes can't be applied.
+- BUG FIXING: the error message "The multiple input element with name='myinput'
+  is not supported!" was displayed into the browser console when calling the
+  znetdkMobile.form.getInputValue() method with a radio button input name as
+  parameter while no radio button was selected. Now, the null value is returned
+  instead and no error message is longer triggered.
+
+ZnetDK 2.11, 2019-10-30 (patch)
+-------------------------------
+- BUG FIXING: error "Fatal error: Uncaught exception 'LogicException' with
+  message 'Class General could not be loaded'..." on some hosting servers like
+  the "Pages Perso Free". This error occurs when the setting of the
+  'include_path' PHP configuration option is not allowed through the
+  'set_include_path()' PHP function.
+
+ZnetDK 2.1, 2019-10-07
+----------------------
+- CHANGE: the 'autocomplete' HTML attributes are set to 'username' and
+  'current-password' into the login form to allow the web browser to memorize
+  the credentials.
+- CHANGE: data-icon attribute added to the 'custom' layout menu hyperlink for
+  display. The data-icon value is set from the icon value indicated into the
+  'menu.php' script by calling the \MenuManager::addMenuItem() method.
+- CHANGE: new page layout dedicated to mobile applications enabled when the
+  CFG_PAGE_LAYOUT paramater is set to 'mobile' into the 'config.php' script of
+  the application. For full documentation, go to the mobile.znetdf.fr website.
+- CHANGE: new 'action_detail' method added to the ZnetDK \Profile controller
+  class to get detailed informations of a user profile through an AJAX call.
+- CHANGE: new 'action_detail' method added to the ZnetDK \Users controller
+  class to get detailed informations of a user through an AJAX call.
+- CHANGE: new \SimpleDAO ZnetDK class for selecting and updating a table content
+  in database without the need of declaring a custom DAO class. This new DAO
+  object is perfect for executing simple operations on one SQL table.
+- CHANGE: additional CSS and JavaScript librairies can be added to a ZnetDK
+  application through the CFG_APPLICATION_CSS and CFG_APP_JS parameters set into
+  the 'config.php' application script. These libraries can be CDN libraries
+  hosted out of the machine hosting the ZnetDK application. To set multiple
+  libraries, declare them using a PHP serialized array.
+- CHANGE: the filename of a CSS or JavaScript internal librairies is now
+  suffixed by a timestamp value (i.e. '/mypath/mylib.js?v=12545656') calculated
+  from its modification date and time. So, newly modified server-side libraries
+  get reloaded if they are newer than those existing in the web browser cache.
+- CHANGE: an offline page is displayed when calling in HTTP GET the resource
+  http(s)://mydomain/offline. The offline page content can be customized by
+  adding a 'offline.php' view into the 'applications/default/app/view' folder.
+- CHANGE: new 'action_isconnected' method added to the ZnetDK \Security
+  controller class to check through an AJAX call if the user's session has not
+  expired. This controller action can be called for example, before downloading
+  a document for which authentication is required.
+- CHANGE: the input fields with 'search' type are now instantiated by the
+  znetdk.initCommonWidgets() JavaScript method.
+- CHANGE: in the root .htaccess file of ZnetDK, the 404 HTTP errors are now
+  managed using the rewrite engine module if installed rather than using the
+  ErrorDocument 404 directive.
+- BUG FIXING: on some Linux Hosting systems, the following MySQL error message
+  "Invalid datetime format: 1366 Incorrect integer value" was displayed when
+  calling the ZnetDK \DAO::store method with boolean type values set to false
+  for storage in a MySQL table column with an integer datatype.
+- BUG FIXING: the title bar of the ZnetDK modal dialog widget was sometimes
+  masked when instantiated with the 'zdk-modal-maximizable' class or the
+  'data-zdk-autoheight' HTML attribute.
+- BUG FIXING: an error 404 was displayed when calling a PHP view with the SEO
+  url specified into 'menu.php' script through the \MenuManager::addMenuItem()
+  method (case of the CFG_VIEW_PAGE_RELOAD parameter set to TRUE into the
+  'config.php' of the application).
+- BUG FIXING: the Font Awesome icon was positioned too high into the Dialog
+  widget title bar.
+- BUG FIXING: the 'type="text/javascript"' attribute of the HTML script tag
+  is no longer specified to avoid the following W3C validator warning error:
+  "The type attribute is unnecessary for JavaScript resources."
+- BUG FIXING: the "CORE - E_WARNING - scandir(..engine/modules): failed to open
+  dir" warning message is no longer displayed when the ZnetDK 'engine/modules'
+  directory is missing.
+
+ZnetDK 2.0, 2019-04-18
+----------------------
+- CHANGE: the selected files displayed by the ZnetDK Multiupload widget when
+  calling the setUploadedFiles() method can be downloaded for display in a new
+  browser tab when the url for download is specified as 'url' property in
+  addition to the 'filename' property.
+- CHANGE: 10 new mono-color widget themes (theme name prefixed by 'z-mono-').
+- CHANGE: new 'refreshIconsColor' method added to the OfficeMenu Widget for
+  refreshing the color of the menu fontawesome icons when the widget theme is
+  changed on the fly.
+- CHANGE: the PrimeUI icons of the Windows Manager Office Page Layout are
+  replaced by fontawesome icons.
+- CHANGE: when the column resizing feature is enabled for the zdkdatatable
+  widget ('resizableColumns' widget option), the width of each column when it is
+  resized, is memorized by the web browser. So, the columns are automatically
+  resized according to the memorized width each time the user connects to the
+  application and display again the concerning datatable.
+- CHANGE: new CFG_DOWNLOAD_AS_POST_REQUEST_ENABLED config.php parameter allowing
+  when it is set to TRUE, to download a file calling the standard ZnetDK
+  Response::setFileToDownload() method while the HTTP request is sent using the
+  POST method. By default, only the HTTP GET method is allowed to download a
+  file.
+- CHANGE: new 'data-zdk-allvalues' HTML attribute added to the zdkform widget.
+  So the empty data are also sent as POST parameters to the PHP controller
+  action when the form is submited while the 'data-zdk-allvalues' HTML attribute
+  is set to 'true' for the form element.
+- CHANGE: new CFG_AUTO_MINIFICATION_METHOD parameter for setting the method
+  to call when the module CSS and JS files are to be minified before adding
+  them as minified CSS and JS dependencies into the application HTML main page.
+- CHANGE: new ZnetDK \General::isW3cDateValid() method for checking if a
+  W3C date in string format ('Y-m-d') is valid or not.
+- CHANGE: new ZnetDK \General::encrypt() and \General::decrypt() methods for
+  encrypting and decrypting data.
+- CHANGE: application or module controller actions now can be executed
+  asynchronously thanks to the new \AsyncExec::submitActionToLaunch() method.
+  To enable this feature, the asynchronous controller action name must be
+  returned as an array by the 'setAsynchronousActions()' protected method of
+  the application or module controller (derived from \AppController).
+  In addition, the new CFG_ASYNCEXEC_PHP_BINARY_PATH parameter is to customize
+  according to the Operating System where the web application is
+  deployed (see 'engine/core/config.php' inline comments for details). Finally,
+  the asynchronous process execution is traced into the 'engine/log/system.log'
+  file when the CFG_ASYNCEXEC_LOG_ENABLED parameter is set to TRUE.
+- BUG FIXING: the dialog content height was not adjusted automatically according
+  to the wiewport height on ZnetDK dialogs with the 'autoHeight' option enabled.
+- BUG FIXING: 'Allowed memory size of xxxx bytes exhausted...' error message
+  when downloading big files beacause the file buffering was enabled (the file
+  to download was fully loaded in the memory of the hosting system before being
+  output it in the HTTP response).
+- BUG FIXING: on the ZnetDK Picklist widget, the wrong icon 'fa-angle-right' was
+  displayed instead of the 'fa-angle-left' icon for removing an item from the
+  right-hand list.
+- BUG FIXING: message 'E_STRICT - Only variables should be passed by reference'
+  traced into the ZnetDK engine/log/errors.log file by the
+  Request::getRemoteAddress() method when reverse proxy is configured on the
+  hosting system.
+
+ZnetDK 1.9, 2018-08-21
+----------------------
+- CHANGE: new CFG_HTTP_BASIC_AUTHENTICATION_ENABLED parameter allowing to
+  authenticate a user by the HTTP basic authentication method when executing
+  a controller action as a web service (only by HTTP POST request).
+  Example of URL for executing the 'myctrlr::action_dostuff' controller action:
+  https://user:pwd@mydomain.com/?control=myctrl&action=dostuff.
+  The specified credentials must match an existing user otherwise a 401 HTTP
+  error is returned and an error message is added to the ZnetDK errors.log file.
+  For security purpose, the CFG_ACTIONS_ALLOWED_FOR_WEBSERVICE_USERS parameter
+  must be defined for limiting the controller action that a user can execute
+  when it is authenticated by the basic authentication method. For example:
+  define('CFG_ACTIONS_ALLOWED_FOR_WEBSERVICE_USERS',serialize(array(
+         'user1|controller1:doaction1', 'user2|controller2:doaction2')));
+- CHANGE: refresh button added to the 'users' view for updating the datatable
+  content.
+- CHANGE: new localized button labels LC_BTN_APPLY and LC_BTN_VALIDATE.
+- CHANGE: new \General::compareAmounts($amount1, $amount2) for comparing two
+  amounts specified as string.
+- CHANGE: when the user changes her or his password, the LC_MSG_INF_PWDCHANGED
+  message is set for the 'message' array key specified as parameter to the
+  overloaded 'loginResult' method called for tracing the user connections to
+  the application.
+- CHANGE: the authentication 'Profiles' datatable is enhanced by the display of
+  tooltips on the 'Profile' and 'Description' columns and the capability of
+  resizing the column width.
+- CHANGE: the authentication 'Users' view is enhanced with a new search field
+  for searching users by their name, login and assigned profile name.
+  In addition, the user datatable can be paginated to display only 10, 20 or 100
+  rows. Finally, the 'Profiles' column content is now multi-lines for a better
+  readability of the profiles assigned to a user when they are numerous.
+- CHANGE: new 'resetSortLabel' option and 'data-zdk-resetsortlabel' HTML
+  attribute added to the 'zdkdatatable' widget for adding a button on the
+  datatable header when a sortable column is clicked. The button label is the
+  one specified for the new option or attribute. The LC_BTN_RESET_SORT PHP
+  constant can be used for labelizing this button. When clicking on this new
+  button, the datatable rows are sorted applying the default sort order applied
+  before having clicked on a datatable column.
+- CHANGE: the user panel displayed when clicking on the login name from the
+  application banner is enlarged for best display of long user email addresses.
+- CHANGE: new 'setReadOnly(readOnly)' method added to the ZnetDK Form widget for
+  enabling or disabling the user keyboard entry of the input elements located
+  within the data form.
+- CHANGE: the icons' buttons displayed on the user confirmation dialog when
+  calling the znetdk.getUserConfirmation() javascript method, are replaced by
+  Fontawesome icons.
+- CHANGE: the attribute 'autocomplete' is set to 'off' when instantiating a
+  ZnetDK InputDate widget for avoiding the display of some date suggestions by
+  the web browser over the jQuery UI Datepicker calendar.
+- CHANGE: a fontawesome icon now can be set to the Dialog widget title bar (on
+  the left of the dialog title text) by setting the 'data-icon' attribute to the
+  the dialog div element.
+- CHANGE: when the application is configured with the CFG_PAGE_LAYOUT parameter
+  set tot 'office', the fontawesome icon defined for the navigation menu item is
+  now also displayed on the dialog title bar of the corresponding view.
+- CHANGE: the icon and menu item label displayed for the 'office' page layout
+  menu are enlarged (class 'fa-lg' set to the icon and 15px font size set to the
+  label).
+- CHANGE: the red warning icon displayed when an error is displayed into a
+  ZnetDK form widget is replaced by a fontawesome icon.
+- CHANGE: when the application is configured with the CFG_PAGE_LAYOUT parameter
+  set tot 'office', the height of the dialog containing the view is fixed to the
+  maximum height of the client area if any HTML element within the wiew has the
+ 'zdk-view-maxheight' CSS class.
+- CHANGE: new 'zdk-modal-maximizable' CSS class allowing to set a ZnetDK modal
+  dialog as maximizable. When the modal dialog is set maximizable, its maximized
+  state is memorized into the web browser local storage and its content is
+  scollable in case of overflow.
+- CHANGE: new getRowData() public method added to the ZnetDK datatable widget
+  for retrieving the internal data of the specified datatable row element.
+- CHANGE: styling classes are added to each cell of the header and body ZnetDK
+  datatable widget rows with the 'zdk-col-' prefix followed by the 'field' value
+  set for the columns definition. By this way, the column styling is simplified
+  for setting the alignment and the width.
+- CHANGE: the dialog displayed when calling the znetdk.getUserConfirmation()
+  method is no longer closable otherwise than by clicking on the yes or no
+  button.
+- CHANGE: new ZnetDK Fullscreen widget allowing to display in full screen a
+  web browser client area HTML element.
+- CHANGE: the UserManager::getUsersHavingProfile() method now returns all the
+  user informations stored in database (initially just the user ID and username
+  were returned).
+- CHANGE: new optional parameter '$sortCriteria' added to the
+  UserManager::getUsersHavingProfile() method for getting back the users sorted
+  according to the specified sort criteria.
+- CHANGE: new 'data-zdk-autowidth' HTML attribute and 'autoWidth' option added
+  to the ZnetDK autocomplete widget for setting the suggestion panel width
+  according to its content width.
+- CHANGE: now the \Request::getRemoteAddress() method returns the user IP
+  address reading first the 'HTTP_X_FORWARDED_FOR' server parameter for taking
+  in account the case of users connected through a proxy server. If the
+  'HTTP_X_FORWARDED_FOR' is not set, the 'REMOTE_ADDR' server parameter is used
+  instead.
+- CHANGE: new ZnetDK Picklist widget based on the PrimeUI Picklist widget.
+  The picklist is automatically instantiated when declared within a ZnetDK form
+  with the 'zdk-picklist' CSS class. The 'data-zdk-action' HTML5 attribute set
+  for the picklist DIV element allows to load the source and target lists from
+  the remote PHP controller action.
+- CHANGE: new 'getInputValues' method added to the ZnetDK form for retrieving
+  the value(s) of the specified input name.
+- CHANGE: the DAO::$tableAlias property is now automatically applied to the
+  SQL DELETE statement generated by the DAO::remove method when the table alias
+  prefixes a column name in the DAO::$filterClause property while multiple rows
+  are to be removed (the $rowID parameter is set to NULL when calling the
+  DAO::remove method).
+- BUG FIXING: the server name into the application URI returned by a call to the
+  General::getApplicationURI() method was empty on some hosting system.
+- BUG FIXING: when a ZnetDK modal dialog was declared with the
+  'confirmationOnClose' option that contained more than one data form, the
+  confirmation message when exiting the dialog without saving was not displayed
+  while the data had been modified into the second or following data form.
+- BUG FIXING: the edit dialog was displayed when double-clicking on a datatable
+  row while the edit button was not declared within the ZnetDK action bar.
+- BUG FIXING: the URL rewriting mechanism enabled when the CFG_VIEW_PAGE_RELOAD
+  parameter is set to TRUE, did not work on some hosting system by reading the
+  REDIRECT_URL server variable. So, the HTTP request original URL is now
+  retrieved from the REQUEST_URI server variable that works generally for all
+  hosting systems.
+
+ZnetDK 1.8, 2017-12-15
+----------------------
+- CHANGE: new 'silent' parameter added to the 'uncheck' method of the PrimeUI
+  Checkbox widget for disabling the 'change' events triggering when it is set
+  to true.
+- CHANGE: new CFG_SQL_PORT parameter for setting the port number where the MySQL
+  database server is listening.
+- CHANGE: new CFG_SEARCH_ENGINES_INDEXING_ENABLED parameter for preventing the
+  indexing and listing of a ZnetDK application by the web search engines.
+- CHANGE: the DAO::$result property declaration is changed from 'private' to
+  'protected' for giving access to the derived classes.
+- CHANGE: the 'fieldValueTriggered' column property of the ZnetDK datatable
+  widget is no longer mandatory. So, the 'icon' column property can be set
+  alone for display purpose only.
+- CHANGE: the ZnetDK form widget displays now the multiple messages returned
+  by the controller action called on submit. The multiples messages must be
+  returned in the AJAX response within the 'multi-messages' property as an array
+  of JavaScript objects mathing to 'znetdk.multiMessages()' method's parameters.
+- CHANGE: the ZnetDK standard button icons are replaced by the FontAwesome
+  icons.
+- CHANGE: when calling the 'showCustomError' zdkform method with an empty
+  message while an error message is displayed, the currently displayed error
+  message is hidden.
+- CHANGE: new Font Awesome 'key' icon displayed on the change password button
+  when clicking on the user login name from the application banner.
+- BUG FIXING: when a ZnetDK form widget contained a PrimeUI checkbox widget,
+  the form state was wrongly set to 'modified' after the call of the form 'init'
+  method.
+- BUG FIXING: the horizontal scroll bar is forced to hidden for textarea widget.
+- BUG FIXING: the 'modified' state of the ZnetDK form widget was not updated
+  after radio button selection changes.
+- BUG FIXING: the panel of the Autocomplete widget could be displayed out of the
+  screen view port.
+- BUG FIXING: the \Request::getRemoteAddress() method could return a NULL value
+  on some hosting servers.
+- BUG FIXING: error message "cannot call methods on zdkmodal prior to
+  initialization; attempted to call method 'show'" displayed when calling the
+  znetdk.showModalDialog while only one HTML form element exists in the DOM
+  after loading the view.
+- BUG FIXING: the PrimeUI notify widget used to display critical error messages
+  can now display long messages without they being truncated.
+- BUG FIXING: the dialog widget was positioned out of the viewport in the case
+  of a document overflow while it was declared with the 'autoheight' attribute.
+- BUG FIXING: after disabling and enabling the PrimeUI Dropdown widget, the
+  selection of the next or previous element with the arrow keys did not work
+  properly.
+
+ZnetDK 1.7, 2017-05-20
+----------------------
+- CHANGE: the 'crypt' PHP function is no longer called for hashing and verifying
+  the user passwords. It is replaced by a call to the 'password_hash' and the
+  'password_verify' functions for compatibility purpose with PHP 5.6 and higher.
+  The 'login_password' column size is enlarged to 255 characters in the
+  'zdk_users' SQL table when it is generated for a new application using the
+  Application Wizard.
+- CHANGE: the fontawesome icons are updated to the version 4.7.
+- CHANGE: new UserManager::getUserInfosById method allowing to select the user
+  informations from her or his database identifier.
+- CHANGE: new UserManager::getUserInfosByName method allowing to retrieve user
+  informations from her or his name.
+- CHANGE: the values set to the '\Response' object from a controller action can
+  now be retrieved thanks to the arrow operator (i.e '->').
+  For example:
+       $myResponse = new \Response();
+       $myResponse->myValue = 'Hello';
+       $myResponse->myOtherValue = $myResponse->myValue . ' world!';
+- CHANGE: new 'setValues' method added to the ZnetDK form widget. This method
+  initializes the data form as done by the 'init' method but the form is not
+  reset. So existing data are preserved into the form.
+- CHANGE: new 'General::writeSystemLog' method for tracking system events in the
+  system.log file. The log file is defined into the config.php script through
+  the new 'CFG_ZNETDK_SYSLOG' parameter.
+- CHANGE: new "autoexecution" feature allowing to launch asynchronously
+  an application controller action at periodical intervals. To enable this
+  capability, a controller named 'autoexec' with a static method named 'main'
+  have to be declared within the application or within a module. In addition,
+  the CFG_AUTOEXEC_PHP_BINARY_PATH new parameter has to be customized according
+  to the Operating System where the web application is deployed. The
+  CFG_AUTOEXEC_FREQUENCY parameter allows you to fine tune the frequency for
+  triggering the 'autoexec' action. Finally, the CFG_AUTOEXEC_LOG_ENABLED allows
+  to track the 'autoexec' process when thrown by setting its value to TRUE.
+- CHANGE: when the 'autoHeight' option is set to 'true' for the Dialog widget,
+  now the dialog adjusts its height automatically when the viewport is resized,
+  particularly when the orientation is changed on a tablet or mobile device.
+- CHANGE: new 'data-zdkerrmsg-step' HTML5 attribute that can be added to an
+  input HTML element of type 'number' to cutomize the error message to display
+  when a 'stepMismatch' error is detected by the web browser on form data
+  validation.
+- BUG FIXING: when a JavaScript object is passed to the 'znetdk.request' method
+  for the 'data' property, its string values are now encoded for replacing its
+  special characters (i.e. / ? : @ & = + $ #) with their encoded version
+  suitable for URI representation.
+- BUG FIXING: when several inputs were declared into a ZnetDK form with the same
+  HTML attribute 'name', the input shown in error on form validation was allways
+  the first element of the form matching the 'name' attribute. Now, if for
+  example the third input with the same 'name' no validates, it is correctly
+  identified in error with a red frame around it.
+
+ZnetDK 1.6, 2017-02-21
+----------------------
+- CHANGE: new 'data-zdk-delay' HTML5 attribute added both to the ZnetDK
+  Actionbar and Autocomplete widgets to set the 'delay' option in milliseconds
+  before sending the AJAX request to the server to get suggestions.
+- CHANGE: the 'setAllowedActions' method can be declared in a ZnetDK application
+  controller to restrict the execution of its actions according to the profile
+  definition of the connected user. Within the 'setAllowedActions' method, the
+  'AppController::setRequiredProfileForAction' parent method is called to set
+  the user profile required by the connected user to execute the specified
+  action. In addition, the 'AppController::setForbiddenProfileForAction' parent
+  method can be called to set the profile that the connected user must not have
+  to execute an action. Finally, the 'AppController::isActionAllowed' method can
+  be called for example from a ZnetDK view, to add or not add an HTML button
+  that matches a specific controller's action, according to the profile
+  restrictions set through the 'setAllowedActions' method.
+- CHANGE: new 'dataloaded' event triggered by the ZnetDK Tree widget after its
+  data loading from the remote controller.
+- CHANGE: the 'menu_id' column length of the 'zdk_profile_menus' table is
+  extended to 50 characters. The new version 1.3 of SQL script named
+  'znetdk-security-1.3.zip' can be downloaded from the official website page
+  located at 'www.znetdk.fr/telechargements'.
+- CHANGE: new 'LC_HEAD_ICO_LOGO' constant for specifying the image file to
+  display as the 'favicon' of the application. If not set, the image indicated
+  for the 'LC_HEAD_IMG_LOGO' constant is displayed instead.
+- CHANGE: new 'Convert::toDecimalForDB' method to convert a number in string
+  format to a formated number suitable for storage in the database.
+- CHANGE: new 'UserManager::getUsersHavingProfile' method for retrieving the
+  users having the specified profile name in parameter.
+- CHANGE: new 'UserManager::hasUserMenuItem' method for checking if a user has
+  access to the specified menu item.
+- CHANGE: new '\Controller\Users::hasMenuItem' method for checking if the
+  connected user has access to the specified menu item.
+- CHANGE: the 'Security::loginResult' method is called each time a user try to
+  connect to the application. This method can be defined in the application to
+  track in a log the users connections informations.
+- CHANGE: new HTML5 'data-zdk-cols-resize' attribute added to the ZnetDK
+  Datatable widget. When set to 'true', the table columns are resizable.
+- CHANGE: new HTML5 'data-zdk-multiselect' attribute added to the ZnetDK
+  Datatable widget. When set to 'true', multiple table rows can be selected.
+- CHANGE: a jQuery UI or Font Awesome icon can be added to the ZnetDK Datatable
+  cells by setting the two new properties 'icon' and 'fieldValueTriggered'
+  in the column definition. When the icon is clicked, the 'iconclick' event
+  is triggered with the value matching the field entered for the
+  'fieldValueTriggered' property.
+- CHANGE: new 'autoHeight' option added to the Dialog widget. When set to true,
+  the height of the dialog is adjusted to the browser window height. So, the
+  dialog can be used for mobile applications.
+- CHANGE: new 'aftershow' event sent by the GenericMenu widget once the view is
+  displayed. In the event handler, the second parameter contains the displayed
+  view name.
+- CHANGE: new 'setCriteria' method added to the ZnetDK Autocomplete widget to
+  set the criteria to send in AJAX to the PHP controller in order to limit the
+  suggestions to the specified criteria.
+- CHANGE: new 'empty' method added to the ZnetDK datatable widget to remove
+  all the rows it contains.
+- CHANGE: a third parameter named '$downloadedFilename' is added to the
+ '\Response::setFileToDownload' method for specifying the name of the downloaded
+ file. By default, the base name set for the $filepath parameter is used to name
+ the downloaded file.
+- CHANGE: new 'DAO::isForUpdate()' méthod added for checking if the 'FOR UPDATE'
+  SQL CLAUSE is set for a DAO.
+- CHANGE: tooltips and '...' ('ellipsis' in CSS) are now displayed on the user
+  datatable for the following columns: 'user_name', 'user_email' and
+  'user_profiles'.
+- BUG FIXING: the focus was not automatically set on the 'textarea' widget when
+  it was declared within a ZnetDK Dialog widget. Now, if a 'textarea' is the
+  first visible and enabled input element into a dialog, the focus is set on it
+  automatically after display of the dialog. The focus can also be forced to
+  a textarea by adding the 'zdk-autofocus' CSS class to its HTML definition.
+- BUG FIXING: when 'enable' and 'disable' methods are called for the ZnetDK
+  Dropdown widget, the HTML 'disabled' property is accordingly set for the
+  hidden HTML 'select' element. So, when the Dropdown widget is declared in a
+  ZnetDK dialog, it is no longer automatically focused if it has been previously
+  disabled.
+- BUG FIXING: the message 'CORE - E_NOTICE - Undefined variable:
+  doesPasswordChanged' was added to the 'errors.log' file when updating a user
+  account without changing its password.
+- BUG FIXING: the error message 'The profile 'profile name' already exists with
+  the same name!' was displayed when trying to rename a user profile.
+- BUG FIXING: the '\Convert::W3CtoLocaleDate' method returned the current date
+  when an empty value was set as parameter. Now a NULL value is returned instead.
+- BUG FIXING: when a radio button group is reset, the radio buttons within the
+  group are now systematically enabled if they were previously disabled by a
+  call to the 'disable' method of the 'puiradiobutton' widget. The 'disabled'
+  property is not supported for the radiobutton widget (the widget must be
+  explicitely disabled by JavaScript code.
+
+ZnetDK 1.5, 2016-11-04
+----------------------
+- CHANGE: new config.php SQL parameter named 'CFG_SQL_TABLE_REPLACE_PREFIXES'
+  for replacing default SQL table prefixes to new table prefixes (for example,
+  to change the 'zdk_' and 'myapp_' prefixes to the 'new_' prefix, set the value
+  serialize(array('zdk_'=>'new_', 'myapp_'=>'new_')) to the
+  'CFG_SQL_TABLE_REPLACE_PREFIXES' parameter). So now, multiple ZnetDK
+  applications can be hosted within a single MySQL database. The table prefixes
+  are automatically replaced by those mentioned in the new config.php parameter
+  while calling the 'DAO::store', 'DAO:remove', 'DAO:getResult', 'DAO:getById'
+  and 'DAO::getCount' methods.
+- CHANGE: when a network error occures while executing an AJAX request, a
+  user friendly message is now displayed inviting the user to retry his last
+  action (see new LC_MSG_ERR_NETWORK language label).
+- CHANGE: when an HTML input element with 'type' attribute equal to 'time'
+  is declared within a ZnetDK form, it is automatically instanciated as a
+  PrimeUI Inputtext.
+- CHANGE: new 'rowremoved' event triggered by the ZnetDK action bar when a row
+  is successfully removed in the associated datatable.
+- CHANGE: new 'resetdone' event triggered by the ZnetDK form when the form is
+  reset.
+- CHANGE: new 'Multiupload' ZnetDK widget designed for selecting multiple files
+  to upload.
+- CHANGE: new 'znetdk.getLocalSettings' and 'znetdk.storeLocalSettings'
+  JavaScript methods to read/write values from/into the web browser local
+  storage.
+- CHANGE: when a submit button is pressed while it is located within a ZnetDK
+  form, its value is now sent to the remote controller action with the rest of
+  the form data. The button must be declared with the 'name' and 'value' HTML
+  attributes.
+- CHANGE: The validation error message displayed in a ZnetDK form is now hidden
+  when the user changes the value of the input in error.
+- CHANGE: the new 'ZDK_REDIRECT_APPL_UNKNOWN' parameter is added to the
+  'globalconfig.php' configuration script. The HTTP request is now temporarily
+  redirected to the URL set for this parameter when the 'default' application
+  does not exist or when the application passed through the 'appl' or 'tool' url
+  parameter does not exist.
+- CHANGE: the widget theme now can be set dynamically by declaring in a ZnetDK
+  application or module, a custom static public method named
+  'Users::getUserTheme' in charge of returning the theme name to display.
+- CHANGE: new '\Validator::setCheckingMissingValues' method for checking missing
+  value by the derived validation methods.
+- CHANGE: new '\Validator::setValues' method for setting values from an array.
+  So, data other than the ones provided by an HTTP request can now be validated.
+- CHANGE: the '\Validator::initOptionalVariables' method is no longer declared
+  as abstract and then, its declaration becomes optional in any derived class.
+- CHANGE: new 'getMessageWithoutCode' method added to the 'ZDKException' class
+  to retrieve the exception message without the error code for a better user
+  friendly display.
+- CHANGE: new 'setCurrentDate' method added to the Inputdate widget to
+  initialize its date field with the current date or the calculated date from
+  the current date (i.e "+15d", "+2m", "+1y").
+- CHANGE: the session identifier of an application include now its relative uri.
+  So, multiple 'default' applications located on a same server machine can now
+  be accessed from the same web browser without conflict.
+- CHANGE: new 'suspend' method added to the autocomplete widget to disable the
+  autocompletion mechanism.
+- BUG FIXING: the default option value set through the 'data-zdk-value'
+  attribute, was not selected for the ZnetDK Dropdown after a form reset.
+- BUG FIXING: the ZnetDK modal dialog is now automatically closed only if the
+  last submit button pressed has the 'zdk-close-dialog'.
+- BUG FIXING: the '\Convert::toMoney' method returned zero when a null value
+  was passed in parameter. By now, a null value is returned instead.
+- BUG FIXING: the default form validation message displayed for the InputHtml
+  widget when empty is now 'A value must be entered!' instead of 'A value must
+  be selected!'.
+- BUG FIXING: the asterisk character was not displayed for the Inputhtml widget
+  label when the 'data-required' was set to 'true'.
+- BUG FIXING: an HTTP GET 404 error was displayed in the web browser console
+  while downloading the 'ui-icons_FFFFFF_256x240.png' resource of the 'z-w10'
+  theme when enabled.
+
+ZnetDK 1.4, 2016-08-17
+----------------------
+- CHANGE: 6 new widget themes added to this version. See the following themes
+  on www.demo.znetdk for demonstration: 'z-bluegrey', 'z-cyan', 'z-funny',
+  'z-hot-sneaks' (updated version of the 'hot-sneaks' original theme), 'z-teal'
+  and 'z-w10'.
+- CHANGE: new 'InputHtml' ZnetDK widget that can be added to a ZnetDK Form to
+  display and edit multiline text in HTML format.
+- CHANGE: ZnetDK modules can now be developed and installed in the
+  'engine/modules' directory to extend the core facilities. Some modules will be
+  soon published on the www.znetdk.fr website.
+- CHANGE: new 'znetdk.multiMessages' JavaScript method that displays several
+  UI messages through the PrimeUI Growl widget.
+- CHANGE: the number of rows to display in a Datatable widget is now memorized
+  each time it is changed by the user from the ActionBar widget. This number
+  is stored locally (HTML5 local storage feature) and is read when the user come
+  back to the application and access to the view containing the Datatable and
+  ActionBar widgets.
+- CHANGE: new warning icon displayed when the 'znetdk.getUserConfirmation()'
+  method is called.
+- CHANGE: new 'zdk-nothumbnail' CSS class used by the InputFile widget to hide
+  the image thumbnail when a file is selected (the image thumbnail is displayed
+  by default).
+- CHANGE: new 'data-zdk-icon' HTML5 attribute added to the InputFile widget to
+  specify the icon displayed for the file selection button.
+- CHANGE: new 'zdk-nosubmit' CSS class that can be applied to the InputFile
+  widget in order to disable the file upload on a form submit event. So, the
+  selected file is uploaded independently of the form submitting.
+- CHANGE: new 'zdk-autoupload' CSS class that is applied to the InputFile widget
+  and that specifies that the file upload is to be triggered automatically when
+  a file is selected.
+- CHANGE: the 'title' attribute text specified for the 'input' element of an
+  InputFile widget is now set to the file selection button for display as
+  tooltip.
+- CHANGE: new 'reset' event triggered by the Inputfile widget when the remove
+  selection button is clicked on.
+- CHANGE: new 'setUploadedFile' method that can be called to initialize the
+  Inputfile widget from a JavaScript object and so display the thumbnail and
+  filename of the file previously uploaded.
+- CHANGE: new 'loadOnCreate' option and 'data-zdk-loadoncreate' attribute
+  added to the ZnetDK Dropdown widget. When set to 'no', the widget's items
+  are not loaded from a remote PHP controller action when the Dropdown is
+  instantiated. Instead, the items are loaded for the first time when the
+  'refresh' or 'selectValue' method is called.
+- CHANGE: the '\Convert::W3CtoLocaleDate' PHP method accepts a W3C date followed
+  by a time with a 'HH:MI:SS' format. The time is now kept once the date is
+  converted.
+- CHANGE: the '\General::getCurrentW3CDate' method accepts the new parameter
+  '$withTime'. When set to TRUE (FALSE by default), the current time is also
+  returned by the method.
+- CHANGE : new '\General::getMimeType' PHP method that returns the MIME type of
+  the specified file.
+- CHANGE: the 'DAO::store' PHP method accepts the new parameter
+  '$emptyValuesToNull' that forces empty string values to null when they are
+  saved in the SQL table.
+- CHANGE: the exception 'DAO-010' is thrown when the 'DAO::beginTransaction'
+  method is called while a transaction is already active.
+- CHANGE: new 'DAO::setForUpdate' method allowing to select rows for update
+  (locking of rows).
+- CHANGE: new methods 'beginTransaction', 'inTransaction', 'rollback' and
+  'commit' added to the PHP '\Database' class.
+- CHANGE: new event 'beforesubmit' sent by the ZnetDK form widget before
+  submitting the data form to validation. This event is usefull for doing extra
+  initialization into the form before validating its data and sending them to
+  the remote controller.
+- CHANGE: new event 'disconnected' sent when the user is disconnected (click on
+  the header 'Logout' link or the 'Cancel' button of the login dialog).
+- BUG FIXING: the label elements declared in a ZnetDK form with the 'zdk-textvalue'
+  CSS class are now emptied when the data form is reset.
+- BUG FIXING: when an http error is thrown in response to a GET request while
+  the CFG_VIEW_PAGE_RELOAD parameter is set to FALSE, the response is returned
+  in HTML format.
+- BUG FIXING: the 'UserSession::getCustomValue' and
+ 'UserSession::setCustomValue' methods do not longer encode quotes characters.
+- BUG FIXING: the 'zdkinputfile: unable to upload file!' JavaScript exception is
+  no longer triggered when the selected file is empty.
+- BUG FIXING: the accented characters was not properly displayed when an error
+  occured while downloading a file.
+- BUG FIXING: the 'UPL-001' exception message was misspelt.
+- BUG FIXING: the 'zdkform.getFormData()' method did not return the data of
+  the empty and disabled input fields even if the 'getEmptyInputs' parameter was
+  set to true.
+
+ZnetDK 1.3, 2016-04-12
+----------------------
+- CHANGE: new 'focusOnYes' option added to the 'znetdk.getUserConfirmation()'
+  method. When this option is set to true, the focus is given to the 'Yes'
+  button. If not set or set to false, the focus is given to the 'No' button.
+- CHANGE: the 'Action bar' and 'Datatable' widgets evolved:
+  1) If a 'Modal dialog' contains a 'Datatable' widget, it is displayed after
+  clicking on the 'Add' or 'Edit' button, only once the datatable rows are
+  loaded.
+  2) When double-clicking on a 'Datatable' row, its data are displayed in a
+  modal dialog for edition, as if the user had clicked on the 'Edit' button.
+  3) The row selected in the 'Datatable' remains selected after a data refresh
+  when the row is modified or when the user clicks on the 'Refresh' button.
+- CHANGE: the ZnetDK 'Datatable' widget can be declared with the 'tooltip'
+  property set to true for the columns where cell content has to be displayed
+  through a tooltip on mouse hover.
+- CHANGE: new parameter '$forPdfPrinting' added to the ZnetDK
+  '\api\Locale::addCurrencySymbol()', '\api\Locale::getCurrencySymbol()' and
+  '\Convert::toMoney()' methods. When specified to TRUE, the Euro currency
+  symbol returned can be printed on a PDF document created through the FPDF API
+ (the Euro character is replaced by the 'chr(128)' character).
+- CHANGE: new method '\Convert::toDecimal' allowing to convert a string decimal
+  number as a typed float number for calculation purpose.
+- CHANGE: new 'znetdk.showModalDialog' JavaScript method allowing to load by an
+  AJAX request and to display, a dialog declared in a ZnetDK view.
+- CHANGE: new labels 'LC_ACTION_ROWS_LABEL', 'LC_ACTION_SEARCH_KEYWORD_BTN_RUN',
+  'LC_ACTION_SEARCH_KEYWORD_BTN_CLEAR' and 'LC_MSG_WARN_SEARCH_NO_VALUE' were
+  added to the core 'locale_en.php', 'locale_es.php' and 'locale_fr.php'
+  scripts. These constants can be used to set the labels displayed for the
+  ZnetDK 'ActionBar' widget.
+- CHANGE: the 'Dropdown' widget evolved:
+  1) the opacity applied to the widget when disabled was increased for a better
+  visibility.
+  2) new event 'dataloaded' triggered by the widget when its items are loaded
+  from a PHP controller action.
+  3) new 'getDataOfSelectedValue' method that allows to retrieve all data of
+  the selected item, including custom extra data other than the usual 'label'
+  and 'value' data, when the widget content is loaded from a PHP controller
+  action.
+- CHANGE: new methods 'enable' and 'disable' added to the 'Autocomplete' widget.
+- CHANGE: new 'data-zdk-confirm' HTML attribute added to the 'Modal dialog'
+  widget for displaying a closure confirmation message when the user close the
+  dialog while the inner form data have been modified. Here is an example of
+  declaration: data-zdk-confirm="Do you want to cancel your changes?:Yes:No".
+- CHANGE: new 'LC_MSG_ASK_CANCEL_CHANGES' localized confirmation message
+  that can be set to the new 'data-zdk-confirm' HTML attribute of the
+  'Modal dialog' widget (see previous change description).
+- CHANGE: the 'dataloaded' event is now triggered for the 'Listbox' widget once
+  its items are loaded from a PHP controller action.
+- CHANGE: the Javascript errors thrown while a view content is initialized, are
+  now catched and an error message is displayed through the 'Notify' widget.
+- BUG FIXING: the 'Dropdown' widget was not properly displayed when disabled.
+- BUG FIXING: the 'enable' method of the 'Dropdown' widget is now executed only
+  when the widget is disabled. So, the widget's events are no longer bound
+  multiple times.
+- BUG FIXING: the 'enable' method of the 'Checkbox' widget is now only performed
+  when it is disabled. So, the widget events are no longer bound multiple times.
+- BUG FIXING: the 'enable' and 'disable' methods of the 'Inputtext' widget are
+  now only performed when the widget is disabled and enabled. So, the widget's
+  events are no longer bound multiple times. In addition, the widget's events
+  are now prefixed by the 'puiinputtext' namespace to avoid side effects when
+  the widget is overloaded by another widget like the 'Inputdate' widget.
+- BUG FIXING: the email address displayed when clicking on the login name from
+  the banner, was not properly displayed for too long email addresses.
+
+ZnetDK 1.22, 2016-03-26 (patch)
+-------------------------------
+- BUG FIXING: on some FastCGI virtualized hosting (for example on 1&1 hosting),
+  the web resources of the application html page was not displayed, due to their
+  incomplete relative path (the subdirectory path was missing after the domain
+  name). See details of this issue on the ZnetDK forum.
+
+ZnetDK 1.21, 2016-02-01 (patch)
+-------------------------------
+- BUG FIXING: ZnetDK fell into an infinite loop when it was deployed on some
+  internet hosting server with FastCgi enabled: The PHP 'filter_input'
+  statement applied to the '$_SERVER['REQUEST_METHOD']' array returns 'false'
+  instead of 'GET' or 'POST'.
+- BUG FIXING: carriage return and line feed characters were removed from the
+  POST parameters when read through the '\Request' object.
+
+ZnetDK 1.2, 2016-01-22
+----------------------
+- CHANGE: new CSV export capability:
+  1) The field separator ("," or ";") is set in the LC_LOCALE_CSV_SEPARATOR
+  locale parameter.
+  2) the 'Response::setDataForCsv()' method is called from the application
+  controller to set the data to return as a CSV file.
+- CHANGE: the DAO class evolves:
+  1) New 'DAO::$amountColumns' property that can be set from the
+  'DAO::initDaoProperties()' method to specify the columns that are to be
+  displayed as an amount. For each of them, a formated amount is returned by the
+  'DAO:getResult()' method in a new column named like the original column,
+  excepted that it is suffixed by the '_amount' string (for example
+  "mycol_amount" if the table column was originally named "mycol").
+  2) New 'DAO::setSelectedColumns()' method: when called before the
+  'DAO::getResult()' method, limits the values returned by the DAO to the only
+  specified columns in parameters.
+  3) The 'DAO::setSortCriteria()' method removes automatically the '_money',
+  '_amount' and '_locale' suffixes into the sort clause string passed in
+  parameter.
+- CHANGE: new widget themes added to ZnetDK : 'asphalt' and 'greensea'.
+- CHANGE: the 'zdkactionbar' widget evolved:
+  1) The datatable rows are now filtered when the "Enter" key is pressed while
+  the search field gets the focus.
+  2) A new 'search' event is triggered when a keyword is submitted to filter the
+  database rows and when the clear button of the search field is pressed. An
+  event handler can then fully overload the standard search process (the call to
+  the 'filterRows' method of the zdkdatatable) by returning the 'false'
+  value.
+  3) When a keyword is submitted through the search field, the entered keyword
+  is automatically selected once the datatable rows is filtered.
+  4) When the clear button of the search field is pressed, the keyboard focus is
+  now automatically set to the search field.
+- CHANGE: new 'Convert::valuesToAnsi()' method that can be called to convert a
+  UTF-8 string to an ISO-8859-1 string.
+- CHANGE: new 'zdk-autofocus' CSS class that can be added to an HTML element
+  located into a 'puidialog' widget, in order to set the focus to this element
+  when the dialog is shown.
+- CHANGE: the 'zdkdatatable' widget by now also displays the warning messages
+  returned by the application controller called to get the data rows. The
+  controller returns a warning message when the 'Response::setWarningMessage()'
+  method is invoked.
+- CHANGE: the 'selectionchange' event is no longer triggered when the 'select'
+  method of the 'puiradiobutton' widget is called. So, this event is only
+  triggered when the radio button state is changed by a user action on the UI.
+- CHANGE: new 'setFormModified' method added to the 'zdkform' widget and that
+  can be call to force the state of the form data to modified or not modified.
+- BUG FIXING: the Fontawesome icons was not displayed on IE11 when a ZnetDK
+  application was deployed over the SSL protocol (the cache properties are now
+  unset into the header response for the downloaded font files).
+- BUG FIXING: the header's dropdown used for language selection was enlarged to
+  display properly some larger language labels.
+- BUG FIXING: the text of the question displayed when calling the
+  'znetdk.getUserConfirmation()' method was not properly aligned.
+
+ZnetDK 1.11, 2015-12-19 (patch)
+-------------------------------
+- CHANGE: the 'filterCriteria' option is now taken in account by the
+  zdkdatatable widget when it is instantiated for the first time.
+
+ZnetDK 1.1, 2015-12-08
+----------------------
+- CHANGE: in the step 3 of the Application Wizard, the new option
+  "No, the access to a database is not required" allows to bypass the database
+  configuration when the application doesn't need to access to a database.
+- CHANGE: the Application Wizard creates now a new private directory named
+  'documents', that is dedicated to the storage of the electronic documents
+  uploaded and downloaded by the users. The path of this new directory can be
+  known thanks to the new 'CFG_DOCUMENTS_DIR' PHP parameter.
+- CHANGE: the conversion in JSON format of the response returned by a controller
+  action is now forced, even if the response data is not properly encoded in
+  UTF8. Nevertheless, if the conversion in JSON fails, an explicit HTTP error
+  message is returned.
+- CHANGE: new 'Users::notify' method that can be overloaded by the application
+  to send an email notification to the user when her or his account has been
+  created or when her or his password has been changed from the users manager
+  view.
+- CHANGE: the ZnetDK front controller accepts now HTTP requests sent with GET
+  method when the specified controller action is named 'download'. By this way,
+  files can be downloaded from a simple hyperlink added to a view or can be
+  displayed inline in a view, through an HTML 'iframe'.
+- CHANGE: new 'Response::setFileToDownload()' method which allows to specify
+  from the 'download' controller action, the file returned by the web server
+  for download.
+- CHANGE: new 'Response::setPrinting()' method called from the 'download'
+  controller action, for setting the FPDF printing returned by the web server.
+- CHANGE: new 'General::getURIforDownload()' method allowing to get the URL of
+  a document to download.
+- CHANGE: the ZnetDK settings consistency controls are strengthened by
+  displaying the HTTP error view with an error 500 when the
+  'CFG_VIEW_PAGE_RELOAD' parameter is set to TRUE while:
+  1) the 'CFG_AUTHENT_REQUIRED' parameter is also set to TRUE (not supported),
+  2) the 'CFG_VIEW_PRELOAD' parameter is also set to TRUE (not consistent),
+  3) the 'CFG_PAGE_LAYOUT' parameter is set to 'office' (not supported).
+  In addition, an error is traced in the ZnetDK 'errors.log' file to specify the
+  cause of the HTTP error.
+- CHANGE:  the 'zdkdatatable' widget has evolved as specified below:
+  1) When the paginator is enabled, the 'first' and 'rows' POST parameters are
+  now systematically sent to the controller's action, even when the datatable is
+  displayed for the first time. So, it's no longer necessary to test within the
+  controller's action, whether the POST pagination parameters are defined or not
+  (the pagination settings are done only one time into the view, through the
+  'data-zdk-paginator' attribute).
+  2) New method named 'selectRowByValue' that can be called to select a row from
+  its value.
+  3) The following attributes are now removed from DOM by the widget itself once
+  it is initialized: 'data-zdk-columns', 'data-zdk-action', 'data-zdk-paginator'
+  and 'title'.
+- CHANGE: the 'DAO' class has 3 new properties that can be initialized from the
+  'DAO:initDaoProperties()' abstract method:
+  1) New 'DAO::$dateColumns' property to fill in for specifying the SQL columns
+  of type 'Date' to format depending on the display language currently selected.
+  2) New 'DAO::$tableAlias' property to fill in when an alias is used into the
+  query for prefixing the main table of the DAO. This property is used by the
+  'DAO::getById()' method to prefix the column containing the identifier of the
+  row to select.
+  3) New 'DAO::$groupByClause' property to fill in with the 'GROUP BY' clause of
+  the SQL query. So, when the SQL query is executed applying custom filters, the
+  'GROUP BY' clause can be added after the SQL conditions of the query.
+- CHANGE: a warning icon is now displayed by the 'znetdk.getUserConfirmation()'
+  confirmation dialog box.
+- CHANGE: the 'znetdk.showMenuView()' method accepts a new 'options' parameter
+  that is sent to the called view by the new 'initview' event.
+- CHANGE: the derived version of the 'puidialog' widget has evolved as described
+  below:
+  1) The 'close' event is sent when the title bar close button is clicked on.
+  2) The focus is set to radio buttons only when they are selected.
+  3) The focus is also set to 'select' HTML elements.
+  4) New method 'setTitle' allowing to set the dialog title dynamically.
+- CHANGE:  the 'zdkmodal' dialog is now also closed automatically when the
+  'zdk-close-dialog' CSS class is set to buttons declared with the 'zdk-bt-yes'
+  or 'zdk-bt-no' CSS class.
+- CHANGE: the 'zdkform' widget has evolved as described below:
+  1) Values can now be displayed into the data form as a simple read only text,
+  through a DIV element declared with the class 'zdk-textvalue' and the
+  'data-name' attribute. So, when the 'init()' method of the 'zdkform' widget is
+  called, the data matching the 'data-name' attribute is displayed into the DIV
+  element.
+  2) Only the HTML buttons which are direct children of the HTML form are grouped
+  at the bottom of the form into the buttons pane. By this way, buttons declared
+  into the form and surrounded for example by a DIV element, are not selected to
+  be grouped into the form buttons pane.
+  3) New 'isFormModified()' method that can be called to know whether the data
+  of the form have been modified by the user.
+- CHANGE: a new private property named '\Response::$viewCaller' has been added
+  to identify the controller at the origin of the call of the view. This
+  property can then be read by the view to customize its display, for example
+  when the same view is used both to add and modify a business entity. In
+  addition, the '\Response::setView' gets a new parameter named '$viewCaller' to
+  specify a customized value for the '\Response::$viewCaller' property.
+- CHANGE: new conversion methods added to the '\Convert' class:
+  1) toMoney(): convert a decimal number to a money using locale settings,
+  2) toLocaleDate(): convert a 'DateTime' object to a localized date,
+  3) toW3CDate(): convert a 'DateTime' object to a W3C date,
+  4) W3CtoLocaleDate(): convert a W3C date to a localized date.
+- CHANGE: new constants added to the 'locale_fr.php', 'locale_en.php' and
+  'locale_es.php' scripts for overloading the localization settings of the
+  'setlocale()' PHP function. These new constants are LC_LOCALE_ALL,
+  LC_LOCALE_DECIMAL_SEPARATOR, LC_LOCALE_THOUSANDS_SEPARATOR,
+  LC_LOCALE_NUMBER_OF_DECIMALS, LC_LOCALE_CURRENCY_SYMBOL,
+  LC_LOCALE_CURRENCY_SYMBOL_PRECEDE, LC_LOCALE_CURRENCY_SYMBOL_SEPARATE and
+  LC_LOCALE_DATE_FORMAT.
+- CHANGE: the FontAwesome icons are shipped with this version. The 'puimenu' and
+  'puibutton' widgets now can be set both with jQueryUI and FontAwesome icons.
+- BUG FIXING: after a call to the 'zdkform.reset()' method, the input focus
+  could be set on hidden HTML input elements.
+- BUG FIXING: when the 'CFG_VIEW_PAGE_RELOAD' parameter was set to TRUE, the
+  hyperlink set for the banner logo and the 'httperror.php' view did not include
+  the 'appl' GET parameter, while executing an application other than the
+  'default' application.
+- BUG FIXING: when the PEAR framework was specified in the 'include_path'
+  parameter of the 'php.ini' file, the error "Notice: Use of undefined constant
+  CFG_ZNETDK_ERRLOG" was displayed, due to the existing PEAR '\Config.php'
+  script in conflict with the one named identically in the ZnetDK core.
+
+ZnetDK 1.0 (stable version), 2015-09-23
+---------------------------------------
+- CHANGE: The ZDK_TOOLS_DISABLED parameter definition was moved from the
+  'znetdk/.htaccess' file to the 'znetdk/applications/globalconfig.php' script,
+  because the definition of a custom environment variable into the .htaccess
+  file, through the 'Setenv' statement, is in most case not taken in
+  account by the Internet Access Providers. TO ENSURE COMPATIBILITY WITH LEGACY
+  APPLICATIONS developed in version 1.0 RC, set now the ZDK_TOOLS_DISABLED
+  parameter as a PHP constant to the value TRUE into the
+  'znetdk/applications/globalconfig.php' script if you want to disable the core
+  tools access in a production environment.
+- CHANGE: the 'classic' and 'office' page layouts were optimized for the display
+  on tablet devices in portrait orientation (768 x 1024 pixels).
+- CHANGE: the 'data-zdk-paginator' HTML5 attribute of the ZnetDK's 'Datatable'
+  widget now can be used to define the number of buttons displayed for selecting
+  a new page of rows (for example, data-zdk-paginator='50:10' will display 50
+  rows per page and 10 page selection buttons on the paginator to select another
+  page and display the matching rows).
+- CHANGE: the widget 'AutoComplete' is now created with the 'autocomplete' HTML5
+  attribute forced to 'off' to avoid conflicts with the autocompletion mechanism
+  of the web browser.
+- CHANGE: the background color of the message displayed with the 'Growl' PrimeUI
+  widget fits now the severity of the message ('info', 'warn' or 'error').
+- CHANGE: in the Application Wizard step 2, the themes displayed in the
+  dropdown panel for selection are now sorted in ascending alphabetical order.
+- BUG FIXING: on FireFox browser, the dropdown's selection panel was not
+  properly aligned to its container when displaying images (the panel width was
+  lower than the dropdown width).
+- BUG FIXING: the main page of the application was loaded twice on FireFox (two
+  HTTP GET requests received by the web server) because the HTML meta tag
+  'charset' was not declared within the 1024 first characters of the page, due
+  to HTML comments too long (see the comment 44 of the page
+  https://bugzilla.mozilla.org/show_bug.cgi?id=236858 for details).
+- BUG FIXING: the message 'CORE - E_NOTICE - Use of undefined constant question'
+  was traced into the 'errors.log' file when trying to remove a user profile
+  with associated data rows.
+- BUG FIXING: the 'znetdk/applications/default/app/.htaccess' file was not
+  generated by the Application Wizard.
+- BUG FIXING: the 'classic' page layout was not properly displayed when the
+  parameter CFG_VIEW_PAGE_RELOAD was set to TRUE.
+- BUG FIXING: when the 'znetdk' widget theme was set, the hyperlinks displayed
+  on the banner were not visible. In addition, an HTTP error 404 was traced in
+  the Chrome web browser console for the 'ui-bg_flat_100_ff9400_4.png' image
+  when ZnetDK was installed on Linux system.
+- BUG FIXING: the 'DropDown' widget was not highlighted in red when no value
+  was selected whereas it was set with the 'required' property (regression
+  introduced in version 1.0RC).
+
+ZnetDK 1.0 RC (Release Candidate), 2015-09-03
+---------------------------------------------
+- CHANGE: new application wizard for configuring and customizing the starter
+  application (launched when typing 'http://myhostaddress/znetdk?tool=appwiz').
+  The default application located in the '/znetdk/applications/default' directory
+  is no longer delivered with ZnetDK.
+- CHANGE: new 'ZDK_TOOLS_DISABLED' parameter in the root '.htaccess' file for
+  disabling the application wizard when ZnetDK is deployed in production.
+- CHANGE: multi-applications feature; several applications can be now deployed
+  within a unique ZnetDK engine, in the '/znetdk/applications' directory, in
+  addition to the 'default' application. Every other application can be accessed
+  thru the GET parameter 'appl' (i.e '127.0.0.1/znetdk/index.php?appl=myappli'
+  where 'myappli' is the sub-directory name of the application within the
+  '/znetdk/applications/' directory).
+- CHANGE: new widget 'zdkautocomplete' that is automatically instantiated when
+  it is declared into a 'zdkform' and that can be directly connected to a ZnetDK
+  controller action to retrieve the suggestions matching the keyword entered in
+  the autocomplete field.
+- CHANGE: new option 'defaultSelectedValue' and its associated HTML5 property
+  'data-zdk-value' added to the 'zdkdropdown' widget for initializing a default
+  value to select into the dropdown.
+- CHANGE: new '\UserSession::removeCustomValue()' method allowing to remove
+  from the user session a custom value initially added thru the
+  '\UserSession::setCustomValue()' method.
+- CHANGE: new file upload capabilities:
+  1) new JavaScript widget 'zdkinputfile' that can be declared out of or into a
+  ZnetDK entry form. It is based on the 'input' HTML element when its 'type'
+  attribute is set to 'file'.
+  2) new PHP methods 'isUploadedFile()', 'getUploadedFileInfos()' and
+  'moveImageFile()' added to the \Request core class for getting informations
+  about the last uploaded file and for moving it into its definitive location on
+  the web server.
+  3) the JavaScript 'znetdk.request' method can now upload a file to a controller
+  action when the option 'fileToUpload' is specified.
+- CHANGE: several AJAX requests now can be queued when user session has expired
+  and are automatically replayed when the user credentials are renewed.
+- CHANGE: the ZnetDK form includes the new features below:
+  1) when the 'novalidate=""' HTML5 property is set for a ZnetDK form, the
+  data of the widgets 'zdkdropdown' and 'zdkinputdate' are no longer validated.
+  2) the text into an input field is automatically selected when it has the focus
+  after an error has been detected.
+  3) leading and trailing spaces are removed from the values returned by the
+  'getFormData()' method.
+- CHANGE: new data filtering feature allowing to limit the display of business
+  table rows to those matching one or several user profiles (useful for Business
+  workflow development):
+  1) new method 'DAO::setStoredProfiles()' allowing to store one or more
+  user profiles for the rows inserted or updated by the DAO.
+  2) new method 'DAO::setProfileCriteria()' allowing to filter the rows
+  returned by a DAO object to those matching one or more user profiles.
+  3) warning message displayed when a profile is removed while business table
+  rows are associated with.
+  4) new core security table 'zdk-profile-rows' storing the business table rows
+  associated to a profile.
+- CHANGE: a user profile can't be longer created or modified if a profile with
+  the same name already exists.
+- CHANGE: the ZnetDK action bar widget evolves:
+  1) The confirmation removal question can be customized for the selected row
+  (new event 'whenremove' and new property 'getRemoveConfirm'.
+  2) The simple declaration of an action button into the action bar with the
+  style class 'zdk-bt-refresh', allows the datatable widget to be refreshed when
+  this button is pressed.
+- CHANGE: new CSS class 'zdk-bt-custom' allowing to instantiate automatically
+  a 'puibutton' widget with custom icon, when declared for an HTML button within
+  a ZnetDK form (widget 'zdkform'). The new HTML5 property 'data-zdk-icon' allows
+  to specify the icon to display for the button.
+- CHANGE: new method Validator::setErrorVariable() allowing to set the variable
+  name in error from the checking method, if the variable in error is not the
+  one matching the checking method where the error is detected.
+- BUG FIXING: the 'checked' status of the radio buttons was wrongly reset for
+  all the radio buttons instantiated for the application, even those not
+  belonging to the radio button group for which the 'resetSelection' method was
+  called.
+- BUG FIXING: after a call to the 'resetSelection' method, the radio button
+  originally declared in HTML with the 'checked' property was not selected by
+  default. It was the same when the 'disabled' property was set.
+
+ZnetDK 0.98 (beta version), 2015-07-21
+--------------------------------------
+- CHANGE: new 'zdkdropdown' widget based on the PrimeUI puidropdown, fully
+  integrated to the ZnetDK form and directly connectable to any action
+  of an application controller (see online demo at www.demo.znetdk.fr).
+- CHANGE: the 'zdkradiobuttongroup' widget now simplifies the positioning of its
+  radio buttons vertically and horizontally using the "br" HTML element to add
+  a line break between two radio buttons (see online demo at www.demo.znetdk.fr).
+- CHANGE: the 'reset' method of the 'zdkform' widget takes in account the HTML
+  properties 'checked' and 'selected' by applying the default selection to the
+  the radio buttons, listboxes and dropdown widgets.
+- BUG FIXING: the displayed modal dialog is now removed when the user session
+  has expired and the user clics on the 'Cancel' bouton from the connection
+  dialog displayed for renewing his credentials.
+- BUG FIXING: about the 'zdkform' widget, the focus is now systematically set to
+  the field in error when the user submits the form several times.
+- BUG FIXING: the 'zdkform' form is now properly initialized when its 'init'
+  method is called whereas an error message is displayed into the form.
+- BUG FIXING: on Internet explorer 11, when the 'classic' layout is set for the
+  application (parameter CFG_PAGE_LAYOUT), the datatable rows are now properly
+  highlighted when the mouse pointer hovers them and the selected row
+  are now visible (see known issues pointed out in version 0.97).
+- BUG FIXING: on Internet explorer 11, the radio buttons are now properly
+  displayed (see known issues pointed out in version 0.97).
+- BUG FIXING: on Internet explorer 11, the 'inputtext' and 'textarea' widgets
+  were not properly reset after the triggering of the 'reset' event and the
+  'required' HTML5 property was not taken in account after a new form HTML5
+  validation.
+
+ZnetDK 0.97 (beta version), 2015-07-10
+--------------------------------------
+- CHANGE: new widget 'zdkradiobuttongroup' which simplifies the declaration and
+  the style definition of the radio buttons.
+- CHANGE: the 'zdkform' widget evolves:
+  1) It allows now to define custom error messages when the form validation fails
+  thru the new HTML5 attributes 'data-zdkerrmsg-min', 'data-zdkerrmsg-max',
+  'data-zdkerrmsg-pattern' and 'data-zdkerrmsg-date'.
+  2) The 'reset' event sent to the form thru a button of type 'reset' is now
+  catched by the form to reset its content.
+  3) The date format is now directly validated by the form (input HTML element
+  of type 'date').
+  4) The 'listbox' and 'radio button' widgets are now easier to declare into the
+  form (no need to wrap them with the DIV 'zdk-form-entry', see online demo on
+  the ZnetDK website for detailed examples).
+- CHANGE: the znetdk.initCommonWidgets() method instantiates the new
+  'zdkradiobuttongroup' widget when the CSS style zdk-radiobuttongroup is
+  declared for a DIV HTML element. In addition, the input HTML elements are also
+  instantiated when their type attribute is 'url' and 'number'.
+- CHANGE: new 'checkDate' public method added to the zdkinputdate widget to check
+  the validity of the date typed in.
+- CHANGE: new 'data-zdk-width' HTML5 attribute allowing to set directly in HTML
+  a fixed width for the 'zdkmodal' dialog widget.
+- CHANGE: JavaScript dedicated views for initializing (ie 'myview-ui-init.php')
+  and managing events (ie 'myview-ui-events.php') can be defined now only one
+  time when the base view is localized (ie 'myview_en.php', 'myview_es.php',...).
+- CHANGE: new widget theme 'flat-two' made with the jQuery UI themeroller.
+- BUG FIXING: the ZnetDK logo was not properly displayed when the '/applications
+  /default' directory is absent. Consequently, the path of the heading logo
+  picture defined for the LC_HEAD_IMG_LOGO constant into the '/applications/
+  default/app/lang/locale_[lang].php' script, must start now from the
+  installation root directory of ZnetDK. TO ENSURE COMPATIBILITY WITH LEGACY
+  APPLICATIONS developed in a lower version than this version 0.97, the original
+  value must be prefixed by the constant ZNETDK_APP_URI. For example:
+  define('LC_HEAD_IMG_LOGO',ZNETDK_APP_URI . 'images/mylogo_en.png');
+- BUG FIXING: the error message "Fatal error: Call to undefined method Locale::
+  setApplicationLanguage() in ...." was displayed when the PHP extension
+  'php_intl.dll' was enabled in the 'php.ini' file. the core class '\Locale' was
+  moved into the '/engine/core/api' directory to avoid conflict with the PHP
+  extension 'php_intl.dll' which also includes a class named '\Locale'.
+- BUG FIXING: the E_NOTICE error 'undefined index: lang' is no longer raised and
+  traced in the ZnetDK /engine/log/errors.log file when the user accesses to the
+  application for the first time.
+- BUG FIXING: a database table row was created twice when an addition form was
+  submitted to the web server while the user session expired, after the user has
+  typed in his credentials. By now, the session expiration is also checked by
+  the object of type \Request.
+- BUG FIXING: the datatable paginator was not properly displayed (only one page
+  link was shown when several pages existed).
+- KNOWN ISSUES: several issues are identified on this version for specific web
+  browsers and are described below.
+  a) Internet explorer 11 (version 11.0.9600.17843): when the 'classic' layout
+  is set for the application (parameter CFG_PAGE_LAYOUT), the datatable rows are
+  not highlighted when the mouse pointer hovers them and the selected row is not
+  visible. Further more, whatever the layout choosen for the application, the
+  button radios are not properly aligned.
+  b) Chrome (version 43.0.2357.132 m): when a form containing an HTML fielset is
+  submitted whereas a mandatory field is not filled in, an exception is triggered
+  in the browser console with the error message "An invalid form control with
+  name='' is not focusable.". See issue description in details on the website
+  https://code.google.com/p/chromium/issues/detail?id=498668 .
+- TRANSLATIONS: the core Spanish translations configured into the script
+  '/engine/core/lang/locale_es.php' are now more accurate (thank you José).
+- REFACTORING: the widgets 'znetdkform' and 'znetdktable' are renamed to
+ 'zdkform' and to 'zdkdatatable'.
+
+ZnetDK 0.96 (beta version), 2015-06-28
+--------------------------------------
+- New widgets zdklistbox that can be directly filled in with the data returned
+  by a controller action.
+- Correction of the \DAO::getCount() method which always returned the value 0
+ (regression introduced in version 0.95).
+- Method DAO::setMultipleFilterCriterias removed. The method DAO::setFilterCriteria
+  is the one to use to define both one criterion or several criteria.
+- The HTML 5 attributes 'data-errmess-required' and 'data-errmess-type'
+  originally supported by zdkform are renamed 'data-zdkerrmsg-required' and
+  'data-zdkerrmsg-type'.
+- New 'zdk-row-id' style sheet class to be applied to the input field in the form
+  which contains the row id currently edited. By now, the 'name' HTML attribute
+  of the input field tagged with the class 'zdk-row-id', is read by the zdkactionbar
+  widget to name identically the POST parameter sent to the controller action,
+  when the user asks for removing a row in the datatable.
+- The profile tree nodes displayed in the profile management form are again fully
+  expanded when adding a new profile (regression introduced in version 0.95).
+  When editing an existing profile, only the selected tree nodes are expanded
+  while the others remain collapsed.
+
+ZnetDK 0.95 (beta version), 2015-06-22
+--------------------------------------
+- The core class '\Menu' was renamed '\MenuManager' to avoid confusion with the
+  application class \app\Menu. TO ENSURE COMPATIBILITY WITH LEGACY APPLICATIONS
+  developed in a lower version than this version 0.95, the call to the
+  "\Menu::addMenuItem" method must be replaced by a call to the
+  new "\MenuManager::addMenuItem" method in the "menu.php" PHP script of your
+  original ZnetDK application.
+- New method '\DAO:setMultipleFilterCriterias' allowing to set several filter
+  criterias to a custom DAO object.
+- New public method '\controller\users::hasProfile()' allowing to know if the
+  connected user has access to the specified profile.
+- New methods 'setCustomValue()' and 'getCustomValue()' added to the \UserSession
+  class to store and retrieve cutom variables from the user session.
+- Core controller actions can be now overloaded individually (it's no longer
+  necessary to overload all the actions of a core controller).
+- New parameter CFG_CHECK_PWD_VALIDITY specifying the regular expression used to
+  check that a new entered password is strong enough.
+- New parameter CFG_NBR_FAILED_AUTHENT: number of login attempts until the user's
+  account be disabled. Fixed to 3 failed attempts by default.
+- The 'Connect' button is now disabled when the user fails to connect after
+  several successive attempts (number configured in CFG_NBR_FAILED_AUTHENT).
+- New public PHP methods 'setWarningMessage' and 'setCriticalMessage' added to
+  the ZnetDK class '\Response'.
+- The hierarchy of the navigation menu is extended to more than 2 levels for
+  the layouts 'office' and 'custom'.
+- New widget 'zdktree' ready to connect to PHP controller actions.
+- Online help added for the user and profile management pages.
+- Enhancement of the user and profile manager views (number of rows displayed in
+  the datatable header, columns resized, new ZnetDK error messages returned when
+  a database error happens...).
+- Profile management: menu items selection with the tree widget improved in the
+  profile edit form. By now, when a tree node is selected, its parents and
+  children are automatically selected (new option 'autoSelectFamily' added to
+  the widget 'zdktree').
+- The "Example" view is now properly displayed for the "office" layout.
+- Upgrade to the version 1.1 of the PrimeUI widgets.
+- The meta tag "charset" is now directly inserted by the method
+  Layout::renderMetaTags().
+
+ZnetDK 0.94 (beta version), 2015-05-16
+--------------------------------------
+- The directory '/app' is moved to '/applications/default/public'.
+- The directory '/engine/app' is moved to '/applications/default/app'.
+- The directory '/resources/znetdk-0.93' is moved to '/engine/public'.
+- All errors of the application are now appended to the file 'errors.log'
+  located to the directory '/engine/log'.
+- Critical errors are now displayed with the PrimeUI widget 'Notify'.
+- The controllers developed for the application must now extend the class
+  'AppController'. The method 'doAction()' is now directly coded in the mother
+  class 'AppController'. The original interface 'iController' must no longer be
+  implemented.
+- The CSS and JS files of ZnetDK are now loaded in a minified version. For
+  debug purpose, the Javascript files are loaded in their extended version when the
+  parameter CFG_DEV_JS_ENABLED is set to TRUE.
+- The constant WEBAPP_ROOT is no longer used and is replaced by ZNETDK_APP_URI
+  which provides the relative path to the directory '/applications/default/public'.
+- New methods setSuccessMessage() and setFailedMessage() added to the class '\Response'.
+- The namespace of the core classes is now shorter (for example, the class
+  'Request' is accessed typing '\Request' instead of '\core\Request').
+- The security tables accessed by the DAO of ZnetDK are now prefixed with 'zdk_'
+ (for example, the table originally named 'users' became 'zdk_users'). Download
+  for compatibility with this version, the latest script 'znetdk-security.sql'
+  at www.znetdk/telechargements.
+
+ZnetDK 0.93 (beta version), 2015-04-10
+--------------------------------------
+- The default theme set for the parameter CFG_THEME in the config.php of the
+  starter application is changed to 'flat-blue' (originally set to 'south-street'
+  in the previous version).
+
+ZnetDK 0.92 (beta version), 2015-04-06
+--------------------------------------
+- First beta version available for download.

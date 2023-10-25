@@ -1,0 +1,312 @@
+/**
+ * ZnetDK, Starter Web Application for rapid & easy development
+ * See official website https://www.znetdk.fr 
+ * Copyright (C) 2019 Pascal MARTINEZ (contact@znetdk.fr)
+ * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
+ * --------------------------------------------------------------------
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------
+ * Mobile layout view styles
+ *
+ * File version: 1.4
+ * Last update: 08/09/2023
+ */
+
+/* GENERAL */
+h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+}
+
+a[target="_blank"]:after {
+    font-family: 'FontAwesome';
+    content: " \f08e";
+}
+
+/* HEADER */
+#zdk-header {
+    z-index: 3;
+    transition: top 0.3s;
+}
+body > h1 {
+    font-size: 0;
+    margin: 0;
+    padding: 0;
+    width:0;
+    height:0;
+}
+
+#zdk-connection-area .adjust-centering {
+    width:200px;
+    height:34px;
+}
+
+#zdk-profile {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 993px) {
+    #zdk-profile {
+        max-width: 30%;
+    }
+}
+
+/* VERTICAL MAIN MENU */
+#zdk-side-nav-menu {
+    width: 200px;
+    z-index: 4;
+}
+
+#zdk-company-logo img {
+    max-height: 116px;
+}
+
+#zdk-side-nav-menu i.fa {
+    margin-right: 8px;
+}
+
+#zdk-custom-menu > ul {
+    display: block;
+    margin:0;
+    padding: 0;
+}
+
+#zdk-custom-menu li {
+    display: block;
+}
+
+#zdk-custom-menu li a {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* HORIZONTAL SECONDARY MENU */
+#zdk-tab-menu a {
+    text-decoration: none;
+}
+
+#zdk-tab-menu i.fa {
+    margin-right: 2px;
+    position: relative;
+    top: -2px;
+}
+
+/* BANNER TITLE */
+.banner-title-small, .banner-title-large {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.banner-title-small {
+    padding: 8px 4px;
+    width: 75%;
+    position: absolute;
+    left: 48px;
+    top: 1px;
+}
+.banner-title-large {
+    width: 100%;
+}
+.banner-title-small.no-connection {
+    width: 85%;
+}
+.banner-title-large.no-connection {
+    width: 180%;
+}
+
+/* BANNER CONNECTED USER ICONS */
+#zdk-connection-area {
+    padding: 8px 8px 8px 0;
+}
+
+#zdk-connection-area a {
+    text-decoration: none;
+}
+
+/* MAIN CONTAINER */
+.w3-main {
+    margin-left: 200px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header + div {
+    flex-grow: 1;
+}
+
+#zdk-content {
+    padding-bottom: 15px;
+    overflow-wrap: break-word;
+}
+
+/* MESSAGES AREA */
+#zdk-messages {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+#zdk-install-message ~ .adjust-centering,
+#zdk-messages ~ .adjust-centering {
+    width:200px;
+}
+
+/* MODAL */
+body .w3-modal {
+    z-index: 5;
+}
+
+.w3-modal-content {
+    overflow-wrap: break-word;
+}
+
+/* FOOTER */
+footer {
+    width: 100%;
+    clear: both;
+}
+
+/* AJAX LOADING */
+
+.zdk-ajax-loader {
+    z-index: 20;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -48px;
+    margin-left: -48px;
+}
+
+.zdk-ajax-loader:after {
+  content: " ";
+  display: block;
+  width: 92px;
+  height: 92px;
+  margin: 1px;
+  border-radius: 50%;
+  border-width: 10px;
+  border-style: solid;
+  border-top-color: inherit;
+  border-right-color: transparent;
+  border-bottom-color: inherit;
+  border-left-color: transparent;
+  animation: zdk-ajax-loader 1.2s linear infinite;
+}
+@keyframes zdk-ajax-loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#zdkmobile-ajax-loading-overlay {
+    display : block;
+    position : fixed;
+    z-index: 19;
+    background-color: transparent;
+    background-repeat : no-repeat;
+    background-position : center;
+    left : 0;
+    bottom : 0;
+    right : 0;
+    top: 0;
+    cursor: wait;
+}
+
+/* AUTHENTICATION DIALOGS */
+#zdk-login-modal .w3-modal-content,
+#zdk-changepwd-modal .w3-modal-content,
+#zdk-userpanel-modal .w3-modal-content {
+    max-width: 600px;
+}
+
+#zdk-login-modal {
+    z-index: 10;
+}
+
+#zdk-login-modal form div.zdk-password {
+    position: relative;
+}
+
+#zdk-login-modal form a.zdk-toggle-password {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    font-size: 1.5em;
+}
+
+/* MODALS */
+.w3-modal-content header h4 {
+    padding-right: 30px;
+    line-height: 32px;
+}
+
+/* FORMS */
+label.zdk-required:after { 
+    content: " * ";
+    color: red;
+    font-size: 1.1em;
+}
+
+form .z4m-form-invalid {
+    box-shadow: 0 0 0 2px red;
+}
+
+input[type=checkbox][readonly],
+input[type=radio][readonly] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ACTION BUTTONS */
+.zdk-mobile-action {
+    position: fixed;
+    z-index: 2;
+}
+.zdk-mobile-action .fa {
+    font-size: 1.1em;
+    position: relative;
+    top: 3px;
+}
+#zdk-mobile-action-scrollup .fa,
+#zdk-mobile-action-search .fa {
+    font-size: 1.0em;
+    top: 1px;
+}
+
+/* LISTS */
+#zdk-content div.search-filter-container ~ ul {
+    clear: left;
+}
+
+ul[data-zdk-load] .w3-col {
+    word-break: break-all;
+}
+
+ul[data-zdk-load] a.edit .fa-edit {
+    font-size: 0.9em;
+    position: relative;
+    left: 1px;
+}
+
+/* AUTOCOMPLETE */
+input[type=search] ~ ul > li {
+    cursor: pointer;
+}
+
+/* CONFIRMATION DIALOG */
+#zdk-confirmation-modal button {
+    width: 49%;
+}
