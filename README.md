@@ -36,7 +36,7 @@ ZnetDK 4 Mobile is developed in **PHP**, **MySQL**, **HTML5** and **JavaScript**
 3. Enter into the address bar of your web browser, the URL to the web folder where the archive has been unziped.
 > Go to the page [Getting Started](https://mobile.znetdk.fr/getting-started) to obtain the complete procedure.
 ## TESTING
-ZnetDK 4 Mobile once installed can be tested through the **Testing Application** (see repository [znetdk4mobile-tests][https://github.com/pascal-martinez/znetdk4mobile-tests]).
+**ZnetDK 4 Mobile** once installed can be tested through the **Testing Application** (see GitHub repository [znetdk4mobile-tests](https://github.com/pascal-martinez/znetdk4mobile-tests)).
 
 ## DEMONSTRATION
 An online demonstration of **ZnetDK 4 Mobile** features is available at https://mobile.znetdk.fr/demo
