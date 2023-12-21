@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Application controller class  
  *
- * File version: 1.5
- * Last update: 09/04/2023
+ * File version: 1.6
+ * Last update: 09/15/2023
  */
 
 use controller\Users;
@@ -213,8 +213,8 @@ abstract class AppController {
     /**
      * Sets the menu item ID which must be assigned to the connected user
      * to allow them to execute the specified controller action
-     * @param type $action Name of the action
-     * @param type $menuItem Identifier of the menu item
+     * @param string $action Name of the action
+     * @param string $menuItem Identifier of the menu item
      */
     static protected function setRequiredMenuItemForAction($action, $menuItem) {
         self::doErrorIfActionUnknown($action);

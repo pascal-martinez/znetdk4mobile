@@ -1,7 +1,7 @@
 <?php
 /**
 * ZnetDK, Starter Web Application for rapid & easy development
-* See official website http://www.znetdk.fr 
+* See official website http://www.znetdk.fr
 * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
 * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
 * --------------------------------------------------------------------
@@ -18,12 +18,12 @@
 * --------------------------------------------------------------------
 * Core english translations of the application
 *
-* File version: 1.18
-* Last update: 09/01/2023
+* File version: 1.19
+* Last update: 10/10/2023
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
-define ('LC_LOCALE_ALL', serialize(array('en_US.UTF-8', 'English_United States.1252', 'en_US', 'english'))); 
+define ('LC_LOCALE_ALL', serialize(array('en_US.UTF-8', 'English_United States.1252', 'en_US', 'english')));
 
 /* Overriden localization settings (instead of the 'setlocale' settings) */
 define('LC_LOCALE_DECIMAL_SEPARATOR', NULL);
@@ -41,7 +41,7 @@ define('LC_LANG_ISO_CODE','en');
 /* General labels */
 define('LC_PAGE_TITLE','ZnetDK application');
 
-/* Heading labels */
+/* Header labels */
 define('LC_HEAD_TITLE','ZnetDK core application');
 define('LC_HEAD_SUBTITLE','Ready for development...');
 define('LC_HEAD_LNK_LOGOUT','Logout');
@@ -50,7 +50,8 @@ define('LC_HEAD_USERPANEL_MY_USER_RIGHTS','My user rights');
 define('LC_HEAD_USERPANEL_INSTALL','Installation');
 define('LC_HEAD_USERPANEL_UNINSTALL','Uninstallation');
 
-/* Heading images */
+/* Header images */
+define('LC_HEAD_IMG_LOGO_LINK_TITLE', 'Back to Home');
 define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.png');
 
 /* Footer labels */
@@ -62,7 +63,7 @@ define('LC_FOOTER_RIGHT','Realized with <a href="https://www.znetdk.fr" target="
 define('LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL', 'Install the app...');
 define('LC_HEAD_USERPANEL_INSTALL_TITLE_HELPFUL_INFOS', 'Helpful infos');
 define('LC_HEAD_USERPANEL_INSTALL_STATUS_IS_INSTALLED', 'Your application is already installed.');
-define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLED', 'Your application is not yet installed. Tap the <b>' 
+define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLED', 'Your application is not yet installed. Tap the <b>'
         . LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL . '</b> button below to install it.');
 define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLABLE', 'Your application must be installed manually. See <b>'
         . LC_HEAD_USERPANEL_INSTALL_TITLE_HELPFUL_INFOS . '</b> below.');
@@ -170,6 +171,7 @@ define('LC_FORM_LBL_ACCESS','Access is');
 define('LC_FORM_LBL_PUBL_ACC','public (session timeout)');
 define('LC_FORM_LBL_PRIV_ACC','private');
 define('LC_FORM_LBL_REMEMBER_ME', 'Remember me');
+define('LC_FORM_LBL_TOGGLE_PASSWORD', 'Show / hide password');
 define('LC_FORM_LBL_FORGOT_PASSWORD', 'Forgot password?');
 
 /* User Form labels */
@@ -204,9 +206,14 @@ define('LC_FORM_NEW_PASSWORD_REQUEST_PLACEHOLDER', 'Email of the user account co
 define('LC_BTN_LOGIN','Login');
 define('LC_BTN_CANCEL','Cancel');
 define('LC_BTN_CLOSE','Close');
+define('LC_BTN_SHOW_MENU', 'Show menu');
+define('LC_BTN_SHOW_USERPANEL', 'User panel');
 define('LC_BTN_SAVE','Save');
 define('LC_BTN_APPLY', 'Apply');
 define('LC_BTN_VALIDATE', 'Validate');
+define('LC_BTN_REFRESH','Refresh');
+define('LC_BTN_SEARCH','Search...');
+define('LC_BTN_SCROLL_TO_TOP','Scroll to top');
 define('LC_BTN_NEW','New');
 define('LC_BTN_MODIFY','Edit');
 define('LC_BTN_OPEN','Open');
@@ -280,6 +287,8 @@ define('LC_MSG_INF_LOGIN',"You have logged in successfully.");
 define('LC_MSG_INF_PWDCHANGED',"Your password has been changed successfully.");
 define('LC_MSG_INF_USERSTORED',"User saved.");
 define('LC_MSG_INF_USERREMOVED',"User removed.");
+define('LC_MSG_INF_USER_PROFILE_STORED',"Profile saved.");
+define('LC_MSG_INF_USER_PROFILE_REMOVED',"Profile removed.");
 define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'A confirmation email has been sent to you.');
 define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Your temporary password has been sent to you by email.<br><a href="%1">Clic here</a> to login.');
 define('LC_MSG_INF_LOGOUT','<h3>Logout succeed.</h3><p><a href="">Clic here</a> to login again.</p>');

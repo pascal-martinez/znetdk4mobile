@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Javascript library for mobile page layout
  *
- * File version: 1.9
- * Last update: 08/11/2023
+ * File version: 1.10
+ * Last update: 10/29/2023
  */
 
 /* global FormData, BeforeInstallPromptEvent */
@@ -1239,9 +1239,12 @@ z4m.messages.make = function (messageElement) {
  * 'autoCloseDuration' property
  */
 z4m.messages.add = function (severity, summary, detail, autoHide) {
+    const menuCloseButtonTitle = z4m.navigation.getVerticalMenu().find('button.close').attr('aria-label');
     var message = $('<div class="w3-panel w3-card w3-animate-top w3-display-container '
             + this.colors[severity] + '">'
-            + '<span class="close w3-button w3-large w3-display-topright"><i class="fa fa-times"></i></span>'
+            + '<a class="close w3-button w3-large w3-display-topright" href="#" aria-label="' 
+            + menuCloseButtonTitle + '"><i class="fa fa-times" aria-hidden="true" title="' 
+            + menuCloseButtonTitle + '"></i></a>'
             + '<h3><i class="fa ' + this.icons[severity] + '"></i>&nbsp;' + summary + '</h3><p>' + detail + '</p></div>');
     var addedMessage = message.appendTo(this.getContainer());
     if (severity !== 'critical' && (typeof autoHide === 'undefined' || autoHide === true)) {
@@ -1383,8 +1386,9 @@ z4m.messages.ask = function (title, question, buttons, callback) {
  * Close a message when its close button is pressed
  */
 z4m.messages.events.handleAllClose = function () {
-    $('#zdk-messages').on('click.znetdkmobile_messages', 'span.close', function () {
+    $('#zdk-messages').on('click.znetdkmobile_messages', 'a.close', function (event) {
         z4m.messages.make($(this).parent()).remove();
+        event.preventDefault();
     });
 };
 
@@ -2029,6 +2033,9 @@ z4m.navigation.build = function () {
         } else {
             newItem.find('i').addClass(icon); // Icon exists
         }
+        if ($this.isPageToBeReloaded) {
+            newItem.attr('href', link.attr('href'));
+        }
         newItem.find('span').text(label);
         newItem.attr('data-view_id', $this.getMenuItemId(menuItem));
         if (onlyOne === true) {
@@ -2364,6 +2371,7 @@ z4m.modal.setTitle = function (title) {
 z4m.modal.events.handleAllClose = function () {
     var modalClass = '.' + z4m.modal.cssClass,
             selector = modalClass + ' span.close, '
+            + modalClass + ' a.close, '
             + modalClass + ' button.cancel';
     $('body').on('click.znetdkmobile_modal', selector, function () {
         var modalObject = z4m.modal.make($(this).closest(modalClass));
@@ -3116,13 +3124,20 @@ z4m.action.adjustPosition = function () {
 
 /**
  * Add a custom action button
- * @param {String} name Name given to the custom button.
+ * @param {String} name Name given to the custom button (no space allowed in the
+ * name).
  * @param {String} iconCssClass Class name of the icon displayed on the button
  * @param {String} colorCssClass Class name of the color used to display the
  * button
+ * @param {String} title Title given to the button for accessibility purpose. If
+ * title is not set, the 'name' parameter is used instead.
  * @returns {Boolean} Value true on success, false otherwise
  */
-z4m.action.addCustomButton = function (name, iconCssClass, colorCssClass) {
+z4m.action.addCustomButton = function (name, iconCssClass, colorCssClass, title) {
+    if (name.indexOf(' ') > -1) {
+        z4m.log.error("Space characters are not allowed in the button name: '" + name + "'!");
+        return false;
+    }
     if (this.buttons.hasOwnProperty(name)) {
         z4m.log.error("The '" + name + "' button name already exists!");
         return false;
@@ -3134,11 +3149,13 @@ z4m.action.addCustomButton = function (name, iconCssClass, colorCssClass) {
         buttonIdSuffix++;
     }
     buttonId = buttonIdPrefix + buttonIdSuffix;
+    const buttonTitle = typeof title === 'string' ? title : name;
     $('#zdk-mobile-action-search').after(
             '<a id="' + buttonId
             + '" class="zdk-mobile-action ' + name + ' w3-hide w3-btn w3-circle w3-ripple w3-xlarge '
-            + colorCssClass + ' w3-card-4"><i class="fa '
-            + iconCssClass + '"></i></a>');
+            + colorCssClass + ' w3-card-4" href="javascript:void(0)" aria-label="' 
+            + buttonTitle + '"><i class="fa ' + iconCssClass + '" aria-hidden="true" title="' 
+            + buttonTitle + '"></i></a>');
     this.buttons[name] = {id: '#'+buttonId};
     return true;
 };
@@ -3803,19 +3820,8 @@ z4m.list.setModal = function (modalElementId, isFormModifiable, onAdd, onEdit) {
                                 innerForm = modal.getInnerForm();
                         // Form is reset
                         innerForm.reset();
-                        // Custom callback
-                        var openModal = true;
-                        if (typeof onAdd === 'function'
-                                && onAdd.call(modal, innerForm) === false) {
-                            openModal = false;;
-                        }
-                        // Modal is shown
-                        if (openModal === true) {
-                            modal.open(function () {
-                                // Submit succeeded so the list is refreshed
-                                $this.refresh();
-                            });
-                        }
+                        // Modal is open
+                        openModal(modal, innerForm, onAdd);
                     }
                 }
             }
@@ -3832,21 +3838,25 @@ z4m.list.setModal = function (modalElementId, isFormModifiable, onAdd, onEdit) {
             if (!isModifiable) {
                 innerForm.setReadOnly();
             }
-            // Custom callback
-            var openModal = true;
-            if (typeof onEdit === 'function'
-                    && onEdit.call(modal, innerForm, response) === false) {
-                openModal = false;
-            }
-            if (openModal === true) {
-                modal.open(function () {
-                    // Submit succeeded so the list is refreshed
-                    $this.refresh();
-                });
-            }
+            // Modal is open
+            openModal(modal, innerForm, onEdit, response);
         });
     });
     return true;
+    // Open Modal dialog
+    function openModal(modalObj, formObj, beforeOpenCallback, formData) {
+        if (typeof beforeOpenCallback === 'function'
+                && beforeOpenCallback.call(modalObj, formObj, formData) === false) {
+            return;
+        }
+        modalObj.open(function (submitResponse) {
+            if (submitResponse.hasOwnProperty('success') && submitResponse.success === false) {
+                return; // No data list refresh
+            }
+            // Submit succeeded so the list is refreshed
+            $this.refresh();
+        });
+    }
 };
 
 /**

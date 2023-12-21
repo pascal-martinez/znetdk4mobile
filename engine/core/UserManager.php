@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core User Management API
  *
- * File version: 1.8
- * Last update: 01/13/2023
+ * File version: 1.9
+ * Last update: 09/15/2023
  */
 
 /**
@@ -437,8 +437,8 @@ class UserManager {
 
     /**
      * Indicates whether the specified user has the specified profile
-     * @param type $loginName User's login name
-     * @param type $profileName Profile name
+     * @param string $loginName User's login name
+     * @param string $profileName Profile name
      * @return boolean TRUE if the user has the specified profile, otherwise FALSE
      */
     static public function hasUserProfile($loginName, $profileName) {

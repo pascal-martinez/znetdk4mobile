@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core users view for mobile
  *
- * File version: 1.9
- * Last update: 08/05/2023
+ * File version: 1.10
+ * Last update: 10/29/2023
  */
 ?>
 <!-- Filter by status -->
@@ -87,7 +87,7 @@
 <div id="mzdk-user-modal" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
         <header class="w3-container w3-theme-d5">
-            <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-user fa-lg"></i>
                 <span class="title"></span>
@@ -101,36 +101,43 @@
                     <i class="fa fa-id-badge fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_IDENTITY; ?>
                 </h3>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_USER_NAME; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="text" name="user_name" maxlength="100" required>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_USER_EMAIL; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="email" name="user_email" required>
-                <label class="field-title"><?php echo LC_FORM_LBL_USER_PHONE; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="tel" name="user_phone" maxlength="50">
-                <label class="field-title"><?php echo LC_FORM_LBL_USER_NOTES; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="text" name="notes" maxlength="100">
+                <label><b><?php echo LC_FORM_LBL_USER_NAME; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="user_name" maxlength="100" required>
+                </label>
+                <label><b><?php echo LC_FORM_LBL_USER_EMAIL; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="email" name="user_email" required>
+                </label>
+                <label><b><?php echo LC_FORM_LBL_USER_PHONE; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="tel" name="user_phone" maxlength="50">
+                </label>
+                <label><b><?php echo LC_FORM_LBL_USER_NOTES; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="notes" maxlength="100">
+                </label>
                 <!-- Connection -->
                 <br>
                 <h3 class="w3-border-top w3-text-theme w3-border-theme">
                     <i class="fa fa-unlock-alt fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_CONNECTION; ?>
                 </h3>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_LOGIN_ID; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="off" value="" maxlength="20" required>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_PASSWORD; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password" autocomplete="off" value="" maxlength="20" required>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_PASSWORD_CONFIRM; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password2" autocomplete="off" value="" maxlength="20" required>
-
+                <label><b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="off" value="" maxlength="20" required>
+                </label>
+                <label><b><?php echo LC_FORM_LBL_PASSWORD; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password" autocomplete="off" value="" maxlength="20" required>
+                </label>
+                <label><b><?php echo LC_FORM_LBL_PASSWORD_CONFIRM; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password2" autocomplete="off" value="" maxlength="20" required>
+                </label>
                 <!-- User rights -->
                 <br>
                 <h3 class="w3-border-top w3-text-theme w3-border-theme">
                     <i class="fa fa-key fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_RIGHTS; ?>
                 </h3>
-                <label class="zdk-required"><?php echo LC_FORM_LBL_USER_EXPIRATION_DATE; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="date" name="expiration_date" required>
-                <label class="field-title"><?php echo LC_FORM_LBL_USER_STATUS; ?></label><br>
+                <label><b><?php echo LC_FORM_LBL_USER_EXPIRATION_DATE; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="date" name="expiration_date" required>
+                </label>
+                <span><b><?php echo LC_FORM_LBL_USER_STATUS; ?></b></span><br>
                 <input id="mzdk-user-modal-radio-enabled" class="w3-radio" type="radio" value="1" name="user_enabled">
                 <label for="mzdk-user-modal-radio-enabled"><?php echo LC_FORM_LBL_USER_STATUS_ENABLED; ?></label>&nbsp;&nbsp;
                 <input id="mzdk-user-modal-radio-disabled" class="w3-radio" type="radio" value="0" name="user_enabled">
@@ -138,18 +145,18 @@
                 <input id="mzdk-user-modal-radio-archived" class="w3-radio" type="radio" value="-1" name="user_enabled">
                 <label for="mzdk-user-modal-radio-archived"><?php echo LC_FORM_LBL_USER_STATUS_ARCHIVED; ?></label>
                 <p></p>
-                <label class="field-title"><?php echo LC_FORM_LBL_USER_MENU_ACCESS; ?></label><br>
+                <span><b><?php echo LC_FORM_LBL_USER_MENU_ACCESS; ?></b></span><br>
                 <input id="mzdk-user-modal-check-full-menu-access" class="w3-check" type="checkbox" name="full_menu_access" value="1">
                 <label for="mzdk-user-modal-check-full-menu-access"><?php echo LC_FORM_LBL_USER_MENU_ACCESS_FULL; ?></label>
                 <p></p>
-                <label class="field-title"><?php echo LC_FORM_LBL_USER_PROFILES; ?></label><br>
-                <select class="w3-select w3-border" name="profiles[]" multiple="multiple" size="6">
-                </select>
+                <label><b><?php echo LC_FORM_LBL_USER_PROFILES; ?></b><br>
+                    <select class="w3-select w3-border" name="profiles[]" multiple="multiple" size="6"></select>
+                </label>
             </div>
             <!-- Submit button -->
             <p class="w3-padding"></p>
             <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
-                <i class="fa fa-check fa-lg"></i>&nbsp;
+                <i class="fa fa-save fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_SAVE; ?>
             </button>
         </form>
@@ -221,10 +228,6 @@
     #mzdk-user-modal h3 {
         text-transform: uppercase;
     }
-    #mzdk-user-modal label.zdk-required,
-    #mzdk-user-modal label.field-title {
-        font-weight: bold;
-    }
     #mzdk-user-modal button.remove {
         float: right;
     }
@@ -283,7 +286,7 @@
                 innerForm.setInputValue('profiles[]', formData['profiles[]'], true);
                 // Modal can be displayed now as the profiles are loaded
                 openModal(modalObj);
-            });            
+            });
             // The modal dialog is not displayed now
             return false;
         });
@@ -309,8 +312,10 @@
         }
         // Open modal dialog: on form submit success, the list is refreshed
         function openModal(modalObj) {
-            modalObj.open(function(){
-                z4muserList.refresh();
+            modalObj.open(function(response){
+                if (response.success === true) {
+                    z4muserList.refresh();
+                }
             });
         }
         // Filter by status

@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Navigation menu API
  *
- * File version: 1.6
- * Last update: 12/02/2022 
+ * File version: 1.7
+ * Last update: 09/15/2023 
  */
 
 /** ZnetDK core navigation menu API */
@@ -249,7 +249,7 @@ Class MenuManager {
     /**
      * Returns the items of the navigation menu according a tree node format 
      * supported by the client side widget puitree. 
-     * @param type $childrenMenuItems Used by the method for its recursive calls.
+     * @param array $childrenMenuItems Used by the method for its recursive calls.
      * This parameter is never directly specified when the method is called
      * externally.
      * @return array An multi-dimension array of tree nodes 

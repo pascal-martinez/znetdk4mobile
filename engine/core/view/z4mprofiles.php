@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core profiles view for mobile
  *
- * File version: 1.6
- * Last update: 08/05/2023
+ * File version: 1.7
+ * Last update: 10/29/2023
  */
 ?>
 <!-- Header -->
@@ -54,7 +54,7 @@
 <div id="mzdk-profile-modal" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
         <header class="w3-container w3-theme-d5">
-            <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-key fa-lg"></i>
                 <span class="title"></span>
@@ -63,17 +63,20 @@
         <form class="w3-container w3-theme-light" data-zdk-load="profiles:detail" data-zdk-submit="profiles:save">
             <input type="hidden" name="profile_id">
             <div class="w3-section">
-                <label class="zdk-required"><?php echo LC_TABLE_COL_PROFILE_NAME; ?></label>
-                <input class="w3-input w3-border w3-margin-bottom" type="text" name="profile_name" maxlength="50" required>
-                <label class="zdk-required"><?php echo LC_TABLE_COL_PROFILE_DESC; ?></label>
-                <textarea class="w3-input w3-border w3-margin-bottom" name="profile_description" rows="3" maxlength="200" required></textarea>
-                <label class="field-title"><?php echo LC_TABLE_COL_MENU_ITEMS; ?></label><br>
-                <select class="w3-select w3-border" name="menu_ids[]" multiple="multiple" size="12"></select>
+                <label><b><?php echo LC_TABLE_COL_PROFILE_NAME; ?></b>
+                    <input class="w3-input w3-border w3-margin-bottom" type="text" name="profile_name" maxlength="50" required>
+                </label>
+                <label><b><?php echo LC_TABLE_COL_PROFILE_DESC; ?></b>
+                    <textarea class="w3-input w3-border w3-margin-bottom" name="profile_description" rows="3" maxlength="200" required></textarea>
+                </label>
+                <label class="field-title"><b><?php echo LC_TABLE_COL_MENU_ITEMS; ?></b><br>
+                    <select class="w3-select w3-border" name="menu_ids[]" multiple="multiple" size="12"></select>
+                </label>
             </div>
             <!-- Submit button -->
             <p class="w3-padding"></p>
             <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
-                <i class="fa fa-check fa-lg"></i>&nbsp;
+                <i class="fa fa-save fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_SAVE; ?>
             </button>
         </form>
@@ -122,7 +125,7 @@
         };
         z4mprofileList.setModal('#mzdk-profile-modal', true, function(innerForm){
             // NEW
-            this.setTitle('<?php echo LC_FORM_TITLE_PROFILE_NEW; ?>');            
+            this.setTitle('<?php echo LC_FORM_TITLE_PROFILE_NEW; ?>');
             // The remove button is hidden
             this.element.find('button.remove').addClass('w3-hide');
             // Menu items are loaded
@@ -185,8 +188,10 @@
         }
         // Open modal dialog: on form submit success, the list is refreshed
         function openModal(modalObj) {
-            modalObj.open(function(){
-                z4mprofileList.refresh();
+            modalObj.open(function(response){
+                if (response.success === true) {
+                    z4mprofileList.refresh();
+                }
             });
         }
         // Click on remove button

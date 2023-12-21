@@ -6,8 +6,8 @@
  License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  =============================================================================
  ZnetDK 'mobile' page layout
- File version: 1.8
- Last update: 08/20/2023
+ File version: 1.9
+ Last update: 10/29/2023
 -->
 <?php /**
  * Input variables >>
@@ -31,8 +31,8 @@
 require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
         <style>.js #zdk-fouc,.js #zdk-custom-menu{display: none;}</style>
         <script>document.documentElement.className='js';</script>
-        <!-- Dependencies -->
-<?php self::renderDependencies(); ?>
+        <!-- CSS Dependencies -->
+<?php self::renderDependencies('css'); ?>
         <!-- CSS Font family -->
         <style>
         .znetdk-mobile-font {
@@ -53,12 +53,12 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
         <nav id="zdk-side-nav-menu"
             class="w3-sidebar w3-bar-block w3-collapse w3-theme-l4 w3-card-2<?php echo CFG_VIEW_PAGE_RELOAD ? '' : ' w3-animate-left'; ?>">
             <!-- Close button -->
-            <button class="close w3-right w3-button w3-hide-large"><i class="fa fa-times w3-xlarge"></i></button>
+            <button class="close w3-right w3-button w3-hide-large" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times w3-xlarge" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></button>
             <div class="w3-clear"></div>
             <!-- Company logo -->
             <div class="w3-margin-bottom w3-center">
-                <a id="zdk-company-logo" href="<?php self::renderLogoURL(); ?>">
-                    <img class="logo w3-hover-opacity w3-padding-16" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="banner logo">
+                <a id="zdk-company-logo" href="<?php self::renderLogoURL(); ?>" title="<?php echo LC_HEAD_IMG_LOGO_LINK_TITLE; ?>">
+                    <img class="logo w3-hover-opacity w3-padding-16" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="<?php echo strip_tags(LC_HEAD_TITLE); ?>">
                 </a>
             </div>
             <?php self::renderNavigationMenu($controller); ?>
@@ -70,8 +70,8 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                 <div class="w3-row w3-theme">
                     <div class="w3-col s10 m9 l5">
                         <!-- Main Vertical menu button -->
-                        <a id="zdk-side-nav-button" class="w3-left w3-hide-large w3-hover-opacity w3-padding-small" href="#" title="navigation button">
-                            <i class="fa fa-navicon w3-xxlarge"></i>
+                        <a id="zdk-side-nav-button" class="w3-left w3-hide-large w3-hover-opacity w3-padding-small" href="#" aria-label="<?php echo LC_BTN_SHOW_MENU; ?>">
+                            <i class="fa fa-navicon w3-xxlarge" aria-hidden="true" title="<?php echo LC_BTN_SHOW_MENU; ?>"></i>
                         </a>
                         <!-- Application Title -->
                         <span class="banner-title-small w3-large w3-hide-large"><?php echo LC_HEAD_TITLE; ?></span>
@@ -89,14 +89,14 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                             <span class="w3-large"><?php echo LC_HEAD_LNK_LOGOUT; ?></span>
                         </a>
                         <!-- Profile icon -->
-                        <a id="zdk-profile" class="w3-right w3-padding-small w3-hover-opacity" href="#">
-                            <i class="fa fa-user fa-lg w3-xlarge"></i>
+                        <a id="zdk-profile" class="w3-right w3-padding-small w3-hover-opacity" href="#" aria-label="<?php echo LC_BTN_SHOW_USERPANEL; ?>">
+                            <i class="fa fa-user fa-lg w3-xlarge" aria-hidden="true" title="<?php echo LC_BTN_SHOW_USERPANEL; ?>"></i>
                             <span class="w3-hide-small w3-hide-medium w3-large"><?php echo $loginName; ?></span>
                         </a>
                     </div>
                 </div>
                 <!-- Secondary Horizontal menu (dynamic) -->
-                <div id="zdk-tab-menu" class="w3-cell-row w3-theme-l3">
+                <nav id="zdk-tab-menu" class="w3-cell-row w3-theme-l3">
                     <div class="template w3-hide">
                         <a href="javascript:void(0)">
                             <div class="w3-cell w3-bottombar w3-border-theme w3-hover-theme w3-padding">
@@ -106,7 +106,7 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                         </a>
                     </div>
                     <div class="items"></div>
-                </div>
+                </nav>
                 <!-- Installation message -->
                 <div class="w3-cell-row w3-container">
                     <div id="zdk-install-message" class="w3-cell w3-hide" data-autodisplay="<?php echo CFG_MOBILE_INSTALL_MESSAGE_DISPLAY_AUTO ? 'yes' : 'no'; ?>">
@@ -114,7 +114,7 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                             <h3 class="w3-text-dark-gray"><i class="fa fa-hdd-o"></i>&nbsp;<?php echo LC_MSG_ASK_INSTALL; ?></h3>
                             <button class="yes w3-button w3-green w3-margin-bottom w3-round-xlarge" type="button"><i class="fa fa-check"></i>&nbsp;<?php echo LC_BTN_YES; ?></button>
                             <button class="no w3-button w3-red w3-margin-bottom w3-round-xlarge" type="button"><i class="fa fa-times"></i>&nbsp;<?php echo LC_BTN_NO; ?></button>
-                        </div>                        
+                        </div>
                     </div>
                     <!-- Spacer displayed on large screen when left side menu is displayed (200px added on the left) -->
                     <div class="adjust-centering w3-cell w3-hide-small w3-hide-medium"></div>
@@ -145,7 +145,7 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
         <div id="zdk-login-modal" class="w3-modal">
             <div class="w3-modal-content w3-card-4">
                 <header class="w3-container w3-theme-d5">
-                    <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+                    <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
                     <h4>
                         <i class="fa fa-unlock-alt fa-lg"></i>
                         <span class="title"><?php echo LC_FORM_TITLE_LOGIN; ?></span>
@@ -154,12 +154,12 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                 <form class="w3-container w3-theme-light" data-zdk-submit="security:login">
                     <input type="hidden" name="access" value="<?php echo CFG_SESSION_DEFAULT_MODE; ?>">
                     <div class="w3-section">
-                        <label class="zdk-required"><b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b></label>
-                        <input class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="username" required>
-                        <label class="zdk-required"><b><?php echo LC_FORM_LBL_PASSWORD; ?></b></label>
+                        <label for="zdk-login-id" class="zdk-required"><b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b></label>
+                        <input id="zdk-login-id" class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="username" required>
+                        <label for="zdk-login-password" class="zdk-required"><b><?php echo LC_FORM_LBL_PASSWORD; ?></b></label>
                         <div class="zdk-password w3-margin-bottom">
-                            <input class="w3-input w3-border" type="password" name="password" autocomplete="current-password" required>
-                            <a class="zdk-toggle-password" href="#"><i class="fa fa-eye-slash fa-lg"></i></a>
+                            <input id="zdk-login-password" class="w3-input w3-border" type="password" name="password" autocomplete="current-password" required>
+                            <a class="zdk-toggle-password" href="#" aria-label="<?php echo LC_FORM_LBL_TOGGLE_PASSWORD; ?>"><i class="fa fa-eye-slash fa-lg" aria-hidden="true" title="<?php echo LC_FORM_LBL_TOGGLE_PASSWORD; ?>"></i></a>
                         </div>
 <?php if (CFG_SESSION_SELECT_MODE === TRUE) : ?>
                         <input id="zdk-login-modal-remember-me" class="w3-check" type="checkbox">
@@ -167,7 +167,7 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
 <?php endif;
 if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE)) : ?>
                         <a class="zdk-forgot-pwd w3-right w3-margin-top w3-margin-bottom w3-hide" href="#"><?php echo LC_FORM_LBL_FORGOT_PASSWORD; ?></a>
-<?php endif; ?>                        
+<?php endif; ?>
                         <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
                             <i class="fa fa-check fa-lg"></i>&nbsp;
                             <?php echo LC_BTN_LOGIN; ?>
@@ -186,7 +186,7 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
         <div id="zdk-changepwd-modal" class="w3-modal">
             <div class="w3-modal-content w3-card-4">
                 <header class="w3-container w3-theme-d5">
-                    <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+                    <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
                     <h4>
                         <i class="fa fa-unlock-alt fa-lg"></i>
                         <span class="title"><?php echo LC_FORM_TITLE_CHANGE_PASSWORD; ?></span>
@@ -195,16 +195,24 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
                 <form class="w3-container w3-theme-light" data-zdk-submit="security:login">
                     <input type="hidden" name="access" value="private">
                     <div class="w3-section">
-                        <label><b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b></label>
-                        <input class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" readonly>
-                        <label class="zdk-required"><b><?php echo LC_FORM_LBL_ORIG_PASSWORD; ?></b></label>
-                        <input class="w3-input w3-border w3-margin-bottom" type="password" name="password" autocomplete="current-password" required>
-                        <label class="zdk-required"><b><?php echo LC_FORM_LBL_NEW_PASSWORD; ?></b></label>
-                        <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password" autocomplete="new-password" required>
-                        <label class="zdk-required"><b><?php echo LC_FORM_LBL_PASSWORD_CONFIRM; ?></b></label>
-                        <input class="w3-input w3-border" type="password" name="login_password2" autocomplete="new-password" required>
+                        <label>
+                            <b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b>
+                            <input class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="off" readonly>
+                        </label>
+                        <label>
+                            <b><?php echo LC_FORM_LBL_ORIG_PASSWORD; ?></b>
+                            <input class="w3-input w3-border w3-margin-bottom" type="password" name="password" autocomplete="current-password" required>
+                        </label>
+                        <label>
+                            <b><?php echo LC_FORM_LBL_NEW_PASSWORD; ?></b>
+                            <input class="w3-input w3-border w3-margin-bottom" type="password" name="login_password" autocomplete="new-password" required>
+                        </label>
+                        <label>
+                            <b><?php echo LC_FORM_LBL_PASSWORD_CONFIRM; ?></b>
+                            <input class="w3-input w3-border" type="password" name="login_password2" autocomplete="new-password" required>
+                        </label>
                         <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
-                            <i class="fa fa-check fa-lg"></i>&nbsp;
+                            <i class="fa fa-save fa-lg"></i>&nbsp;
                             <?php echo LC_BTN_SAVE; ?>
                         </button>
                     </div>
@@ -221,7 +229,7 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
         <div id="zdk-userpanel-modal" class="w3-modal">
             <div class="w3-modal-content w3-card-4 w3-theme-light">
                 <header class="w3-container w3-padding-24">
-                    <span class="close w3-button w3-xlarge w3-theme-action w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+                    <a class="close w3-button w3-xlarge w3-theme-action w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
                 </header>
                 <div class="w3-container w3-center">
                     <h3 class="username">&nbsp;</h3>
@@ -244,16 +252,20 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
         <div id="zdk-searchinlist-modal" class="w3-modal">
             <div class="w3-modal-content w3-card-4 w3-theme-light">
                 <header class="w3-container w3-padding-24">
-                    <span class="close w3-button w3-xlarge w3-theme-action w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+                    <a class="close w3-button w3-xlarge w3-theme-action w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
                 </header>
                 <form class="w3-container w3-section">
-                    <label><b><?php echo LC_FORM_SEARCH_KEYWORD_LABEL; ?></b></label>
-                    <input class="w3-input w3-border" type="search" name="keyword"
+                    <label>
+                        <b><?php echo LC_FORM_SEARCH_KEYWORD_LABEL; ?></b>
+                        <input class="w3-input w3-border" type="search" name="keyword"
                            placeholder="<?php echo LC_FORM_SEARCH_KEYWORD_PLACEHOLDER; ?>">
+                    </label>
                     <div class="sort-criterium w3-margin-top w3-hide">
-                        <label><b><?php echo LC_FORM_SEARCH_SORT_FIELD_LABEL; ?></b></label>
-                        <select class="w3-select w3-border w3-margin-bottom" name="sortfield"></select>
-                        <label><b><?php echo LC_FORM_SEARCH_SORT_ORDER_LABEL; ?></b></label><br>
+                        <label>
+                            <b><?php echo LC_FORM_SEARCH_SORT_FIELD_LABEL; ?></b>
+                            <select class="w3-select w3-border w3-margin-bottom" name="sortfield"></select>
+                        </label>
+                        <span><b><?php echo LC_FORM_SEARCH_SORT_ORDER_LABEL; ?></b></span><br>
                         <input id="zdk-searchinlist-modal-sort-order-asc" class="w3-radio" type="radio" name="sortorder" value="1" checked>
                         <label for="zdk-searchinlist-modal-sort-order-asc"><?php echo LC_FORM_SEARCH_SORT_ORDER_ASCENDING_LABEL; ?></label><br>
                         <input id="zdk-searchinlist-modal-sort-order-desc" class="w3-radio" type="radio" name="sortorder" value="-1">
@@ -289,10 +301,10 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
             </div>
         </div>
         <!-- Fixed Action buttons -->
-        <a id="zdk-mobile-action-scrollup" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-light-grey w3-card-4"><i class="fa fa-arrow-up"></i></a>
-        <a id="zdk-mobile-action-add" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-red w3-card-4"><i class="fa fa-plus"></i></a>
-        <a id="zdk-mobile-action-refresh" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-green w3-card-4"><i class="fa fa-refresh"></i></a>
-        <a id="zdk-mobile-action-search" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-blue w3-card-4"><i class="fa fa-search"></i></a>
+        <a id="zdk-mobile-action-scrollup" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-light-grey w3-card-4" href="javascript:void(0)" aria-label="<?php echo LC_BTN_SCROLL_TO_TOP; ?>"><i class="fa fa-arrow-up" aria-hidden="true" title="<?php echo LC_BTN_SCROLL_TO_TOP; ?>"></i></a>
+        <a id="zdk-mobile-action-add" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-red w3-card-4" href="javascript:void(0)" aria-label="<?php echo LC_BTN_NEW; ?>"><i class="fa fa-plus" aria-hidden="true" title="<?php echo LC_BTN_NEW; ?>"></i></a>
+        <a id="zdk-mobile-action-refresh" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-green w3-card-4" href="javascript:void(0)" aria-label="<?php echo LC_BTN_REFRESH; ?>"><i class="fa fa-refresh" aria-hidden="true" title="<?php echo LC_BTN_REFRESH; ?>"></i></a>
+        <a id="zdk-mobile-action-search" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge w3-blue w3-card-4" href="javascript:void(0)" aria-label="<?php echo LC_BTN_SEARCH; ?>"><i class="fa fa-search" aria-hidden="true" title="<?php echo LC_BTN_SEARCH; ?>"></i></a>
         <!-- Notification dialog -->
         <div id="zdk-notification-modal" class="w3-modal">
             <div class="w3-modal-content w3-card-4 w3-theme-light">
@@ -326,6 +338,8 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
                 </div>
             </div>
         </div>
+        <!-- JS Dependencies -->
+<?php self::renderDependencies('js'); ?>
         <script>document.getElementById('zdk-fouc').style.display='block';</script>
     </body>
 </html>

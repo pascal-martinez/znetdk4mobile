@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core Layout controller
  *
- * File version: 1.9
- * Last update: 09/01/2023 
+ * File version: 1.10
+ * Last update: 10/17/2023 
  */
 
 /**
@@ -257,9 +257,9 @@ Class Layout {
 
     /**
      * Renders the meta tag definition of the page in the HTML header section 
-     * @param type $description Description (meta name="description")
-     * @param type $keywords Keyword (meta name="keyword")
-     * @param type $author Author (meta name="author")
+     * @param string $description Description (meta name="description")
+     * @param string $keywords Keyword (meta name="keyword")
+     * @param string $author Author (meta name="author")
      */
     static private function renderMetaTags($description, $keywords, $author) {
         $tabs = "\t\t";
@@ -304,16 +304,34 @@ Class Layout {
                 $mainScriptWithGetParams = \General::addGetParameterToURI(\General::getMainScript(TRUE), 'lang', current($allLanguages));
                 $otherLanguages = \api\Locale::getActiveLanguages();
                 $sessionLanguage = \UserSession::getLanguage();
+                $jsonCountries = self::getCountriesAsJson($otherLanguages);
                 require(ZNETDK_CORE_ROOT . DIRECTORY_SEPARATOR . 'layout/languages-layout.php');
             }
         }
+    }
+    
+    /**
+     * Returns the list of countries in JSON format
+     * @param array $languages The configured languages for the application
+     * @return string List of countries in JSON format
+     */
+    static private function getCountriesAsJson($languages) {
+        $countries = [];
+        foreach ($languages as $country_code) {
+            $countries[] = [
+                'label' => \api\Locale::getLanguageLabel($country_code),
+                'value' => $country_code,
+                'icon' => \api\Locale::getLanguageIcon($country_code)
+            ];
+        }
+        return json_encode($countries);
     }
 
     /**
      * Renders the dependencies CSS et JavaScript of the page
      */
-    static private function renderDependencies() {
-        \Dependencies::render();
+    static private function renderDependencies($type = NULL) {
+        \Dependencies::render($type);
     }
 
 }

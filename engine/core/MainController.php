@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Front controller of the application
  *
- * File version: 1.7
- * Last update: 08/04/2023
+ * File version: 1.8
+ * Last update: 11/02/2023
  */
 
 /**
@@ -67,17 +67,17 @@ Class MainController {
      * @param boolean $doError Indicates whether an HTTP error 404 must be returned
      * when no controller is found. The default value is FALSE.
      * @return string|boolean Class name found for the specified controller and
-     * action. Returns FALSE if the controller is found but not the action. 
+     * action. Returns FALSE if the controller is found but not the action.
      */
     static public function getControllerName($controller, $method, $isAction = TRUE, $doError = FALSE) {
         $controllerSearchPaths = array(array('app\\controller\\' . $controller,FALSE));
-        $modulesWithMatchingController = \General::getModules('mod' 
-                . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR 
+        $modulesWithMatchingController = \General::getModules('mod'
+                . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR
                 . $controller . '.php', FALSE);
         if (is_array($modulesWithMatchingController) && count($modulesWithMatchingController) > 0) {
             foreach ($modulesWithMatchingController as $moduleName) {
-                $controllerSearchPaths[] = array($moduleName 
-                        . '\\mod\\controller\\' . $controller,FALSE);   
+                $controllerSearchPaths[] = array($moduleName
+                        . '\\mod\\controller\\' . $controller,FALSE);
             }
         }
         $controllerSearchPaths[] = array('controller\\' . $controller,$doError);
@@ -92,7 +92,7 @@ Class MainController {
     }
 
     /**
-     * Executes a controller action 
+     * Executes a controller action
      * Return false if no controller and action are found!
      */
     static private function executeAction($controller, $action) {
@@ -136,12 +136,12 @@ Class MainController {
         if ($method === 'POST' && ($action === 'show' || $action === 'help')) {
             // View requested by POST method
             self::renderView($controller, $action);
-        } elseif ($method === 'POST' || ($method === 'GET' && isset($controller) 
-                && $action !== 'show' && $action !== 'help' 
+        } elseif ($method === 'POST' || ($method === 'GET' && isset($controller)
+                && $action !== 'show' && $action !== 'help'
                 && !\Request::isControllerReservedNameForGetMethod())) {
             if (!self::executeAction($controller, $action)) { // Business action requested
                 // No custom & core controller found!
-                $message = $controller === 'httperror' 
+                $message = $controller === 'httperror'
                         ? "CTL-010: the requested URL does not exists!"
                         : "CTL-003: the controller '$controller' and the action '$action' does not exist!";
                 \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
@@ -154,17 +154,21 @@ Class MainController {
                 $errorMessage = "CTL-002: a severe error occurred while loading the layout of the application!";
                 \General::writeErrorLog("ZNETDK ERROR", $errorMessage, TRUE);
                 echo $errorMessage;
+            } elseif (CFG_AUTHENT_REQUIRED === TRUE 
+                    && ($userId = UserSession::getUserId()) !== NULL) {
+                // User's profiles are refreshed in session
+                \UserSession::setUserProfiles(\UserManager::getUserProfilesAsArray($userId));
             }
         }
     }
 
     /**
      * Renders the specified view
-     * @param String $controller Name of the controller in charge to render the 
+     * @param String $controller Name of the controller in charge to render the
      * view or directly the view name to render.
      * @param String $action Name of the controller action that renders the view
      * or directly the 'show' action to directly render the view name specified
-     * as controller.  
+     * as controller.
      * @param Boolean $checkAuthentication If TRUE, checks if the user is
      * correctly authentified. If FALSE, the user authentication is not checked.
      */
@@ -208,5 +212,5 @@ Class MainController {
             return FALSE;
         }
     }
-    
+
 }

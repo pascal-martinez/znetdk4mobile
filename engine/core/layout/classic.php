@@ -6,8 +6,8 @@
  License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  =============================================================================
  ZnetDK page layout "classic"
- File version: 1.5
- Last update: 08/08/2023
+ File version: 1.6
+ Last update: 10/17/2023
 -->
 <?php /**
  * Input variables >>
@@ -25,7 +25,7 @@
 <html lang="<?php echo $language; ?>">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <?php self::renderMetaTags($metaDescription, $metaKeywords, $metaAuthor); ?>
+<?php self::renderMetaTags($metaDescription, $metaKeywords, $metaAuthor); ?>
         <title><?php echo $pageTitle; ?></title>
 <?php if (CFG_NON_MOBILE_PWA_ENABLED) :
     $faviconDir = ZNETDK_ROOT_URI . CFG_MOBILE_FAVICON_DIR . '/';
@@ -33,7 +33,7 @@
 endif; ?>
         <style>.js #zdk-fouc{display: none;}</style>
         <script>document.documentElement.className='js';</script>
-        <?php self::renderDependencies(); ?>
+<?php self::renderDependencies('css'); ?>
     </head>
     <body id="zdk-fouc" class="ui-widget" data-ui-token="<?php echo \UserSession::setUIToken(); ?>" data-appver="<?php echo CFG_APPLICATION_VERSION; ?>"<?php echo CFG_NON_MOBILE_PWA_ENABLED ? ' data-service-worker-url="'.CFG_MOBILE_SERVICE_WORKER_URL.'"' : ''; ?>>
         <div id="zdk-messages"></div><div id="zdk-critical-err"></div>
@@ -44,7 +44,9 @@ endif; ?>
                 <tbody>
                     <tr>
                         <td id="banner_left">
-                            <a id="zdk-header-logo" href="<?php self::renderLogoURL(); ?>"><img id="banner_logo" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="banner logo"></a>
+                            <a id="zdk-header-logo" href="<?php self::renderLogoURL(); ?>" title="<?php echo LC_HEAD_IMG_LOGO_LINK_TITLE; ?>">
+                                <img id="banner_logo" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="<?php echo strip_tags(LC_HEAD_TITLE); ?>">
+                            </a>
                         </td>
                         <td id="banner_middle">
                             <h1><?php echo LC_HEAD_TITLE; ?></h1>
@@ -82,6 +84,7 @@ endif; ?>
             </div>
         </div>
         <img id="zdk-ajax-loading-img" class="ui-helper-hidden" src="<?php echo ZNETDK_ROOT_URI . CFG_AJAX_LOADING_IMG; ?>" alt="ajax loader">
+<?php self::renderDependencies('js'); ?>
         <script>document.getElementById('zdk-fouc').style.display='block';</script>
     </body>
 </html>

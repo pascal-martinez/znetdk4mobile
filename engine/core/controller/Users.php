@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for user management
  *
- * File version: 1.11
- * Last update: 08/06/2023
+ * File version: 1.12
+ * Last update: 09/15/2023
  */
 
 namespace controller;
@@ -29,7 +29,7 @@ namespace controller;
  * ZnetDK Core controller for user management
  */
 class Users extends \AppController {
-    
+
     /**
      * Evaluates whether action is allowed or not.
      * When authentication is required, action is allowed if connected user has
@@ -93,7 +93,7 @@ class Users extends \AppController {
                     . "<i class=\"fa fa-sticky-note fa-lg\"></i>"
                     . "<i>{$user['notes']}</i></div>";
                 }
-                
+
         }
         return $users;
     }
@@ -199,7 +199,7 @@ class Users extends \AppController {
 
     /**
      * Generates a hashed version of the password specified in clear.
-     * @param type $password Password in clear
+     * @param string $password Password in clear
      * @return string Hashed password
      */
     static public function hashPassword($password) {
@@ -261,7 +261,7 @@ class Users extends \AppController {
 
     /**
      * Disables the user account for the specified user
-     * @param type $loginName Login name of the user account to disable
+     * @param string $loginName Login name of the user account to disable
      * @return boolean TRUE if user account has been disabled successfully
      */
     static public function disableUser($loginName) {
@@ -271,7 +271,7 @@ class Users extends \AppController {
 
     /**
      * Indicates whether the user has the specified profile or not
-     * @param type $profileName Profile name
+     * @param string $profileName Profile name
      * @return boolean TRUE if user has the specified profile, otherwise FALSE
      */
     static public function hasProfile($profileName) {

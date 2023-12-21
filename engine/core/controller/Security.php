@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for authentication
  *
- * File version: 1.7
- * Last update: 01/11/2023
+ * File version: 1.8
+ * Last update: 09/15/2023
  */
 
 namespace controller;
@@ -214,8 +214,8 @@ class Security extends \AppController {
 
     /**
      * Checks whether the user password is valid 
-     * @param type $inputPassword Password typed in by the user
-     * @param type $storedPassword Password stored in the database
+     * @param string $inputPassword Password typed in by the user
+     * @param string $storedPassword Password stored in the database
      * @return boolean TRUE if the password is valid else FALSE.
      */
     static public function isPasswordValid($inputPassword, $storedPassword) {

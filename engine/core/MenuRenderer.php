@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Navigation menu renderer
  *
- * File version: 1.2
- * Last update: 09/24/2020 
+ * File version: 1.3
+ * Last update: 10/18/2023
  */
 
 /** ZnetDK core navigation menu renderer called by the \Layout class to generate
@@ -33,7 +33,7 @@ Class MenuRenderer {
      * called the first time.
      * @param array $sortedMenuItems Menu items to render in the HTML menu
      * @param string $selectedMenuItem Menu item identifier to select in the
-     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE. 
+     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE.
      * @param array $allowedMenuItems Menu items which are granted to the connected
      * user thru its profile definition.
      */
@@ -44,7 +44,7 @@ Class MenuRenderer {
         $nbTabs = 3 * $level;
         $indent = $level === 1 ? str_repeat("\t", 3) : str_repeat("\t", 4 + $level);
         if ($level === 1) { // Level one menu
-            // Class 'zdk-pagereload' added to menu if page reload is set. 
+            // Class 'zdk-pagereload' added to menu if page reload is set.
             $pgReloadClass = $pageReloadEnabled ? ' class="zdk-pagereload"' : null;
             echo "$indent<div id=\"{$menuId}\"{$pgReloadClass}>" . PHP_EOL;
         } else { // Level two menu
@@ -71,7 +71,7 @@ Class MenuRenderer {
                                     'action','show');
                     }
                 } else {
-                    // No page link, just an HTML anchor (view content loaded dynamically or fully loaded first time) 
+                    // No page link, just an HTML anchor (view content loaded dynamically or fully loaded first time)
                     $hrefLink = "#$value[0]";
                 }
                 echo str_repeat("\t", $nbTabs + 2) . "<li><a href=\"$hrefLink\">$value[1]</a></li>" . PHP_EOL;
@@ -123,16 +123,17 @@ Class MenuRenderer {
      * called the first time.
      * @param array $sortedMenuItems Menu items to render in the HTML menu
      * @param string $selectedMenuItem Menu item identifier to select in the
-     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE. 
+     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE.
      * @param array $allowedMenuItems Menu items which are granted to the connected
      * user thru its profile definition.
      */
     static public function renderVerticalMenu($level, $sortedMenuItems, $selectedMenuItem, $allowedMenuItems = null) {
         $menuId = 'zdk-office-menu';
-        $nbTabs = 3 + $level;
+        $nbTabs = 3;
         if ($level === 1) {
-            echo '<div id="' . $menuId . '">' . PHP_EOL;
+            echo str_repeat("\t", $nbTabs) . '<div id="' . $menuId . '">' . PHP_EOL;
         }
+        $nbTabs += $level;
         echo str_repeat("\t", $nbTabs) . '<ul>' . PHP_EOL;
         foreach ($sortedMenuItems as $value) {
             if (!is_array($allowedMenuItems) || (is_array($allowedMenuItems) && array_search($value[0], $allowedMenuItems) !== false)) {
@@ -166,53 +167,75 @@ Class MenuRenderer {
     }
 
     /**
-     * Renders the generic HTML navigation menu for the 'custom' layout.
+     * Renders the generic HTML navigation menu for the 'custom' and 'mobile'
+     * layout.
+     * The 'is-selected' CSS class is added to the menu items which are selected
+     * (parent and child items).
+     * The 'has-sub' CSS class is added to the parent menu items which have
+     * subitems.
+     * For the 'mobile' layout, only two levels of menu item definition is taken
+     * in account.
      * @param int $level Hierarchical level of the menu set to the value 1 when
      * called the first time.
      * @param array $sortedMenuItems Menu items to render in the HTML menu
      * @param string $selectedMenuItem Menu item identifier to select in the
-     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE. 
-     * @param array $allowedMenuItems Menu items which are granted to the connected
-     * user thru its profile definition.
+     *  menu when the configuration parameter CFG_VIEW_PAGE_RELOAD is set to TRUE.
+     * @param array $allowedMenuItems Menu items which are granted to the logged
+     * in user thru its profile definition.
      */
     static public function renderCustomMenu($level, $sortedMenuItems, $selectedMenuItem, $allowedMenuItems = null) {
+        $subMenuAllowed = \Parameters::getPageLayoutName() === 'custom' || $level === 1;
+        $isSetPageReload = \Parameters::isSetPageReload();
         $menuId = 'id="zdk-custom-menu"';
         $nbTabs = 3 + $level;
+        $mainScript = \General::getMainScript(TRUE);
         if ($level === 1) {
-            $cssClassPageReload = \Parameters::isSetPageReload() ? ' class="zdk-pagereload"' : null;
+            // Menu container begin tag
+            $cssClassPageReload = $isSetPageReload ? ' class="zdk-pagereload"' : null;
             echo "<div {$menuId}{$cssClassPageReload}>" . PHP_EOL;
+            // Default selected menu item
+            if (is_null($selectedMenuItem) && key_exists(0, $sortedMenuItems)) {
+                $selectedMenuItem =  key_exists(2, $sortedMenuItems[0]) && isset($sortedMenuItems[0][2])
+                    ? $sortedMenuItems[0][2][0][0] : $sortedMenuItems[0][0];
+            }
         }
         echo str_repeat("\t", $nbTabs) . '<ul>' . PHP_EOL;
         foreach ($sortedMenuItems as $value) {
             if (!is_array($allowedMenuItems) || (is_array($allowedMenuItems) && array_search($value[0], $allowedMenuItems) !== false)) {
-                $hasSubMenu = isset($value[2]) ? " class=\"has-sub\"" : null; // CSS class has-sub 
+                $cssClasses = [];
+                if (isset($value[2])) {
+                    $cssClasses[] = 'has-sub';
+                }
+                if ($value[0] === $selectedMenuItem ||
+                        (isset($value[2]) && in_array($selectedMenuItem, array_column($value[2], 0)))) {
+                    $cssClasses[] = 'is-selected';
+                }
+                $itemCssClasses = count($cssClasses) > 0 ? ' class="' . implode(' ', $cssClasses) . '"' : '';
                 $hrefLink = "#";
+                if ($isSetPageReload) {
+                    $retainedValue = isset($value[2])
+                        ? $value[2][0] // Sub-menu items exist, the link correspond to the first sub-menu item
+                        : $value; // leaf item
+                    $hrefLink = isset($retainedValue[4])
+                        ? $retainedValue[4] // SEO URI
+                        : \General::addGetParameterToURI(\General::addGetParameterToURI( // URI with parameters control & action
+                            $mainScript, 'control', $retainedValue[0]), 'action', 'show');
+                }
                 $viewID = "id=\"znetdk-{$value[0]}-menu\"";
-                if (!isset($value[2]) && \Parameters::isSetPageReload()) { // leaf item and the page is to be reloaded
-                    $mainScript = \General::getMainScript(TRUE);
-                    $hrefLink = isset($value[4]) ? $value[4] :
-                        \General::addGetParameterToURI(
-                                    \General::addGetParameterToURI($mainScript, 'control', $value[0]),
-                                    'action','show');
-                }
-                if (isset($value[3])) {
-                    $iconAttr = " data-icon=\"$value[3]\"";
-                } else {
-                    $iconAttr = '';
-                }
-                echo str_repeat("\t", $nbTabs + 1) . "<li " . $viewID . $hasSubMenu 
+                $iconAttr = isset($value[3]) ? " data-icon=\"$value[3]\"" : '';
+                echo str_repeat("\t", $nbTabs + 1) . "<li " . $viewID . $itemCssClasses
                         . "><a href=\"{$hrefLink}\"{$iconAttr} title=\"{$value[1]}\">{$value[1]}</a>";
-                if (isset($value[2])) { // submenu exists...
+                if ($subMenuAllowed && isset($value[2])) { // submenu exists...
                     echo PHP_EOL;
                     self::renderCustomMenu($level + 2, $value[2], $selectedMenuItem, $allowedMenuItems);
                     echo str_repeat("\t", $nbTabs + 1) . "</li>" . PHP_EOL;
-                } else { // leaf item 
+                } else { // leaf item
                     echo "</li>" . PHP_EOL;
                 }
             }
         }
         echo str_repeat("\t", $nbTabs) . '</ul>' . PHP_EOL;
-        if ($level === 1) {
+        if ($level === 1) { // Menu container end tag
             echo str_repeat("\t", $nbTabs - 1) . '</div>' . PHP_EOL;
         }
     }

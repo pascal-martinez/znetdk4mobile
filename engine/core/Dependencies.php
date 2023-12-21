@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core renderer of the ressource dependencies
  *
- * File version: 1.9
- * Last update: 09/03/2023
+ * File version: 1.10
+ * Last update: 10/17/2023
  */
 
 /**
@@ -30,21 +30,30 @@ class Dependencies {
     /**
      * Main public method called by the Layout controller to insert the
      * HTML dependencies to the main page of the application.
+     * @param string $type Optional, value 'css' or 'js'
      */
-    public static function render() {
+    public static function render($type = NULL) {
         $layout = \Parameters::getPageLayoutName();
         if ($layout === 'mobile') {
             // CSS rendering
-            self::renderCSSforMobile();
-            // JS rendering
-            self::renderJSforMobile();
-        } else {
-            if (CFG_NON_MOBILE_PWA_ENABLED === FALSE) {
-                $icon = defined('LC_HEAD_ICO_LOGO') ? LC_HEAD_ICO_LOGO : LC_HEAD_IMG_LOGO;
-                echo '<link rel="icon" type="image/png" href="'.$icon.'">'.PHP_EOL;
+            if (is_null($type) || $type === 'css') {
+                self::renderCSSforMobile();
             }
-            self::renderCSS();
-            self::renderJS();
+            // JS rendering
+            if (is_null($type) || $type === 'js') {
+                self::renderJSforMobile();
+            }
+        } else {
+            if (is_null($type) || $type === 'css') {
+                if (CFG_NON_MOBILE_PWA_ENABLED === FALSE) {
+                    $icon = defined('LC_HEAD_ICO_LOGO') ? LC_HEAD_ICO_LOGO : LC_HEAD_IMG_LOGO;
+                    echo "\t\t" . '<link rel="icon" type="image/png" href="'.$icon.'">'.PHP_EOL;
+                }
+                self::renderCSS();
+            }
+            if (is_null($type) || $type === 'js') {
+                self::renderJS();
+            }
         }
     }
 
@@ -84,7 +93,7 @@ class Dependencies {
         if ($activeTheme['level'] === 'application') {
             $cssDependencies[] = \General::getFilledMessage(CFG_ZNETDK_CSS,'custom-theme');
         }
-        self::renderDependencies('CSS', "\t", $cssDependencies);
+        self::renderDependencies('CSS', "\t\t", $cssDependencies);
     }
 
     /**
@@ -104,8 +113,8 @@ class Dependencies {
         }
         self::addModulesDependencies('js', $jsDependencies);
         self::addApplicationDependencies('js', $jsDependencies);
-        echo "\t".'<script>var znetdkAjaxURL = "'.\General::getMainScript(TRUE).'";</script>'.PHP_EOL;
-        self::renderDependencies('JS', "\t", $jsDependencies);
+        echo "\t\t".'<script>var znetdkAjaxURL = "'.\General::getMainScript(TRUE).'";</script>'.PHP_EOL;
+        self::renderDependencies('JS', "\t\t", $jsDependencies);
     }
 
     /**

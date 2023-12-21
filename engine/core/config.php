@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core parameters of the applications
 *
-* File version: 1.13
-* Last update: 08/29/2023
+* File version: 1.14
+* Last update: 12/15/2023
 */
 
 /** Page layout chosen for the application.
@@ -490,3 +490,14 @@ define('CFG_DOWNLOAD_AS_POST_REQUEST_ENABLED', FALSE);
  */
 define('CFG_REQUEST_VARIABLE_FILTERING_LEVEL', 'HIGH');
 
+/**
+ * Defines the file path of the PHP script to run after a controller action has
+ * been done.
+ * This parameter can be useful to measure performance of a given controller
+ * action (see ZNETDK_TIME_ELAPSED_FOR_ACTION PHP constant) or to track activity
+ * of a given user.
+ * @return string File path of the PHP script or NULL (by default) if no script
+ * is to execute once the controller action is done.
+ * For example: ZNETDK_APP_ROOT . '/app/myscript.php'
+ */
+define('CFG_EXEC_PHP_SCRIPT_AFTER_ACTION_DONE', NULL);

@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.0
- * Last update: 07/28/2022
+ * File version: 1.1
+ * Last update: 10/17/2023
  */
 $appUrl = str_replace('index.php', '', General::getApplicationURI());
 $internetAddressText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INTERNET_ADDRESS, "<a href=\"{$appUrl}\">{$appUrl}</a>");
@@ -32,7 +32,7 @@ $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, 
 <div id="mzdk-userpanel-install" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
         <header class="w3-container w3-theme-d5">
-            <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
+            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-hdd-o fa-lg"></i>
                 <span class="title"><?php echo LC_HEAD_USERPANEL_INSTALL; ?></span>

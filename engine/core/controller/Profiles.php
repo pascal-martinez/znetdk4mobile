@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for user profile management
  *
- * File version: 1.3
- * Last update: 08/06/2023
+ * File version: 1.4
+ * Last update: 10/17/2023
  */
 
 namespace controller;
@@ -29,12 +29,12 @@ namespace controller;
  * ZnetDK Core controller for profile management
  */
 class Profiles extends \AppController {
-    
+
     /**
      * Evaluates whether action is allowed or not.
      * When authentication is required, action is allowed if connected user has
      * full menu access or if has a profile allowing access to the profiles view.
-     * If no authentication is required, action is allowed if the profile view 
+     * If no authentication is required, action is allowed if the profile view
      * menu item is declared in the 'menu.php' script of the application.
      * @param string $action Action name
      * @return Boolean TRUE if action is allowed, FALSE otherwise
@@ -48,7 +48,7 @@ class Profiles extends \AppController {
         return CFG_AUTHENT_REQUIRED === TRUE
             ? Users::hasMenuItem($menuItem) // User has right on menu item
             : \MenuManager::getMenuItem($menuItem) !== NULL; // Menu item declared in 'menu.php'
-    }    
+    }
 
     /** Return the profiles defined for the application and to be displayed in
      *  the profile datatable
@@ -80,7 +80,7 @@ class Profiles extends \AppController {
         $response->setResponse(\ProfileManager::getById($request->id));
         return $response;
     }
-    
+
     /** Save the profile created or modified from the profile view form */
     static protected function action_save() {
         $response = new \Response();
@@ -91,7 +91,7 @@ class Profiles extends \AppController {
             $profileRow = $request->getValuesAsMap('profile_id', 'profile_name', 'profile_description');
             $menuItems = $request->menu_ids;
             \ProfileManager::storeProfile($profileRow, $menuItems);
-            $response->setSuccessMessage($summary, LC_MSG_INF_SAVE_RECORD);
+            $response->setSuccessMessage(CFG_PAGE_LAYOUT === 'mobile' ? NULL : $summary, LC_MSG_INF_USER_PROFILE_STORED);
         } else { //Data validation failed...
             $response->setFailedMessage($summary, $validator->getErrorMessage(),
                     $validator->getErrorVariable());
@@ -118,7 +118,7 @@ class Profiles extends \AppController {
         $response = new \Response();
         $request = new \Request();
         $profileID = $request->profile_id;
-        /* First, check whether the user profile is defined for a user ... */
+        /* First, check whether the user profile is granted to a user ... */
         if (\ProfileManager::isProfileGrantedToUsers($profileID)) {
             $response->setFailedMessage(LC_FORM_TITLE_PROFILE_REMOVE, LC_MSG_ERR_REMOVE_PROFILE);
             return $response;
@@ -126,7 +126,7 @@ class Profiles extends \AppController {
         /* Next, remove the profile... */
         \ProfileManager::removeProfile($profileID);
         /* Response returned to the main controller */
-        $response->setSuccessMessage(LC_FORM_TITLE_PROFILE_REMOVE, LC_MSG_INF_REMOVE_RECORD);
+        $response->setSuccessMessage(CFG_PAGE_LAYOUT === 'mobile' ? NULL : LC_FORM_TITLE_PROFILE_REMOVE, LC_MSG_INF_USER_PROFILE_REMOVED);
         return $response;
     }
 

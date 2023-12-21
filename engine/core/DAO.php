@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * --------------------------------------------------------------------
- * Core Data Access Object API 
+ * Core Data Access Object API
  *
- * File version: 1.13
- * Last update: 11/22/2022
+ * File version: 1.14
+ * Last update: 12/15/2023
  */
 abstract class DAO {
 
@@ -63,7 +63,7 @@ abstract class DAO {
     private $customDbConnection = NULL;
 
     /**
-     * Creates a new custom DAO object 
+     * Creates a new custom DAO object
      * @param \PDO $customDbConnection Optional database connection to use other
      * than the database connection set in the config.php file.
      * @throws \Exception Thrown when the custom DAO is not properly defined.
@@ -90,7 +90,7 @@ abstract class DAO {
             }
         }
     }
-    
+
     private function addAmountColumns(&$row) {
         if (is_array($row) && is_array($this->amountColumns)) {
             foreach ($this->amountColumns as $column) {
@@ -106,7 +106,7 @@ abstract class DAO {
             }
         }
     }
-    
+
     private function getDbConnection() {
         if (!is_null($this->customDbConnection)) {
             return $this->customDbConnection;
@@ -116,7 +116,7 @@ abstract class DAO {
                 return \Database::getCoreDbConnection();
             } else {
                 return \Database::getApplDbConnection();
-            }            
+            }
         } catch (\Exception $e) {
             $message = "DAO-008: unable to connect to the database".
                     ": code='" . $e->getCode() . "', message='" . $e->getMessage();
@@ -126,7 +126,7 @@ abstract class DAO {
     }
 
     private function getProfileJoinClause() {
-        $database = defined('CFG_SQL_CORE_DB') && CFG_SQL_CORE_DB != '' 
+        $database = defined('CFG_SQL_CORE_DB') && CFG_SQL_CORE_DB != ''
                     ? "`".CFG_SQL_CORE_DB."`." : '';
         $profileSetOperator = $this->profileCriteriaExclude ? 'NOT IN' : 'IN';
         $joinClause = " INNER JOIN " . $database . "zdk_profile_rows ON"
@@ -140,7 +140,7 @@ abstract class DAO {
         . implode("','",$this->profileCriteria) . "'))";
         return $joinClause;
     }
-    
+
     private function storeProfiles($rowID) {
         // First, remove existing profiles
         $profileMenusDAO = new model\ProfileRows();
@@ -162,7 +162,7 @@ abstract class DAO {
             }
         }
     }
-    
+
     private function getTablePrefixParameter() {
         if (is_null(CFG_SQL_TABLE_REPLACE_PREFIXES)) {
             return NULL;
@@ -176,7 +176,7 @@ abstract class DAO {
         }
         return $prefixes;
     }
-    
+
     private function replaceTablePrefixesToQuery(&$fullQuery) {
         $prefixes = $this->getTablePrefixParameter();
         if (is_null($prefixes)) {
@@ -196,7 +196,7 @@ abstract class DAO {
     /**
      * Returns the table name set for the DAO.
      * If the CFG_SQL_TABLE_REPLACE_PREFIXES parameter is set, the table name
-     * returned is the converted table name obtained after replacement of its 
+     * returned is the converted table name obtained after replacement of its
      * prefix to the one specified in the config.php parameter.
      * @return string The name of the table
      */
@@ -213,7 +213,7 @@ abstract class DAO {
         }
         return $this->table; // The table name does not match the prefixes to replace
     }
-    
+
     private function executeQuery() {
         $fullQuery = $this->query;
         $dbConnection = $this->getDbConnection();
@@ -237,8 +237,9 @@ abstract class DAO {
             $fullQuery .= ' FOR UPDATE';
         }
         $this->replaceTablePrefixesToQuery($fullQuery);
-        $statement = $dbConnection->prepare($fullQuery);
+        $queryStartTime = microtime(TRUE);
         try {
+            $statement = $dbConnection->prepare($fullQuery);
             $statement->execute($this->filterValues);
         } catch (\PDOException $e) {
             $message = "DAO-002: unable to execute the SQL query '" . $fullQuery .
@@ -246,15 +247,15 @@ abstract class DAO {
             \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
             throw $e;
         }
-        $this->traceSqlStatement($fullQuery, $this->filterValues);
+        $this->traceSqlStatement($fullQuery, $this->filterValues, $queryStartTime);
         return $statement;
     }
-    
+
     /**
      * Removes '_money', '_amount' and '_locale' suffixes in the specified
-     * columns string 
+     * columns string
      * @param string $columns String containing columns description
-     * @return string Columns description without '_money', '_local' and 
+     * @return string Columns description without '_money', '_local' and
      * '_amount' suffixes.
      */
     private function removeExtraSuffixes($columns) {
@@ -279,7 +280,7 @@ abstract class DAO {
 
     /**
      * Returns only the values of the specified columns from the data row passed
-     * in parameter 
+     * in parameter
      * @param array $row All values of the row
      * @return array The values of the specified columns in the $selectedColumns
      * property
@@ -288,14 +289,14 @@ abstract class DAO {
         if (is_array($this->selectedColumns) && count($this->selectedColumns) > 0) {
             $selection = array();
             foreach ($this->selectedColumns as $key) {
-                $selection [$key] = $row[$key]; 
+                $selection [$key] = $row[$key];
             }
             return $selection;
         } else {
             return $row;
         }
     }
-        
+
     /**
      * Method called when the inherited class is instanciated
      * The $query, $filterClause, $IdColumnName and $moneyColumns
@@ -326,7 +327,7 @@ abstract class DAO {
         }
     }
     /**
-     * Commits the data changed in the table. 
+     * Commits the data changed in the table.
      */
     public function commit() {
         $dbConnection = $this->getDbConnection();
@@ -334,7 +335,7 @@ abstract class DAO {
     }
 
     /**
-     * Rollbacks the data changed in the table. 
+     * Rollbacks the data changed in the table.
      */
     public function rollback() {
         $dbConnection = $this->getDbConnection();
@@ -344,7 +345,7 @@ abstract class DAO {
     /**
      * Sets one or several values as criteria for the filter defined for the DAO.
      * <br>The values are passed in parameters of the method.<br>
-     * The order of the values passed to the method must be the same than 
+     * The order of the values passed to the method must be the same than
      * the one of the criteria defined for the $filterClause property.
      */
     public function setFilterCriteria() {
@@ -354,9 +355,9 @@ abstract class DAO {
         }
         $this->result = FALSE;
     }
-    
+
     /**
-     * Sets the sort criteria to apply to the data returned by the method 
+     * Sets the sort criteria to apply to the data returned by the method
      * getResult().
      * @param string $sortCriteria Column name of the table from which the data
      * have to be sorted.
@@ -377,11 +378,11 @@ abstract class DAO {
         $this->limitClause = 'LIMIT ' . $offset . ', ' . $count;
         $this->result = FALSE;
     }
-    
+
     /**
      * Sets the profiles for limiting the rows returned by the 'getResults'
-     * method to those matching them.  
-     * @param array $profiles Names of the profiles   
+     * method to those matching them.
+     * @param array $profiles Names of the profiles
      * @param boolean $exclude When set to TRUE, the profiles other than those
      * specified will be returned by the 'getResults' method.
      */
@@ -390,10 +391,10 @@ abstract class DAO {
         $this->profileCriteriaExclude = $exclude;
         $this->result = FALSE;
     }
-    
+
     /**
      * Sets the profiles to store for each row inserted thru a call to the
-     * 'store' method.  
+     * 'store' method.
      * @param array $profiles Names of the profiles
      */
     public function setStoredProfiles($profiles) {
@@ -402,18 +403,18 @@ abstract class DAO {
     }
 
     /**
-     * Limits the returned values on database selection to the specified columns 
+     * Limits the returned values on database selection to the specified columns
      * @param array $columns Columns to return on DAO selection
      */
     public function setSelectedColumns($columns) {
         $this->selectedColumns = $columns;
         $this->result = FALSE;
     }
-    
+
     /**
      * Set columns to display as Amount according locale settings.
-     * For example, if the column 'total' is specified, the column named 
-     * 'total_amount' is added to the row returned by the DAO::getById() and 
+     * For example, if the column 'total' is specified, the column named
+     * 'total_amount' is added to the row returned by the DAO::getById() and
      * DAO::getResult() methods and contains the formated value as amount.
      * See also LC_LOCALE_DECIMAL_SEPARATOR, LC_LOCALE_THOUSANDS_SEPARATOR,
      * LC_LOCALE_NUMBER_OF_DECIMALS ZnetDK constants.
@@ -425,14 +426,14 @@ abstract class DAO {
             $this->amountColumns[] = strval($column);
         }
     }
-    
+
     /**
      * Set columns to display as Money according locale settings.
-     * For example, if the column 'total' is specified, the column named 
-     * 'total_money' is added to the row returned by the DAO::getById() and 
+     * For example, if the column 'total' is specified, the column named
+     * 'total_money' is added to the row returned by the DAO::getById() and
      * DAO::getResult() methods and contains the formated value as money.
      * See also LC_LOCALE_DECIMAL_SEPARATOR, LC_LOCALE_THOUSANDS_SEPARATOR,
-     * LC_LOCALE_NUMBER_OF_DECIMALS, LC_LOCALE_CURRENCY_SYMBOL, 
+     * LC_LOCALE_NUMBER_OF_DECIMALS, LC_LOCALE_CURRENCY_SYMBOL,
      * LC_LOCALE_CURRENCY_SYMBOL_PRECEDE, LC_LOCALE_CURRENCY_SYMBOL_SEPARATE
      * ZnetDK constants.
      * @param string one or several column names
@@ -443,11 +444,11 @@ abstract class DAO {
             $this->moneyColumns[] = strval($column);
         }
     }
-    
+
     /**
      * Set columns to display as Date according locale settings.
-     * For example, if the column 'update_date' is specified, the column named 
-     * 'update_date_locale' is added to the row returned by the DAO::getById() 
+     * For example, if the column 'update_date' is specified, the column named
+     * 'update_date_locale' is added to the row returned by the DAO::getById()
      * and DAO::getResult() methods and contains the formated value as money.
      * See also LC_LOCALE_DATE_FORMAT ZnetDK constant.
      * @param string one or several column names
@@ -458,13 +459,13 @@ abstract class DAO {
             $this->dateColumns[] = strval($column);
         }
     }
-    
+
     /**
      * Enables or disables the locking of rows when they are selected by adding
      * the 'FOR UDATE' clause to the SQL query.
      * @param boolean $isForUpdate Value TRUE for enabling rows locking, FALSE
      * to disable it.
-     * @throws \ZDKException Thrown if no transaction is started 
+     * @throws \ZDKException Thrown if no transaction is started
      */
     public function setForUpdate($isForUpdate) {
         $dbConnection = $this->getDbConnection();
@@ -475,19 +476,21 @@ abstract class DAO {
         }
         $this->isForUpdate = $isForUpdate;
     }
-    
+
     /**
      * Returns the current 'for update' state set for the next SELECT statement
      * to execute.
      * @return boolean Value TRUE is the next select statement is to execute
-     * with the for update clause. 
+     * with the for update clause.
      */
     public function isForUpdate() {
         return $this->isForUpdate;
     }
-    
+
     /**
-     * Returns the number of data row returned by the method getResult().
+     * Returns the number of data rows.
+     * For large tables, it is better to execute a specific SQL query with
+     * COUNT(*) in column definition.
      * @return int Number of data rows.
      */
     public function getCount() {
@@ -495,7 +498,7 @@ abstract class DAO {
 
         if ($this->result) {
             $rowCount = $this->result->rowCount();
-            $this->result = FALSE;
+                $this->result = FALSE;
             return $rowCount;
         } else {
             return 0;
@@ -503,11 +506,11 @@ abstract class DAO {
     }
 
     /**
-     * Returns the current data row  
+     * Returns the current data row
      * @return array|boolean Characteristics of the current data row as an array
      * where the index value matches the column name. Returns null if no data
      * row exists or if the last data row has already been returned at the
-     * previous call. 
+     * previous call.
      */
     public function getResult() {
         if (!$this->result) { // First call, the SQL query is not yet executed
@@ -534,10 +537,10 @@ abstract class DAO {
 
     /**
      * Returns the data row for the specified identifier.
-     * @param int $id Identifier of the data row to select 
-     * @return array|boolean Array containing the characteristics of the data 
-     * row selected. Returns false if no data row exists for the specified 
-     * identifier. 
+     * @param int $id Identifier of the data row to select
+     * @return array|boolean Array containing the characteristics of the data
+     * row selected. Returns false if no data row exists for the specified
+     * identifier.
      */
     public function getById($id) {
         $this->filterValues = array($id);
@@ -552,7 +555,7 @@ abstract class DAO {
      * @param array $row Data row as an array. If the identifier is specified in
      * the array, the data row is updated. Else, the data row is inserted in the
      * table.
-     * @param boolean $autocommit Specifies whether the data must be commited 
+     * @param boolean $autocommit Specifies whether the data must be commited
      * after its modification or insertion.
      * @param boolean $emptyValuesToNull If TRUE, converts the empty values
      * (ie '') to NULL.
@@ -593,9 +596,9 @@ abstract class DAO {
         if ($autocommit) {
             $dbConnection->beginTransaction();
         }
-        $statement = $dbConnection->prepare($sql);
-
+        $queryStartTime = microtime(TRUE);
         try {
+            $statement = $dbConnection->prepare($sql);
             $statement->execute(array_values($values));
         } catch (\PDOException $e) {
             $message = "DAO-004: unable to execute the SQL statement '" . $sql .
@@ -606,26 +609,26 @@ abstract class DAO {
             }
             throw $e;
         }
-        
-        $returnedRowID = isset($rowID) ? $rowID : $dbConnection->lastInsertId();        
-            
+
+        $returnedRowID = isset($rowID) ? $rowID : $dbConnection->lastInsertId();
+
         if (count($this->storedProfiles) > 0 ) {
             $this->storeProfiles($returnedRowID);
         }
-        
+
         if ($autocommit) {
             $dbConnection->commit();
-        }        
-        $this->traceSqlStatement($sql, $values);        
+        }
+        $this->traceSqlStatement($sql, $values, $queryStartTime);
         return $returnedRowID;
     }
 
     /**
      * Removes the table row matching the specified row identifier. If the row
      * identifier is not set in paramater, the filter criteria set for the DAO
-     * object are used to remove the corresponding rows. 
-     * @param int $rowID Identifier of the row to remove. 
-     * @param boolean $autocommit Specifies whether the data once removed must 
+     * object are used to remove the corresponding rows.
+     * @param int $rowID Identifier of the row to remove.
+     * @param boolean $autocommit Specifies whether the data once removed must
      * be commited or not.
      * @return int The number of rows removed
      */
@@ -636,7 +639,7 @@ abstract class DAO {
             \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
             throw new \ZDKException($message);
         } elseif (!isset($rowID) && (count($this->filterValues) === 0 || !$this->filterClause)) {
-            $message = "DAO-006: the parameter 'rowID' is absent when calling the method 'DAO::remove()' or the properties 'filterValues' and 'filterClause' are not properly set for the class '" . 
+            $message = "DAO-006: the parameter 'rowID' is absent when calling the method 'DAO::remove()' or the properties 'filterValues' and 'filterClause' are not properly set for the class '" .
                     get_class($this) . "' to remove data row!";
             \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
             throw new \ZDKException($message);
@@ -657,9 +660,9 @@ abstract class DAO {
         if ($autocommit) {
             $dbConnection->beginTransaction();
         }
-        $statement = $dbConnection->prepare($sql);
-             
+        $queryStartTime = microtime(TRUE);
         try {
+            $statement = $dbConnection->prepare($sql);
             $statement->execute($filterValues);
         } catch (\PDOException $e) {
             $message = "DAO-007: unable to execute the SQL statement '" . $sql .
@@ -674,25 +677,25 @@ abstract class DAO {
         if (isset($rowID)) {
             \ProfileManager::removeProfilesRow($this->table, $rowID);
         }
-        
+
         if ($autocommit) {
             $dbConnection->commit();
-        }        
-        $this->traceSqlStatement($sql, $filterValues);        
+        }
+        $this->traceSqlStatement($sql, $filterValues, $queryStartTime);
         return $rowCount;
     }
-    
+
     /**
-     * Check if the table name set for the 'table' property exists in the 
+     * Check if the table name set for the 'table' property exists in the
      * current database
-     * @return Boolean TRUE if table exists, FALSE if table does not exist or 
+     * @return Boolean TRUE if table exists, FALSE if table does not exist or
      * if the 'table' property is not set.
      */
     public function doesTableExist() {
         if (!isset($this->table)) {
             return FALSE;
         }
-        $connection = $this->getDbConnection();        
+        $connection = $this->getDbConnection();
         $dbQuery = "SELECT 1 FROM information_schema.tables
             WHERE table_name = ?
             AND table_schema = DATABASE()";
@@ -707,7 +710,7 @@ abstract class DAO {
         }
         return $statement !== FALSE && $statement->rowCount() === 1;
     }
-    
+
     private function isTableAliasRequired($filterClause) {
         return $this->tableAlias && strpos($filterClause, $this->tableAlias . '.') !== FALSE;
     }
@@ -719,7 +722,7 @@ abstract class DAO {
             }
         }
     }
-    
+
     private function convertBooleanValuesToInt(&$row) {
         foreach ($row as $key => &$value) {
             if (is_bool($value)) {
@@ -727,14 +730,15 @@ abstract class DAO {
             }
         }
     }
-    
-    private function traceSqlStatement($sqlStatement, $values) {
+
+    private function traceSqlStatement($sqlStatement, $values, $queryStartTime) {
         if (CFG_SQL_TRACE_ENABLED === TRUE) {
+            $timeElapsed = round(microtime(TRUE) - $queryStartTime, 3);
             $queryValuesAsString = implode(', ', $values);
             $callBackTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
             $callingMethod = key_exists(2, $callBackTrace) && key_exists('function', $callBackTrace[1])
                     ? "::{$callBackTrace[2]['function']}()" : '';
-            General::writeSystemLog(get_class($this).$callingMethod, "SQL QUERY: {$sqlStatement}\nVALUES: [{$queryValuesAsString}]", TRUE);
+            General::writeSystemLog(get_class($this).$callingMethod, "SQL QUERY: {$sqlStatement}\nVALUES: [{$queryValuesAsString}]\nTIME ELAPSED: {$timeElapsed} s", TRUE);
         }
     }
 }

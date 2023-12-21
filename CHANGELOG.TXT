@@ -1,3 +1,48 @@
+ZnetDK 3.1.0, 2023-12-21
+------------------------
+- CHANGE (all): the SQL query execution time is now traced when the
+  CFG_SQL_TRACE_ENABLED PHP constant is set to TRUE.
+- CHANGE (all): a custom PHP script can be ran after a controller action is
+  executed to track application activity or measure performance, by setting its
+  path through the new 'CFG_EXEC_PHP_SCRIPT_AFTER_ACTION_DONE' PHP constant in
+  the 'config.php' script of the application. The time elapsed in seconds for
+  executing a controller action is given by the 'ZNETDK_TIME_ELAPSED_FOR_ACTION'
+  PHP constant.
+- CHANGE (all): to optimize the first display of the application, JavaScript
+  dependencies are now loaded at the end of the 'body' block of the HTML 
+  document.
+- CHANGE (all): after granting or not granting a profile to a user, the latter 
+  no longer needs to log out and log in again for their new rights to apply.
+  Indeed, reloading the application in the internet browser is now enough for
+  the user's rights to apply.
+- CHANGE (ZnetDK 4 mobile only): for better accessibility, new 'title' parameter
+  added to the JavaScript z4m.action.addCustomButton() method to specify a title
+  for the custom action button.
+- BUG FIXING (ZnetDK 4 mobile only): a JS data list was wrongly refreshed after
+  a form submission if the 'success' property of the JSON response existed and 
+  was false (see z4m.list.setModal() method).
+- BUG FIXING (ZnetDK 4 mobile only): for better accessibility, 'title' and
+  'aria-label' HTML attributes are added to the action buttons.
+- BUG FIXING (ZnetDK 4 mobile only): after saving and removing a user profile,
+  the confirmation message is now displayed as a snackbar message.
+- BUG FIXING (ZnetDK 4 mobile only): for better accessibility, form labels are
+  now associated with their form fields.
+- BUG FIXING (ZnetDK 4 mobile only): items in the left vertical menu were not 
+  focusable when navigating with keyboard (accessibility issue).
+- BUG FIXING (all): HTML title attribute added to the application's logo link
+  and HTML alt attribute set from the PHP LC_HEAD_TITLE constant.
+- BUG FIXING (ZnetDK 4 mobile only): for SEO purpose when the 
+  CFG_VIEW_PAGE_RELOAD parameter is set to TRUE, the 'href' attribute of the 
+  level 2 horizontal menu items is now set to the $menuItemSEOlink value
+  specified in the menu.php script on \MenuManager::addMenuItem() method call.
+- BUG FIXING (ZnetDK only): when an application was configured with 
+  CFG_PAGE_LAYOUT set to 'custom', upon clicking a menu item, its associated
+  view might not be displayed the first time and was ultimately only displayed
+  upon clicking a second time.
+- BUG FIXING (ZnetDK only): when an application was configured with 
+  CFG_PAGE_LAYOUT set to 'classic' or 'custom', the icon on the title bar of the
+  login dialog was displayed on the right instead of the left.
+
 ZnetDK 3.0.0, 2023-09-10
 ------------------------
 - CHANGE (all): new \Convert::toISO88591() method to convert a string from UTF-8

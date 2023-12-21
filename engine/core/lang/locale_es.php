@@ -1,7 +1,7 @@
 <?php
 /**
 * ZnetDK, Starter Web Application for rapid & easy development
-* See official website http://www.znetdk.fr 
+* See official website http://www.znetdk.fr
 * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
 * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
 * --------------------------------------------------------------------
@@ -18,12 +18,12 @@
 * --------------------------------------------------------------------
 * Core spanish translations of the application
 *
-* File version: 1.18
-* Last update: 08/29/2023
+* File version: 1.19
+* Last update: 10/17/2023
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
-define ('LC_LOCALE_ALL', serialize(array('es_ES.UTF-8', 'Spanish_Spain.1252', 'es_ES', 'spanish'))); 
+define ('LC_LOCALE_ALL', serialize(array('es_ES.UTF-8', 'Spanish_Spain.1252', 'es_ES', 'spanish')));
 
 /* Overriden localization settings (instead of the 'setlocale' settings) */
 define('LC_LOCALE_DECIMAL_SEPARATOR', NULL);
@@ -41,7 +41,7 @@ define('LC_LANG_ISO_CODE','es');
 /* General labels */
 define('LC_PAGE_TITLE','Aplicación ZnetDK');
 
-/* Heading labels */
+/* Header labels */
 define('LC_HEAD_TITLE','Aplicación ZnetDK (core)');
 define('LC_HEAD_SUBTITLE','Lista para desarrollar...');
 define('LC_HEAD_LNK_LOGOUT','desconectarse');
@@ -50,7 +50,8 @@ define('LC_HEAD_USERPANEL_MY_USER_RIGHTS','Mis derechos de usuario');
 define('LC_HEAD_USERPANEL_INSTALL','Instalación');
 define('LC_HEAD_USERPANEL_UNINSTALL','Desinstalación');
 
-/* Heading images */
+/* Header images */
+define('LC_HEAD_IMG_LOGO_LINK_TITLE', 'Retorno al inicio');
 define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.png');
 
 /* Footer labels */
@@ -62,7 +63,7 @@ define('LC_FOOTER_RIGHT','Realizado con <a href="https://www.znetdk.fr" target="
 define('LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL', 'Instalar la aplicación...');
 define('LC_HEAD_USERPANEL_INSTALL_TITLE_HELPFUL_INFOS', 'Información útil');
 define('LC_HEAD_USERPANEL_INSTALL_STATUS_IS_INSTALLED', 'Su aplicación ya está instalada.');
-define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLED', 'Su aplicación aún no está instalada. Toque el botón <b>' 
+define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLED', 'Su aplicación aún no está instalada. Toque el botón <b>'
         . LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL . '</b> a continuación para instalarla.');
 define('LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLABLE', 'Su aplicación debe instalarse manualmente. Ver <b>'
         . LC_HEAD_USERPANEL_INSTALL_TITLE_HELPFUL_INFOS . '</b> a continuación.');
@@ -176,6 +177,7 @@ define('LC_FORM_LBL_ACCESS','Accesso');
 define('LC_FORM_LBL_PUBL_ACC','público (finaliza la sesión)');
 define('LC_FORM_LBL_PRIV_ACC','privado');
 define('LC_FORM_LBL_REMEMBER_ME', 'Recuérdame');
+define('LC_FORM_LBL_TOGGLE_PASSWORD', 'Mostrar / ocultar contraseña');
 define('LC_FORM_LBL_FORGOT_PASSWORD', 'Contraseña olvidada ?');
 
 /* User Form labels */
@@ -210,9 +212,14 @@ define('LC_FORM_NEW_PASSWORD_REQUEST_PLACEHOLDER', 'Email de la cuenta de usuari
 define('LC_BTN_LOGIN','Conectarse');
 define('LC_BTN_CANCEL','Cancelar');
 define('LC_BTN_CLOSE','Cerrar');
+define('LC_BTN_SHOW_MENU', 'Mostrar el menú');
+define('LC_BTN_SHOW_USERPANEL', 'Panel de usuario');
 define('LC_BTN_SAVE','Guardar');
 define('LC_BTN_APPLY', 'Aplicar');
 define('LC_BTN_VALIDATE', 'Validar');
+define('LC_BTN_REFRESH','Actualizar');
+define('LC_BTN_SEARCH','Buscar...');
+define('LC_BTN_SCROLL_TO_TOP','Vuelve al comienzo');
 define('LC_BTN_NEW','Nuevo');
 define('LC_BTN_MODIFY','Editar');
 define('LC_BTN_OPEN','Abrir');
@@ -250,7 +257,7 @@ define('LC_MSG_ERR_MISSING_VALUE',"Por favor, introduzca un valor!");
 define('LC_MSG_ERR_MISSING_VALUE_FOR',"Por favor, introduzca un valor por '%1'!");
 define('LC_MSG_ERR_PWD_MISMATCH','La contraseña y su confirmación no corresponden!');
 define('LC_MSG_ERR_PWD_IDENTICAL','La nueva contraseña tiene que ser diferente de la contraseña actual!');
-define('LC_MSG_ERR_PASSWORD_BADLENGTH','La contraseña debe contener un mínimo de 8 caracteres, al menos 1 letra mayúscula y minúscula y 1 número.' 
+define('LC_MSG_ERR_PASSWORD_BADLENGTH','La contraseña debe contener un mínimo de 8 caracteres, al menos 1 letra mayúscula y minúscula y 1 número.'
             .'<br>También se aceptan los siguientes caracteres especiales: ! * + - / = . , ; : _ @ # ? % " \' $ &');
 define('LC_MSG_ERR_EMAIL_INVALID','El email no es válido!');
 define('LC_MSG_ERR_LOGIN_BADLENGTH','¡El login de conexión debe contener entre 6 y 20 caracteres!');
@@ -285,6 +292,8 @@ define('LC_MSG_INF_LOGIN',"Se ha conectado con éxito.");
 define('LC_MSG_INF_PWDCHANGED',"Su contraseña ha sido cambiada correctamente.");
 define('LC_MSG_INF_USERSTORED',"Usuario guardado.");
 define('LC_MSG_INF_USERREMOVED',"Usuario eliminado.");
+define('LC_MSG_INF_USER_PROFILE_STORED',"Perfil guardado.");
+define('LC_MSG_INF_USER_PROFILE_REMOVED',"Perfil eliminado.");
 define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'Se le ha enviado un correo electrónico de confirmación.');
 define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Su contraseña temporal le ha sido enviada por correo electrónico.<br><a href="%1">Haga clic aquí</a> para conectarse.');
 define('LC_MSG_INF_LOGOUT','<h3>Desconexión correcta.</h3><p><a href="">Haga clic aquí</a> para conectarse de nuevo.</p>');

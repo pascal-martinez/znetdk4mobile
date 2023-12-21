@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core User session API
  *
- * File version: 1.11
- * Last update: 08/30/2023
+ * File version: 1.12
+ * Last update: 09/15/2023
  */
 Class UserSession {
     static private $customVarPrefix = "zdkcust-";
@@ -443,7 +443,7 @@ Class UserSession {
 
     /**
      * Stored in session the fact that the specified user failed to authenticate
-     * @param type $loginName Login of the user
+     * @param string $loginName Login of the user
      */
     static public function setAuthentHasFailed($loginName) {
         if (!is_null(self::getValue('nbr_of_failed_authent'))
