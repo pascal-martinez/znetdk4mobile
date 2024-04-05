@@ -1,6 +1,6 @@
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr
+ * See official website https://mobile.znetdk.fr
  * Copyright (C) 2019 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Javascript library for mobile page layout
  *
- * File version: 1.10
- * Last update: 10/29/2023
+ * File version: 1.11
+ * Last update: 03/20/2024
  */
 
 /* global FormData, BeforeInstallPromptEvent */
@@ -32,10 +32,12 @@ var znetdkMobile = {
     },
     authentication: {
         loginFormId: '#zdk-login-modal',
+        urlLoginParamName: 'login',
         changePasswordFormId: '#zdk-changepwd-modal',
         connectedUserPanelId: '#zdk-userpanel-modal',
         rememberMeLocalStorageKey: 'znetdkmobile_authentication_remember_me',
         loginNameStorageKey: 'znetdkmobile_authentication_login_name',
+        loginWithEmailStorageKey: 'znetdkmobile_authentication_login_with_email',
         myUserRightsModalId: '#mzdk-my-user-rights',
         myUserRightsViewName: 'z4mmyuserrights',
         events: {}
@@ -252,15 +254,14 @@ z4m.initApp = function () {
         if (z4m.authentication.isEnabled()) {
             // The header connected user buttons are displayed
             z4m.header.showConnectionArea();
+            // The 'login' param is removed from the query string of the URL
+            z4m.authentication.removeLoginParamFromUrl();
         } else {
             z4m.header.hideConnectionArea();
         }
     }
     // Handle all events
     this.browser.events.handleViewportResize(); // Viewport resize
-    if (isMenuBuilt) { // Menu not built
-        this.browser.events.handleBeforeUnload();// Confirmation on application close
-    }
     this.modal.events.handleAllClose(); // Close modal dialog
     this.form.events.handleAllInput(); // Form input data modified by user
     this.form.events.handleAllSubmit(); // Submit a data form
@@ -739,9 +740,7 @@ z4m.browser.removeLocalData = function (storageKey) {
  */
 z4m.browser.doPhoneCall = function(phoneNumber) {
     var callablePhoneNbr = phoneNumber.replace(/\./g, '');
-    z4m.browser.events.detachBeforeUnload();
     document.location.replace('tel:' + callablePhoneNbr);
-    z4m.browser.events.handleBeforeUnload();
 };
 
 /**
@@ -752,9 +751,7 @@ z4m.browser.doPhoneCall = function(phoneNumber) {
  */
 z4m.browser.sendSms = function(phoneNumber, message) {
     var callablePhoneNbr = phoneNumber.replace(/\./g, '');
-    z4m.browser.events.detachBeforeUnload();
     document.location.replace('sms:' + callablePhoneNbr + ';?&body=' + encodeURIComponent(message.trim()));
-    z4m.browser.events.handleBeforeUnload();
 };
 
 /**
@@ -796,23 +793,9 @@ z4m.browser.events.handleBeforeUnload = function () {
             && !z4m.navigation.isPageToBeReloaded()
             && !z4m.authentication.isRequired()) {
         $(window).on('beforeunload.znetdkmobile', function (event) {
-            if (!isMailOrTelAnchor()) {
-                event.preventDefault();
-                event.returnValue = 'Confirmation...';
-                return "Confirmation...";
-            }
-        }).on('unload.znetdkmobile', function (event) {
-            if (!isMailOrTelAnchor()) {
-                event.preventDefault();
-                event.returnValue = 'Confirmation...';
-                return "Confirmation...";
-            }
+            event.preventDefault();
+            return (event.returnValue = '');
         });
-    }
-    function isMailOrTelAnchor() {
-        return document.activeElement.tagName === 'A'
-            && (document.activeElement.href.indexOf('mailto:') === 0
-            || document.activeElement.href.indexOf('tel:') === 0);
     }
 };
 
@@ -820,7 +803,7 @@ z4m.browser.events.handleBeforeUnload = function () {
  * Detach the handlers declared for the 'beforeunload' events
  */
 z4m.browser.events.detachBeforeUnload = function () {
-    $(window).off('beforeunload.znetdkmobile').off('unload.znetdkmobile');
+    $(window).off('beforeunload.znetdkmobile');
 };
 
 /**
@@ -1002,8 +985,9 @@ z4m.content.getPreloadedViewId = function () {
  */
 z4m.content.getViewId = function (viewElement) {
     if (viewElement.length === 1) {
-        var splittedID = (viewElement.attr('id')).split("-");
-        return splittedID[1];
+        let splittedID = (viewElement.attr('id')).split('-');
+        splittedID.splice(0, 1); splittedID.splice(-1, 1);
+        return splittedID.join('-');
     }
     return null;
 };
@@ -1242,8 +1226,8 @@ z4m.messages.add = function (severity, summary, detail, autoHide) {
     const menuCloseButtonTitle = z4m.navigation.getVerticalMenu().find('button.close').attr('aria-label');
     var message = $('<div class="w3-panel w3-card w3-animate-top w3-display-container '
             + this.colors[severity] + '">'
-            + '<a class="close w3-button w3-large w3-display-topright" href="#" aria-label="' 
-            + menuCloseButtonTitle + '"><i class="fa fa-times" aria-hidden="true" title="' 
+            + '<a class="close w3-button w3-large w3-display-topright" href="#" aria-label="'
+            + menuCloseButtonTitle + '"><i class="fa fa-times" aria-hidden="true" title="'
             + menuCloseButtonTitle + '"></i></a>'
             + '<h3><i class="fa ' + this.icons[severity] + '"></i>&nbsp;' + summary + '</h3><p>' + detail + '</p></div>');
     var addedMessage = message.appendTo(this.getContainer());
@@ -1307,16 +1291,17 @@ z4m.messages.removeAll = function () {
 z4m.messages.showSnackbar = function (text, isWarning, parentContainer) {
     var color = isWarning === true ? 'w3-yellow' : 'w3-green',
             icon = isWarning === true ? 'fa-exclamation-triangle' : 'fa-check-circle',
-            message = $('<div class="w3-panel w3-card w3-animate-bottom ' + color + '">'
+            message = $('<div class="z4m-snackbar w3-panel w3-card w3-animate-bottom ' + color + '">'
                     + '<p class="w3-center"><i class="fa ' + icon + '"></i>&nbsp;' + text + '</p></div>');
     message.css({
         position: 'fixed',
         bottom: '0px',
         left: '25%',
-        width: '50%'
+        width: '50%',
+        "z-index": '10'
     });
     var addedMessage = message.appendTo(typeof parentContainer === 'undefined'
-        ? this.getContainer() : parentContainer);
+        ? $('body') : parentContainer);
     window.setTimeout(function () {
         addedMessage.remove();
     }, 2500);
@@ -1461,17 +1446,17 @@ z4m.authentication.changePassword = function (loginName, errorMessage) {
     modal.open(
             function (response) { // On submit
                 if (response.success === true) {
+                    innerForm.reset();
                     modal.close();
                     z4m.messages.showSnackbar(response.msg);
-                }
-                if (!isUserConnected && response.success === true) {
-                    setTimeout(function(){ location.reload(); }, 500);
-                }
-                if (response.success === true) {
+                    if (!isUserConnected) {
+                        setTimeout(function(){ location.reload(); }, 500);
+                    }
                     return false; // Message has been already displayed as Snackbar
                 }
             },
             function () { // On close
+                innerForm.reset();
                 if (!isUserConnected) {
                     $this.cancelLogin(modal);
                     return false; // Modal not closed by default event handler
@@ -1497,7 +1482,8 @@ z4m.authentication.showUserPanel = function () {
     modalElement.find('p.usermail').text(email);
     modal.open();
     _handleButtonClick('changepwd', function(){
-        this.changePassword(z4m.header.getConnectedUserLogin());
+        const isLoginNameEmail = z4m.browser.readLocalData(this.loginWithEmailStorageKey);
+        this.changePassword(isLoginNameEmail === '1' ? email : z4m.header.getConnectedUserLogin());
     });
     _handleButtonClick('myuserrights', function(){
         z4m.modal.make(this.myUserRightsModalId, this.myUserRightsViewName, function(){ this.open(); });
@@ -1541,12 +1527,14 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
     }
     modal.open(
             function (response) { // On submit
+                if (response.success === true || response.newpasswordrequired) {
+                    memorizeRememberMeState(response.login_with_email);
+                }
                 if (response.success === true) {
                     if (renewCredentials === true) {
                         modal.close();
                         z4m.ajax.requestFromQueue();
                     } else {
-                        memorizeRememberMeState();
                         location.reload(); // The page is reloaded
                     }
                 }
@@ -1571,15 +1559,29 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
             focusedField // Form Field with focus
     );
     function initLoginName() {
-        var userLogin = z4m.header.getConnectedUserLogin(),
-                loginName = typeof userLogin === 'string' && userLogin.length > 0
-                ? userLogin : z4m.browser.readLocalData($this.loginNameStorageKey);
-        if (typeof loginName === 'string' && loginName.length > 0) {
+        const login = getDefaultLoginName();
+        if (login !== null) {
             // The login name is pre-filled
-            modal.getInnerForm().setInputValue('login_name', loginName);
+            modal.getInnerForm().setInputValue('login_name', login);
             // The focus is set on the password field
             return 'password';
         }
+        function getDefaultLoginName() {
+            const urlLogin = new URL(window.location.toLocaleString())
+                    .searchParams.get($this.urlLoginParamName);
+            if (isOK(urlLogin)) {
+                return urlLogin;
+            }
+            const userLogin = z4m.header.getConnectedUserLogin();
+            if (isOK(userLogin)) {
+                return userLogin;
+            }
+            const localLogin = z4m.browser.readLocalData($this.loginNameStorageKey);
+            return isOK(localLogin) ? localLogin : null;
+            function isOK(val) {
+                return typeof val === 'string' && val.length > 0;
+            }
+        };
     }
     function handleRememberMeClick() {
         $('#zdk-login-modal-remember-me').off('change.znetdkmobile')
@@ -1599,7 +1601,7 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
         }
         return accessValue !== false;
     }
-    function memorizeRememberMeState() {
+    function memorizeRememberMeState(loginWithEmail) {
         var accessValue = modal.getInnerForm().getInputValue('access');
         z4m.browser.storeLocalData($this.rememberMeLocalStorageKey, accessValue);
         if (accessValue === 'private') {
@@ -1608,6 +1610,7 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
         } else {
             z4m.browser.removeLocalData($this.loginNameStorageKey);
         }
+        z4m.browser.storeLocalData($this.loginWithEmailStorageKey, loginWithEmail);
     }
     function handleForgotPasswordClick() {
         modal.getInnerForm(true).find('.zdk-forgot-pwd').off('click.znetdkmobile')
@@ -1630,6 +1633,17 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
             event.preventDefault();
         }).removeClass('w3-hide');
     }
+};
+
+/**
+ * Removes if exists, the 'login' param from the query string of the URL.
+ */
+z4m.authentication.removeLoginParamFromUrl = function() {
+    const url = new URL(document.location.href);
+    const params = new URLSearchParams(url.search);
+    params.delete(this.urlLoginParamName);
+    url.search = params.toString();
+    history.replaceState({}, '', url.toString());
 };
 
 /**
@@ -1869,7 +1883,11 @@ z4m.navigation.build = function () {
         }
         function _displayPreloadedView() {
             var innerViewId = z4m.content.getPreloadedViewId(),
-                    item = _getMenuItem(innerViewId);
+                    item = _getMenuItem(innerViewId),
+                    itemId = $this.getMenuItemId(item);
+            if (innerViewId !== itemId) {
+                innerViewId = itemId;
+            }
             if (_initHorizontalMenu(item) === false) {
                 return false;
             }
@@ -1988,6 +2006,9 @@ z4m.navigation.build = function () {
     }
     function _getMenuItem(viewID) {
         var menuItem = $this.getMenuDefinition().find('ul > li[id=znetdk-' + viewID + '-menu]');
+        if (menuItem.length === 0) {
+            menuItem = $this.getMenuDefinition().find('ul > li.is-selected');
+        }
         return menuItem.length === 1 ? menuItem : false;
     }
     function _setVerticalMenuItemActive(viewID) {
@@ -2494,6 +2515,11 @@ z4m.form.setDataModifiedState = function (isModified) {
         return false;
     }
     this.element.data('is-modified', isModified ? 'y' : 'n');
+    if (isModified) {
+        z4m.browser.events.handleBeforeUnload();
+    } else {
+        z4m.browser.events.detachBeforeUnload();
+    }
     return true;
 };
 
@@ -3153,8 +3179,8 @@ z4m.action.addCustomButton = function (name, iconCssClass, colorCssClass, title)
     $('#zdk-mobile-action-search').after(
             '<a id="' + buttonId
             + '" class="zdk-mobile-action ' + name + ' w3-hide w3-btn w3-circle w3-ripple w3-xlarge '
-            + colorCssClass + ' w3-card-4" href="javascript:void(0)" aria-label="' 
-            + buttonTitle + '"><i class="fa ' + iconCssClass + '" aria-hidden="true" title="' 
+            + colorCssClass + ' w3-card-4" href="javascript:void(0)" aria-label="'
+            + buttonTitle + '"><i class="fa ' + iconCssClass + '" aria-hidden="true" title="'
             + buttonTitle + '"></i></a>');
     this.buttons[name] = {id: '#'+buttonId};
     return true;

@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for authentication
  *
- * File version: 1.8
- * Last update: 09/15/2023
+ * File version: 1.9
+ * Last update: 03/20/2024
  */
 
 namespace controller;
@@ -38,7 +38,7 @@ class Security extends \AppController {
         $response->success = true;
         return $response;
     }
-    
+
     /**
      * Action called to cancel the login process of the user trying to connect
      * @return \Response Response returned to the main controller
@@ -54,7 +54,7 @@ class Security extends \AppController {
     /**
      * Action called to authenticate the user attempting to connect
      * @param array $credentials The login name, password and access values
-     * for direct authentication throw HTTP Basic authentication 
+     * for direct authentication throw HTTP Basic authentication
      * @return \Response Response returned to the main controller
      */
     static protected function action_login($credentials = NULL) {
@@ -72,10 +72,11 @@ class Security extends \AppController {
             $loginOk = FALSE;
             $errorMsg = $validator->getErrorMessage();
         } else { // Data validation is OK
-            // Get user infos from the DB security tables 
-            $user = \UserManager::getUserInfos($validator->getValue('login_name'));
-            // Check user credentials
-            if ($user && $user['login_name'] !== $validator->getValue('login_name')) { 
+            // Get user infos from the DB security tables
+            $user = \UserManager::getUserInfosByCredential($validator->getValue('login_name'));
+            // Check user credential: log in with login name or email address
+            if ($user && $user['login_name'] !== $validator->getValue('login_name')
+                    && $user['user_email'] !== $validator->getValue('login_name')) {
                 // Case sensitive mismatch
                 $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN, 'login_name');
                 $loginOk = FALSE;
@@ -83,7 +84,7 @@ class Security extends \AppController {
             } elseif ($user && \MainController::execute('Security', 'isPasswordValid', $validator->getValue('password'), $user['login_password'])) {
                 // Authentication has succeed
                 \UserSession::resetAuthentHasFailed();
-                if ($user['user_enabled'] === '0') { // But user account is disabled                    
+                if ($user['user_enabled'] === '0') { // But user account is disabled
                     $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN_DISABLED, 'login_name');
                     $loginOk = FALSE;
                     $errorMsg = LC_MSG_ERR_LOGIN_DISABLED;
@@ -107,7 +108,7 @@ class Security extends \AppController {
                         $response->setSuccessMessage($summaryLabel, LC_MSG_INF_LOGIN);
                     }
                     if ($result === TRUE) {
-                        \UserSession::setLoginName($validator->getValue('login_name'));
+                        \UserSession::setLoginName($user['login_name']);
                         \UserSession::setUserId($user['user_id']);
                         \UserSession::setUserName($user['user_name']);
                         \UserSession::setUserEmail($user['user_email']);
@@ -122,8 +123,8 @@ class Security extends \AppController {
                 }
             } elseif ($user && $user['user_enabled'] === '1') { // Password is invalid but user exists and they account is enabled...
                 // The counter of allowed login attempts is incremented
-                \UserSession::setAuthentHasFailed($validator->getValue('login_name'));
-                if (\UserSession::isMaxNbrOfFailedAuthentReached() && \MainController::execute('Users', 'disableUser', $validator->getValue('login_name'))) {
+                \UserSession::setAuthentHasFailed($user['login_name']);
+                if (\UserSession::isMaxNbrOfFailedAuthentReached() && \MainController::execute('Users', 'disableUser', $user['login_name'])) {
                     // The max number of authentications allowed has been reached
                     // User account has been disabled
                     $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS,'login_name');
@@ -145,11 +146,14 @@ class Security extends \AppController {
         // public static method in your application or module controller class).
         \MainController::execute('Security', 'loginResult', array(
             'login_date' => \General::getCurrentW3CDate(TRUE),
-            'login_name' => $validator->getValue('login_name'),
+            'login_name' => $loginOk ? $user['login_name'] : $validator->getValue('login_name'),
             'ip_address' => \Request::getRemoteAddress(),
             'status' => $loginOk,
             'message' => $changePasswordRequested && $loginOk ? LC_MSG_INF_PWDCHANGED : $errorMsg
         ));
+        if ($loginOk) {
+            $response->login_with_email = $validator->getValue('login_name') === $user['user_email'] ? '1' : '0'; 
+        }
         return $response;
     }
 
@@ -187,16 +191,16 @@ class Security extends \AppController {
         $response->changePasswordOriginal = LC_FORM_LBL_ORIG_PASSWORD;
         $response->changePasswordNew = LC_FORM_LBL_NEW_PASSWORD;
         $response->changePasswordConfirm = LC_FORM_LBL_PASSWORD_CONFIRM;
-        $response->forgotPasswordAnchor = CFG_FORGOT_PASSWORD_ENABLED 
+        $response->forgotPasswordAnchor = CFG_FORGOT_PASSWORD_ENABLED
                 ? LC_FORM_LBL_FORGOT_PASSWORD : NULL;
         return $response;
     }
 
-    // Other security methods that can be overiden by the class named 'security' 
+    // Other security methods that can be overiden by the class named 'security'
     // in the /app/controller directory.
-    
+
     /**
-     * Indicates which are the granted menu items to the currently connected user 
+     * Indicates which are the granted menu items to the currently connected user
      * @return string|array Value "ALL" if the connected user has a full access
      *  to the navigation menu, otherwise the menu items which are granted to him
      *  thru his assigned profiles
@@ -204,7 +208,7 @@ class Security extends \AppController {
     static public function getAllowedMenuItems() {
         // Has user full access to the menu items?
         if (\UserSession::hasFullMenuAccess()) {
-            // String "ALL" is returned because all menu items are allowed 
+            // String "ALL" is returned because all menu items are allowed
             return "ALL";
         } else {
             // Get menu items authorized for the authenticated user
@@ -213,7 +217,7 @@ class Security extends \AppController {
     }
 
     /**
-     * Checks whether the user password is valid 
+     * Checks whether the user password is valid
      * @param string $inputPassword Password typed in by the user
      * @param string $storedPassword Password stored in the database
      * @return boolean TRUE if the password is valid else FALSE.
@@ -244,13 +248,13 @@ class Security extends \AppController {
         }
         return TRUE;
     }
-    
+
     /**
      * Disconnects the current user if he has been authenticated by through
      * HTTP basic authentication method.
      * @return boolean Value TRUE if the user has been previously authenticated
      * with the credentials set into the HTTP request and then has been logged out.
-     * Otherwise returns FALSE; 
+     * Otherwise returns FALSE;
      */
     static public function logoutIfHttpBasicAuth() {
         $request = new \Request(FALSE);

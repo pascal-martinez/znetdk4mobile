@@ -1,13 +1,13 @@
 <!DOCTYPE HTML>
 <!--
  ZnetDK, Starter Web Application for rapid & easy development
- See official website http://www.znetdk.fr
+ See official website https://mobile.znetdk.fr
  Copyright (C) 2019 Pascal MARTINEZ (contact@znetdk.fr)
  License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  =============================================================================
  ZnetDK 'mobile' page layout
- File version: 1.9
- Last update: 10/29/2023
+ File version: 1.10
+ Last update: 02/21/2024
 -->
 <?php /**
  * Input variables >>
@@ -31,7 +31,6 @@
 require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
         <style>.js #zdk-fouc,.js #zdk-custom-menu{display: none;}</style>
         <script>document.documentElement.className='js';</script>
-        <!-- CSS Dependencies -->
 <?php self::renderDependencies('css'); ?>
         <!-- CSS Font family -->
         <style>
@@ -338,8 +337,8 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
                 </div>
             </div>
         </div>
-        <!-- JS Dependencies -->
-<?php self::renderDependencies('js'); ?>
+<?php self::renderExtraHtmlCode();
+self::renderDependencies('js'); ?>
         <script>document.getElementById('zdk-fouc').style.display='block';</script>
     </body>
 </html>

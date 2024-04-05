@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Validator : check credentials of a user for authentication 
  *
- * File version: 1.0
- * Last update: 09/18/2015
+ * File version: 1.1
+ * Last update: 03/19/2024
  */
 
 namespace validator;
@@ -41,19 +41,24 @@ class Authentication extends \Validator {
     /**
      * Checks if the login name is the same than the one memorized in the
      * user session.
-     * @param String $value Login name
-     * @return boolean FALSE if the login name stored in session is different 
-     * than the one used to connect. Returns TRUE otherwise. 
+     * @param String $loginName Login name
+     * @return boolean FALSE if the login name stored in session is different
+     * than the one used to connect. Returns TRUE otherwise.
      */
-    protected function check_login_name($value) {
-        $login_name_in_session = \UserSession::getLoginName();
-        if (isset($login_name_in_session) && $login_name_in_session !== $value) {
-            // User login is not the same in session 
-            $this->setErrorMessage(LC_MSG_ERR_DIFF_LOGIN);
-            return FALSE;
-        } else {
-            return TRUE;
+    protected function check_login_name($loginName) {
+        $loginNameInSession = \UserSession::getLoginName();
+        if (!isset($loginNameInSession) || $loginNameInSession === $loginName) {
+            return TRUE; // No login name in user session or login names are identical
         }
+        if (filter_var($loginName, FILTER_VALIDATE_EMAIL)) {
+            // $loginName is a well formated email address
+            $user = \UserManager::getUserInfosByEmail($loginName);
+            if (is_array($user) && $user['login_name'] === $loginNameInSession) {
+                return TRUE; // The user email has been used as login name
+            }
+        }
+        $this->setErrorMessage(LC_MSG_ERR_DIFF_LOGIN);
+        return FALSE; // User login is not the same in session
     }
 
     /**

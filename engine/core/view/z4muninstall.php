@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.1
- * Last update: 10/17/2023
+ * File version: 1.2
+ * Last update: 02/15/2024
  */
 ?>
 <div id="mzdk-userpanel-uninstall" class="w3-modal">
@@ -34,7 +34,7 @@
                 <span class="title"><?php echo LC_HEAD_USERPANEL_UNINSTALL; ?></span>
             </h4>
         </header>
-        <div class="w3-container w3-margin-bottom">
+        <div class="w3-container w3-theme-light">
             <p><?php echo LC_HEAD_USERPANEL_UNINSTALL_TEXT_GENERAL; ?></p>
             <p><?php echo LC_HEAD_USERPANEL_UNINSTALL_TEXT_SPECIFIC; ?></p>
             <ul class="w3-ul">

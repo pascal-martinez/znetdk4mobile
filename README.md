@@ -23,10 +23,10 @@ Intended for businesses, add **data lists** and **input forms** specific to your
 ## REQUIREMENTS
 To develop your web app, you just need a **AMP** (Apache, MySQL and PHP) server and a **text editor** (Notepad++, Atom, ...) or a most sophisticated **IDE** (Visual Studio Code, Apache NetBeans, Eclipse PDT, ...).
 
-Supported versions of **PHP** are versions **5.6** to **8.2**.
+Supported versions of **PHP** are versions **7.4** to **8.3**.
 ## DEPENDENCIES
 ZnetDK 4 Mobile is developed in **PHP**, **MySQL**, **HTML5** and **JavaScript** and from the following libraries and additional resources:
-- **jQuery** version 3.6.0
+- **jQuery** version 3.7.1
 - **W3.CSS** version 4.12
 - **FontAwesome** version 4.7.0
 - **Google Font Exo Regular** version 7.

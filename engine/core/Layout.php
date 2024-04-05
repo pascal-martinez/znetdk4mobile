@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core Layout controller
  *
- * File version: 1.10
- * Last update: 10/17/2023 
+ * File version: 1.11
+ * Last update: 03/17/2024 
  */
 
 /**
@@ -241,7 +241,7 @@ Class Layout {
             $hidden = $firstView ? NULL : ' style="display:none;"';
             $firstView = FALSE;
             if ((!is_array($allowedMenuItems) || (is_array($allowedMenuItems) && array_search($value[0], $allowedMenuItems) !== FALSE))) {
-                if (isset($value[2])) { // submenu exists...
+                if ($selectedMenuItem !== $value[0] && isset($value[2])) { // submenu exists...
                     self::renderCustomContent(NULL, $value[2], $allowedMenuItems);
                 } else {
                     echo str_repeat("\t", $nbTabs + 1) . '<div id="znetdk-' . $value[0] . '-view" class="zdk-filled zdk-view"' . $hidden . '>' . PHP_EOL;
@@ -329,9 +329,53 @@ Class Layout {
 
     /**
      * Renders the dependencies CSS et JavaScript of the page
+     * If CFG_LOAD_JS_DEPENDENCIES_FROM_HTML_HEAD = TRUE, both CSS and JS
+     * dependencies are loaded from the <head> tag.
      */
     static private function renderDependencies($type = NULL) {
-        \Dependencies::render($type);
+        $appliedType = $type;
+        if (CFG_LOAD_JS_DEPENDENCIES_FROM_HTML_HEAD === TRUE) {
+            if ($type === 'css') {
+                $appliedType = NULL;
+            } else {
+                return;
+            }
+        }
+        \Dependencies::render($appliedType);
+    }
+    
+    /**
+     * Renders the extra HTML code added by the application and the modules.
+     * This HTML code must be located within the 'app/layout/extra_hmtl.php' 
+     * script for the application and within the 'mod/layout/extra_hmtl.php' 
+     * script for a module.
+     */
+    static private function renderExtraHtmlCode() {
+        $comment = "\t\t<!-- Extra HTML code -->" . PHP_EOL;
+        $isCommentInserted = FALSE;
+        $extraCodeScriptNameSubPath = DIRECTORY_SEPARATOR . 'layout' 
+                . DIRECTORY_SEPARATOR . 'extra_html.php';
+        $appExtraCodePath = ZNETDK_APP_ROOT . DIRECTORY_SEPARATOR . 'app' 
+            . $extraCodeScriptNameSubPath;
+        if (file_exists($appExtraCodePath)) {
+            echo $comment;
+            $isCommentInserted = TRUE;
+            require $appExtraCodePath;
+        }
+        $modules = General::getModules();
+        if (!is_array($modules)) {
+            return;
+        }
+        if ($isCommentInserted === FALSE) {
+            echo $comment;
+        }
+        foreach ($modules as $moduleName) {
+            $modExtraCodePath = ZNETDK_MOD_ROOT . DIRECTORY_SEPARATOR . $moduleName
+                    . DIRECTORY_SEPARATOR . 'mod' . $extraCodeScriptNameSubPath;
+            if (file_exists($modExtraCodePath)) {
+                require $modExtraCodePath;
+            }
+        }
     }
 
 }

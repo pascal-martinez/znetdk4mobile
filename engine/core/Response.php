@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core API for the definition of the HTTP response data
  *
- * File version: 1.14
- * Last update: 09/03/2023
+ * File version: 1.15
+ * Last update: 02/16/2024
  */
 
 /**
@@ -263,15 +263,17 @@ class Response {
      * @param boolean $doExit Specifies whether the PHP script execution must be
      * stopped (TRUE by default) or not (FALSE)
      */
-    public function doHttpError($http_error,$summary,$message,$doExit=TRUE) {
+    public function doHttpError($http_error, $summary, $message, $doExit=TRUE) {
         $displayedMessage = CFG_DISPLAY_ERROR_DETAIL === FALSE  && $http_error > 403
-                    ? LC_MSG_CRI_ERR_GENERIC : $message;
+            ? (defined('LC_MSG_CRI_ERR_GENERIC') ? LC_MSG_CRI_ERR_GENERIC : "Error HTTP {$http_error}.")
+            : $message;
         self::setHeaderErrorStatusCode($http_error);
         if (\Request::getMethod() === 'POST') { // JSON response
             $this->summary = $summary;
             $this->msg = $displayedMessage;
             $this->output();
-        } else { // HTTP response
+        } else { // HTML response
+            ob_clean();
             echo '<html><head><meta charset="UTF-8">';
             echo '<title>'.$summary. ' | '. LC_PAGE_TITLE . '</title></head><body>';
             echo '<span class="pui-growl-image zdk-image-fatal"></span><h3>'.

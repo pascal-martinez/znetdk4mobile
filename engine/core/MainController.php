@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Front controller of the application
  *
- * File version: 1.8
- * Last update: 11/02/2023
+ * File version: 1.9
+ * Last update: 03/17/2024
  */
 
 /**
@@ -184,7 +184,8 @@ Class MainController {
                         "{$viewType}' of the application, modules and of the ZnetDK engine!";
                 \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
                 $response = new \Response(FALSE);
-                $response->doHttpError(404, LC_MSG_CRI_ERR_SUMMARY, \General::getFilledMessage(LC_MSG_CRI_ERR_DETAIL, $message), FALSE);
+                $response->doHttpError(404, LC_MSG_CRI_ERR_SUMMARY,
+                        \General::getFilledMessage(LC_MSG_CRI_ERR_DETAIL, $message), TRUE);
             }
         }
     }

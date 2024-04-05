@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Navigation menu API
  *
- * File version: 1.7
- * Last update: 09/15/2023 
+ * File version: 1.8
+ * Last update: 03/18/2024 
  */
 
 /** ZnetDK core navigation menu API */
@@ -173,17 +173,31 @@ Class MenuManager {
 
     /**
      * Returns the menu item that matches the SEO link of the current HTTP 
-     * request URI (used when 'CFG_VIEW_PAGE_RELOAD' is set to TRUE)
-     * @return array Specifications of the menu item.
+     * request URI (used when 'CFG_VIEW_PAGE_RELOAD' is set to TRUE).
+     * If URI is ended by multiple SEO links separated by a slash, each parent
+     * SEO link must exist and be a child of its parent in the menu hierarchy.
+     * @return NULL|array Menu item properties as array or NULL if no menu item
+     * is found in URI or if the path of SEO links is invalid.
      */
     static public function getMenuItemFromURI() {
-        $urlPiece = \General::getExtraPartOfURI();
-        if ($urlPiece === 'offline') {
+        $urlPieces = \General::getExtraPartOfURI(FALSE);
+        if (is_string($urlPieces) && $urlPieces === 'offline') {
             return array('offline');
         }
-        if (\Parameters::isSetPageReload() && $urlPiece !== FALSE) { 
-           // SEO link is used to find the menu item
-           return self::getMenuItemByCriteria(4, $urlPiece);
+        if (\Parameters::isSetPageReload()) { 
+            $urlPieces = is_string($urlPieces) ? [$urlPieces] : $urlPieces;
+            $menuItem = NULL; $previousMenuItemId = NULL;
+            foreach ($urlPieces as $seoLink) {
+                $menuItem = self::getMenuItemByCriteria(4, $seoLink);
+                $parentMenuItemId = is_array($menuItem) 
+                        ? self::getParentMenuItem($menuItem[0]) : NULL;
+                if (!is_array($menuItem) || ($parentMenuItemId !== $previousMenuItemId &&
+                        self::getParentMenuItem($parentMenuItemId) !== $previousMenuItemId)) {
+                    return NULL; // SEO link is invalid 
+                }
+                $previousMenuItemId = $menuItem[0];
+            }
+            return $menuItem; // Leaf SEO link is returned
         }
         return NULL;
     }

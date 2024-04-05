@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Error handler of the application
  *
- * File version: 1.2
- * Last update: 08/30/2023
+ * File version: 1.3
+ * Last update: 01/28/2024
  */
 
 /**
@@ -37,6 +37,12 @@ class ErrorHandler {
         self::$isErrorTrackingEnabled = TRUE;
         set_error_handler("\\ErrorHandler::handleRuntimeError");
         register_shutdown_function(array("\\ErrorHandler", 'handleFatalError'));
+        // If a message exists in the output buffer, it is traced and next removed
+        $error = ob_get_contents();
+        if (is_string($error) and strlen($error) > 0) {
+            \General::writeErrorLog('ZNETDK WARNING', 'Existing error in the output buffer: ' . strip_tags($error), TRUE);
+            ob_clean();
+        }
         // Output is buffered
         ob_start();
     }
@@ -81,9 +87,10 @@ class ErrorHandler {
             ob_end_clean();
             // The error is output in JSON format
             $response = new \Response(FALSE);
-            $response->doHttpError(500,LC_MSG_CRI_ERR_SUMMARY,
-                    \General::getFilledMessage(LC_MSG_CRI_ERR_DETAIL,
-                    $errorMessage),FALSE);
+            $summary = defined('LC_MSG_CRI_ERR_SUMMARY') ? LC_MSG_CRI_ERR_SUMMARY : 'Error';
+            $detail = defined('LC_MSG_CRI_ERR_DETAIL') ? LC_MSG_CRI_ERR_DETAIL : '%1';
+            $response->doHttpError(500, $summary, \General::getFilledMessage(
+                    $detail, $errorMessage),FALSE);
         }
         // Flush output buffer and stop buffering
         ob_end_flush();

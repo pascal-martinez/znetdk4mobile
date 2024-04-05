@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "My user rights" view for mobile
  *
- * File version: 1.2
- * Last update: 10/17/2023
+ * File version: 1.3
+ * Last update: 02/15/2024
  */
 $profileNamesAsList = '';
 $profileIDs = [];
@@ -36,7 +36,7 @@ $hasFullMenuAccess = UserSession::hasFullMenuAccess();
                 <span class="title"><?php echo LC_HEAD_USERPANEL_MY_USER_RIGHTS; ?></span>
             </h4>
         </header>
-        <div class="w3-container">
+        <div class="w3-container w3-theme-light">
 <?php if (count($profiles) > 0) : ?>
             <ul class="w3-ul w3-border w3-margin-top">
                 <li><h3><i class="fa fa-users"></i>&nbsp;<?php echo LC_TABLE_COL_USER_PROFILES; ?></h3></li>

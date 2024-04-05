@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Navigation menu renderer
  *
- * File version: 1.3
- * Last update: 10/18/2023
+ * File version: 1.4
+ * Last update: 03/18/2024
  */
 
 /** ZnetDK core navigation menu renderer called by the \Layout class to generate
@@ -203,7 +203,7 @@ Class MenuRenderer {
         foreach ($sortedMenuItems as $value) {
             if (!is_array($allowedMenuItems) || (is_array($allowedMenuItems) && array_search($value[0], $allowedMenuItems) !== false)) {
                 $cssClasses = [];
-                if (isset($value[2])) {
+                if ($subMenuAllowed && isset($value[2])) {
                     $cssClasses[] = 'has-sub';
                 }
                 if ($value[0] === $selectedMenuItem ||
@@ -213,11 +213,12 @@ Class MenuRenderer {
                 $itemCssClasses = count($cssClasses) > 0 ? ' class="' . implode(' ', $cssClasses) . '"' : '';
                 $hrefLink = "#";
                 if ($isSetPageReload) {
-                    $retainedValue = isset($value[2])
+                    $retainedValue = $subMenuAllowed && isset($value[2])
                         ? $value[2][0] // Sub-menu items exist, the link correspond to the first sub-menu item
                         : $value; // leaf item
+                    $isUrl = isset($retainedValue[4]) && preg_match('/^http(s)?:\/\//', $retainedValue[4]);
                     $hrefLink = isset($retainedValue[4])
-                        ? $retainedValue[4] // SEO URI
+                        ? ($isUrl ? $retainedValue[4] : General::getAbsoluteURI() . $retainedValue[4]) // SEO URI
                         : \General::addGetParameterToURI(\General::addGetParameterToURI( // URI with parameters control & action
                             $mainScript, 'control', $retainedValue[0]), 'action', 'show');
                 }

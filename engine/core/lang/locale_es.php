@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core spanish translations of the application
 *
-* File version: 1.19
-* Last update: 10/17/2023
+* File version: 1.20
+* Last update: 03/21/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -56,7 +56,7 @@ define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.pn
 
 /* Footer labels */
 define('LC_FOOTER_LEFT','Versión '.ZNETDK_VERSION);
-define('LC_FOOTER_CENTER','Copyright 2014-2023 Pascal MARTINEZ');
+define('LC_FOOTER_CENTER','Copyright 2014-2024 Pascal MARTINEZ');
 define('LC_FOOTER_RIGHT','Realizado con <a href="https://www.znetdk.fr" target="_blank">ZnetDK</a>');
 
 /* User Panel Installation labels */

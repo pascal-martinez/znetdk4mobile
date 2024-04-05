@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Theme API  
  *
- * File version: 1.1
- * Last update: 12/02/2022
+ * File version: 1.2
+ * Last update: 02/18/2024
  */
 
 /**
@@ -54,13 +54,19 @@ class ThemeManager {
     }
 
     /**
-     * Returns the The full CSS path of the active theme
+     * Returns the full CSS path of the active theme
      * @return string The full CSS path
      */
     static public function getActiveThemeCssFilePath() {
-        $userThemeName = \MainController::execute('Users', 'getUserTheme');
-        $themeName = $userThemeName === FALSE ? CFG_THEME : $userThemeName;
-        return self::getThemeCssFilePath($themeName);
+        $userTheme = CFG_AUTHENT_REQUIRED === FALSE 
+                || !UserSession::isAuthenticated(TRUE) ? FALSE 
+                : \MainController::execute('Users', 'getUserTheme');
+        if (CFG_PAGE_LAYOUT === 'mobile') {
+            return $userTheme === FALSE ? CFG_MOBILE_W3CSS_THEME : $userTheme;
+        } else {
+            $themeName = $userTheme === FALSE ? CFG_THEME : $userTheme;
+            return self::getThemeCssFilePath($themeName);
+        }
     }
     
     /**

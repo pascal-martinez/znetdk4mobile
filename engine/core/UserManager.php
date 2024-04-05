@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core User Management API
  *
- * File version: 1.9
- * Last update: 09/15/2023
+ * File version: 1.10
+ * Last update: 03/20/2024
  */
 
 /**
@@ -61,9 +61,9 @@ class UserManager {
         self::addProfilesToSearchedUsers($userIds, $users);
         return $total;
     }
-    
+
     /**
-     * For each user found by the getSearchedUsers() method, adds the list of 
+     * For each user found by the getSearchedUsers() method, adds the list of
      * user's profiles (only one SQL query is executed)
      * @param array $userIds Internal identifiers of the users to which user's
      * profiles are added.
@@ -74,7 +74,7 @@ class UserManager {
         $userProfilesDAO = new \model\UserProfiles();
         $userProfilesDAO->setUsersAsFilter($userIds);
         $userProfilesDAO->setSortCriteria('user_id, profile_name');
-        $allUserProfiles = [];        
+        $allUserProfiles = [];
         try {
             while ($profileRow = $userProfilesDAO->getResult()) {
                 $allUserProfiles[$profileRow['user_id']][] = $profileRow;
@@ -95,8 +95,8 @@ class UserManager {
                 $users[$key]['user_profiles'] = implode(', ', $profileNames);
                 $users[$key]['profiles[]'] = $profileIDs;
                 $users[$key]['has_profiles'] = '1';
-            }            
-        }        
+            }
+        }
     }
 
     /**
@@ -121,7 +121,7 @@ class UserManager {
                 $userRow['profiles[]'] = $profileIDs;
                 $userRow['has_profiles'] = '1';
             }
-        }        
+        }
         $userRow['has_expired'] = $userRow['expiration_date']
                 <= General::getCurrentW3CDate() ? '1' : '0';
         // Original password is not provided, a dummy value is returned instead
@@ -150,7 +150,7 @@ class UserManager {
         try {
             return $usersDAO->getResult();
         } catch (\Exception $e) {
-            $response = new \Response();
+            $response = new \Response(FALSE);
             $response->setCriticalMessage(
                     "USR-002: unable to query the user information", $e,TRUE);
         }
@@ -212,7 +212,7 @@ class UserManager {
             $profileNamesAsList = implode(', ', array_values($profiles));
         }
     }
-    
+
     /**
      * Returns the profiles granted to the specified user
      * @param string $userId Internal identifier of the user
@@ -356,28 +356,33 @@ class UserManager {
 
     /**
      * Changes the password for the specified user
-     * @param string $loginName User login name
+     * @param string $credential User login name or email address
      * @param string $newPassword New user password to store
      * @param boolean $isTemporary If set to TRUE, the expiration date is set to
      * today to force user to change the temporary password and the user is
      * enabled if she or he was disabled.
+     * @return Boolean TRUE on success, FALSE if no user exists for the
+     * specified credential.
      */
-    static public function changeUserPassword($loginName, $newPassword, $isTemporary = FALSE) {
+    static public function changeUserPassword($credential, $newPassword, $isTemporary = FALSE) {
+        $userRow = self::getUserInfosByCredential($credential);
+        if (!is_array($userRow)) {
+            return FALSE;
+        }
+        $user['user_id'] = $userRow['user_id'];
+        $user['login_password'] = $newPassword;
+        $user['expiration_date'] = $isTemporary
+                ? \General::getCurrentW3CDate() : self::getUserExpirationDate();
+        if ($isTemporary) {
+            $user['user_enabled'] = 1;
+        }
         $userDAO = new \model\Users();
-        $userDAO->setFilterCriteria($loginName);
         try {
-            $userRow = $userDAO->getResult();
-            $user['user_id'] = $userRow['user_id'];
-            $user['login_password'] = $newPassword;
-            $user['expiration_date'] = $isTemporary
-                    ? \General::getCurrentW3CDate() : self::getUserExpirationDate();
-            if ($isTemporary) {
-                $user['user_enabled'] = 1;
-            }
             $userDAO->store($user);
+            return TRUE;
         } catch (\PDOException $e) {
             $response = new \Response();
-            $response->setCriticalMessage("USR-010: unable to change the user password for the login name '$loginName'", $e, TRUE);
+            $response->setCriticalMessage("USR-010: unable to change the user password for the login name '{$credential}'", $e, TRUE);
         }
     }
 
@@ -522,6 +527,18 @@ class UserManager {
     }
 
     /**
+     * Returns user's information stored in the database from their login name
+     * or email address.
+     * @param string $credential Login name or Email address
+     * @return array User's information or FALSE if user does not exist or
+     * if their login name is 'autoexec'.
+     */
+    static public function getUserInfosByCredential($credential) {
+        $user = self::getUserInfosByEmail($credential);
+        return $user === FALSE ? self::getUserInfos($credential) : $user;
+    }
+
+    /**
      * Returns the users matching the specified profile name
      * @param string $profileName Name of the profile assigned to the users who
      * are searched
@@ -625,7 +642,7 @@ class UserManager {
         }
         $dao->beginTransaction();
         self::removeResetPasswordKey($email, FALSE);
-        try {            
+        try {
             $dao->store(['email' => $email,
                 'request_date_time' => General::getCurrentW3CDate(TRUE),
                 'reset_key' => $resetKey
@@ -639,7 +656,7 @@ class UserManager {
         $appUrlWithCtrlEmail = General::addGetParameterToURI($appUrlWithCtrl, 'email', rawurlencode($email));
         return General::addGetParameterToURI($appUrlWithCtrlEmail, 'key', $resetKey);
     }
-    
+
     /**
      * Removes the reset password key in database for the specified email address
      * @param string $email Email address
@@ -666,10 +683,10 @@ class UserManager {
      * @throws Exception Password reset has failed
      */
     static public function resetPassword($email, $key) {
-        $userInfos = self::checkEmailForPasswordReset($email);        
+        $userInfos = self::checkEmailForPasswordReset($email);
         if (!self::isResetPasswordKeyValid($email, $key)) {
             throw new \Exception('Password reset key is invalid', 300);
-        }        
+        }
         $newTemporaryPwd = \MainController::execute('Users', 'getAutoGeneratedPassword');
         if (empty($newTemporaryPwd)) {
             throw new \Exception('Error on password generation!', 301);
@@ -682,7 +699,7 @@ class UserManager {
         self::removeResetPasswordKey($email);
         return $newTemporaryPwd;
     }
-    
+
     /**
      * Check if password reset is allowed.
      * @param string $email Email address
@@ -701,7 +718,7 @@ class UserManager {
         if (\AutoExec::getLoginName() === $userInfos['login_name']
                 || $userInfos['user_enabled'] === '-1') {
             throw new \Exception('Password reset not allowed for this email address', 102);
-        }        
+        }
         return $userInfos;
     }
 

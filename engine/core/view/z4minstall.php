@@ -18,15 +18,15 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.1
- * Last update: 10/17/2023
+ * File version: 1.2
+ * Last update: 02/15/2024
  */
 $appUrl = str_replace('index.php', '', General::getApplicationURI());
 $internetAddressText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INTERNET_ADDRESS, "<a href=\"{$appUrl}\">{$appUrl}</a>");
 $safariShareIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAIAAACvoq6rAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAzfHTVMAAAGHSURBVGje7dgxTsQwEAXQEUfgKNxgj8BRKOngBitaGiQuQEFJSYuo9grbUlKGHw2KHHu8iT0z2S3GmmI3ieMn27GToUFdvo/DzdMY+KEvpNdcPw5X92Pgh95EVhorUz/o7ZBrJhNObQ16+RIoaeCC7UCLGo2JnDTdJlJqsiPiBV6gu3e5sfSIiEZFe9DDR/XxzkDicoDqxqDdc3WxKUGlCdWNQbev1aVPBGUmVDcG/fyOUwFRLsQ1EJu4FqpvtJedBp1hcw3QeUGYevvP2RNeRivoxK3QEJrL5jstvk74gcTXFZo0K/dLcxDHZCIeqTV94woCgMduBGEg0xPluHpMap6vaUfg7z8oncV8dLOnLO0L3u8ou2NT3+hBaC6rTvqFxLZ6gAIUoAAFKEABmuUYLwKEz1N8KSP6sov2IH6t6XiRcgQZftYFKEABClCAAqQEde+R3buyAFKmYzRFTscoE1bdfVNNWDWl9JxiltJrSno6xSzp2ZQW9ugbIS28PnFuGAuJ8wspf8ppBYazmOWgAAAAAElFTkSuQmCC";
 $safariShareIconTag = '<img src="' . $safariShareIcon . '" alt="Safari icon" width="18">';
 $installOnAppleText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INSTALL_APPLE, $safariShareIconTag);
-$smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, LC_HEAD_TITLE, $appUrl);
+$smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, strip_tags(LC_HEAD_TITLE), $appUrl);
 /* Sur l'écran d'accueil */
 ?>
 <div id="mzdk-userpanel-install" class="w3-modal">
@@ -38,7 +38,7 @@ $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, 
                 <span class="title"><?php echo LC_HEAD_USERPANEL_INSTALL; ?></span>
             </h4>
         </header>
-        <div class="w3-container w3-margin-bottom">
+        <div class="w3-container w3-theme-light">
             <div class="is-installed w3-panel w3-green w3-hide">
                 <p><i class="fa fa-check fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_STATUS_IS_INSTALLED; ?></p>
             </div>

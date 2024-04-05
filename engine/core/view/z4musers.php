@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core users view for mobile
  *
- * File version: 1.10
- * Last update: 10/29/2023
+ * File version: 1.11
+ * Last update: 02/15/2024
  */
 ?>
 <!-- Filter by status -->
@@ -42,10 +42,10 @@
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_FORM_FLD_USER_RIGHTS; ?></b></div>
 </div>
 <!-- List of Users -->
-<ul id="mzdk-user-list" class="w3-ul w3-stretch w3-hide w3-margin-bottom"
+<ul id="mzdk-user-list" class="w3-ul w3-hide w3-margin-bottom"
         data-zdk-load="users:all" data-zdk-autocomplete="users:suggestions">
-    <li class="w3-border-theme w3-hover-white" data-id="{{user_id}}">
-        <div class="w3-row">
+    <li class="w3-border-theme w3-hover-light-grey" data-id="{{user_id}}">
+        <div class="w3-row w3-stretch">
             <a class="edit" href="javascript:void(0)">
                 <div class="w3-col s12 m6 l3 w3-padding-small">
                     <div class="w3-text-theme w3-large"><strong>{{user_name}}</strong></div>

@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core User session API
  *
- * File version: 1.12
- * Last update: 09/15/2023
+ * File version: 1.13
+ * Last update: 02/16/2024
  */
 Class UserSession {
     static private $customVarPrefix = "zdkcust-";
@@ -278,7 +278,8 @@ Class UserSession {
                 $response->appver = $appVersion;
                 $response->reload_summary = LC_MSG_WARN_NEW_VERSION_SUMMARY;
                 $response->reload_msg = LC_MSG_WARN_NEW_VERSION_MSG;
-            } elseif ($response->is_disconnected === TRUE) {
+            } elseif ($response->is_disconnected === TRUE 
+                    && \Request::getMethod() === 'POST') {
                 $summary = LC_MSG_WARN_LOGGED_OUT_SUMMARY;
                 $message = LC_MSG_WARN_LOGGED_OUT_MSG;
             }

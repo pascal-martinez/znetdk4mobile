@@ -1,7 +1,7 @@
 <?php
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website https://www.znetdk.fr 
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -18,11 +18,11 @@
  * --------------------------------------------------------------------
  * Core version of ZnetDK 
  *
- * File version: 3.1.0
- * Last update: 12/21/2023
+ * File version: 3.2.0
+ * Last update: 03/21/2024
  */
 
 /**
  * Version installed of ZnetDK
  */
-define('ZNETDK_VERSION', '3.1.0');
+define('ZNETDK_VERSION', '3.2.0');

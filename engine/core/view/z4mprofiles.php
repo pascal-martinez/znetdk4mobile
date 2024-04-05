@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core profiles view for mobile
  *
- * File version: 1.7
- * Last update: 10/29/2023
+ * File version: 1.8
+ * Last update: 02/15/2024
  */
 ?>
 <!-- Header -->
@@ -29,9 +29,9 @@
     <div class="w3-col l6 w3-padding-small"><b><?php echo LC_TABLE_COL_MENU_ITEMS; ?></b></div>
 </div>
 <!-- List of Profiles -->
-<ul id="mzdk-profile-list" class="w3-ul w3-stretch w3-hide w3-margin-bottom" data-zdk-load="profiles:all">
-    <li class="w3-border-theme w3-hover-white" data-id="{{profile_id}}">
-        <div class="w3-row">
+<ul id="mzdk-profile-list" class="w3-ul w3-hide w3-margin-bottom" data-zdk-load="profiles:all">
+    <li class="w3-border-theme w3-hover-light-grey" data-id="{{profile_id}}">
+        <div class="w3-row w3-stretch">
             <a class="edit" href="javascript:void(0)">
                 <div class="w3-col s12 m6 l3 w3-padding-small">
                     <span class="w3-text-theme w3-large"><strong>{{profile_name}}</strong></span>

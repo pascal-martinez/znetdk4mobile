@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core renderer of the ressource dependencies
  *
- * File version: 1.10
- * Last update: 10/17/2023
+ * File version: 1.11
+ * Last update: 02/18/2024
  */
 
 /**
@@ -234,12 +234,14 @@ class Dependencies {
     static private function renderCSSforMobile() {
         $cssDependencies = array(CFG_FONTAWESOME_CSS, CFG_MOBILE_W3_CSS);
         $cssDependencies[] = \General::getFilledMessage(CFG_ZNETDK_CSS, 'mobile');
-        if (CFG_MOBILE_W3CSS_THEME !== NULL) {
-            $cssDependencies[] = CFG_MOBILE_W3CSS_THEME;
+        $themeCssPath = ThemeManager::getActiveThemeCssFilePath();
+        if ($themeCssPath !== NULL) {
+            $cssDependencies[] = $themeCssPath;
         }
         if (CFG_MOBILE_CSS_FONT !== NULL) {
             $cssDependencies[] = CFG_MOBILE_CSS_FONT;
         }
+        echo "\t\t<!-- CSS Dependencies -->" . PHP_EOL;
         self::addModulesDependencies('css', $cssDependencies);
         self::addApplicationDependencies('css', $cssDependencies);
         self::renderDependencies('CSS', "\t\t", $cssDependencies);
@@ -252,6 +254,7 @@ class Dependencies {
         } else {
             $jsDependencies[] = CFG_ZNETDK_JS_DIR.'/minified/mobile-min.js';
         }
+        echo "\t\t<!-- JS Dependencies -->" . PHP_EOL;
         self::addModulesDependencies('js', $jsDependencies);
         self::addApplicationDependencies('js', $jsDependencies);
         self::renderDependencies('JS', "\t\t", $jsDependencies);

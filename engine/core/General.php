@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core General purpose API
  *
- * File version: 1.16
- * Last update: 08/24/2023
+ * File version: 1.17
+ * Last update: 03/21/2024
  */
 
 /**
@@ -50,7 +50,7 @@ Class General {
     }
 
     /**
-     * Returns the extra part of the URI
+     * Returns the leaf extra part of the URI
      * On OVH hosting, the 'REDIRECT_URL' server variable does the job.
      * Unfortunately not on PHPNET, the 'REQUEST_URI' server variable must be
      * used instead (variable both OK on OVH and PHPNET).
@@ -59,14 +59,17 @@ Class General {
      * SOLVING: \Request::getFilteredServerValue() method that sanitize the
      * requested server parameter using both filter_input and filter_var as done
      * by the \Request::getRemoteAddress() method.
-     * @return string|boolean FALSE if not found, otherwise the extra part.
+     * @param boolean $onlyTheLeaf If set to FALSE, an array of subpaths is 
+     * returned when the number of subpaths is greater than 1.  
+     * @return string|boolean|array FALSE if not found, otherwise the leaf extra
+     * part as string or as array.
      */
-    static public function getExtraPartOfURI() {
+    static public function getExtraPartOfURI($onlyTheLeaf = TRUE) {
         if (\Request::getController() !== 'httperror') {
             return FALSE;
         }
         $requestUri = \Request::getFilteredServerValue('REQUEST_URI', FILTER_SANITIZE_URL);
-        $redirectURL = str_replace(self::getAbsoluteURI(), '', $requestUri); // Base URI removed
+        $redirectURL = substr($requestUri, strlen(self::getAbsoluteURI())); // Base URI removed
         // Extra URL GET parameters are removed from the right side
         $questionMarkPos = strpos($redirectURL, '?');
         if ($questionMarkPos !==FALSE) {
@@ -75,6 +78,8 @@ Class General {
         $URLpieces = explode('/', $redirectURL);
         if (count($URLpieces) === 1) {
             return $URLpieces[0];
+        } elseif ($onlyTheLeaf === FALSE && count($URLpieces) > 1) {
+            return $URLpieces;
         } else {
             return FALSE;
         }
@@ -344,12 +349,12 @@ Class General {
             // implementations of FCGI/PHP
             $server = filter_var($_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL);
         }
-        $tcpipPort = ''; 
+        $tcpipPort = '';
         if ($_SERVER['HTTP_HOST'] !== $server) {
             $hostAndPort = explode(':', $_SERVER['HTTP_HOST']);
-            $tcpipPort = count($hostAndPort) === 2 
+            $tcpipPort = count($hostAndPort) === 2
                     && $hostAndPort[0] === $server
-                    && $hostAndPort[1] === $_SERVER['SERVER_PORT'] 
+                    && $hostAndPort[1] === $_SERVER['SERVER_PORT']
                     ? ":{$hostAndPort[1]}" : '';
         }
         return $protocol . '://' . $server . $tcpipPort . self::getMainScript(TRUE);

@@ -1,3 +1,82 @@
+ZnetDK 3.2.0, 2024-03-21
+------------------------
+- CHANGE (all): users now can authenticate to the application by using their
+  address email instead of their login name.
+- CHANGE (ZnetDK 4 mobile only): when the Application GET URL include a 'login'
+  parameter and user is not authenticated (CFG_AUTHENTICATION_REQUIRED is TRUE),
+  the login name is initialized from this parameter and the input focus is set
+  to the password field.
+- CHANGE (ZnetDK 4 mobile only): when CFG_VIEW_PAGE_RELOAD is set to TRUE, an 
+  external link URL can be set for the $menuItemSEOlink argument when calling 
+  the \MenuManager::addMenuItem() method within the 'menu.php' script.
+- CHANGE (ZnetDK 4 mobile only): when CFG_VIEW_PAGE_RELOAD is set to TRUE, views
+  not tied to a level 1 or level 2 menu can be displayed in the application
+  via a hierarchical URL. For example, the view 'view2' can be displayed
+  invoking the https://myhost/myapp/view1seolink/view2seolink URL with the
+  following definition in the menu.php of the application:
+  \MenuManager::addMenuItem(NULL, '_views', 'Views', NULL);
+  \MenuManager::addMenuItem('_views', 'view1', 'View #1', NULL, 'view1seolink');
+  \MenuManager::addMenuItem('view1', 'view2', 'View #2', NULL, 'view2seolink');
+- CHANGE (ZnetDK 4 mobile only): the 'beforeunload' JS event listener is no
+  longer added once the application is loaded to ask the user for confirmation
+  to exit the application. It is now only added when data has been modified in 
+  an input form.
+- CHANGE (all): extra HTML code can be injected at the end of the page layout
+  (before JS dependencies) by the application and by the modules by adding in
+  the 'app/layout/' and 'mod/layout/' subfolder a PHP script named
+  'extra_hmtl.php' containing the extra HTML code.
+- CHANGE (ZnetDK 4 mobile only): the custom Users:getUserTheme() controller
+  method of the application or a module is now called to set the ZnetDK 4 Mobile
+  CSS theme for the logged in user.
+- CHANGE (ZnetDK 4 mobile only): jQuery library updated to version 3.7.1.
+- CHANGE (ZnetDK 4 mobile only): the color of the rows on hover is changed to
+  light grey instead of white in the user and profile management views
+ (z4musers.php and z4mprofiles.php).
+- BUG FIXING (ZnetDK 4 mobile only): the z4m.content.getDisplayedViewId() method
+  returned a wrong view ID when the view name contained a dash character.
+- BUG FIXING (all): while processing a GET request, if the MainController
+  ::renderView() method failed due to a missing view, the PHP script was not
+  interrupted and the output error message was followed by unexpected HTML code.
+- BUG FIXING (ZnetDK 4 mobile only): issue 'Unload event listeners are
+  deprecated and will be removed.' displayed in Chrome's console. The JS 
+  'unload' event handler is no longer added to the application.
+- BUG FIXING (all): error 'Uncaught ReferenceError: $ is not defined' displayed 
+  in browser's console when CFG_VIEW_PRELOAD is set to TRUE and jQuery code
+  exists in the preloaded views. To prevent this error, the new parameter 
+  CFG_LOAD_JS_DEPENDENCIES_FROM_HTML_HEAD can be set to TRUE to force the JS
+  dependencies loading from the HTML <head> tag.
+- BUG FIXING (ZnetDK 4 mobile only): snackbar messages were masked by elements
+  with a CSS 'z-index' higher than 1. The snackbar element is now set with a CSS
+  'z-index' value of 10 by default. This value can be increased in CSS by 
+  selecting the snackbar through the 'z4m-snackbar' class name.
+- BUG FIXING (all): the error message LC_MSG_WARN_LOGGED_OUT_MSG is not longer
+  displayed by the \UserSession::isAuthenticated() method if the request method
+  is GET. The LC_MSG_WARN_NO_AUTH error message is displayed instead.
+- BUG FIXING (all): in the event of an error processing a GET request, the
+  PHP output buffer is now cleared before returning an HTTP error in HTML format
+  (see \Response::doHttpError() method).
+- BUG FIXING (ZnetDK 4 mobile only): the page layout scripts 'office.php',
+ 'custom.php' and 'classic.php', not useful for ZnetDK 4 Mobile, are no longer
+  included in the 'engine/core/layout/' subfolder of the delivery ZIP archive.
+- BUG FIXING (ZnetDK 4 mobile only): the background color was not properly set
+  for the following user panel modal dialogs: z4minstall.php, z4muninstall.php
+  and z4mmyuserrights.php.
+- BUG FIXING (ZnetDK 4 mobile only): the separator lines of the records in the
+  list were longer than that of the title header in the user and profile
+  management views (z4musers.php and z4mprofiles.php).
+- BUG FIXING (ZnetDK only): from the user management view, when clicking the
+  New button, the modal dialog was automatically closed after its first display.
+- BUG FIXING (all): a PHP fatal error was not properly displayed when happened
+  before the definition of the LC_MSG_CRI_ERR_SUMMARY and LC_MSG_CRI_ERR_DETAIL
+  PHP constants.
+- BUG FIXING (all): message 'You will be redirected to the login page.' were
+  displayed when a user tried to log in to the application while the database
+  was down.
+- BUG FIXING (all): when a PHP warning error existed in the output buffer before
+  the first statement of the index.php script was executed, it was not traced in
+  the engine/log/errors.log and made any response generated in JSON format
+  unreadable.
+
 ZnetDK 3.1.0, 2023-12-21
 ------------------------
 - CHANGE (all): the SQL query execution time is now traced when the
@@ -9,9 +88,9 @@ ZnetDK 3.1.0, 2023-12-21
   executing a controller action is given by the 'ZNETDK_TIME_ELAPSED_FOR_ACTION'
   PHP constant.
 - CHANGE (all): to optimize the first display of the application, JavaScript
-  dependencies are now loaded at the end of the 'body' block of the HTML 
+  dependencies are now loaded at the end of the 'body' block of the HTML
   document.
-- CHANGE (all): after granting or not granting a profile to a user, the latter 
+- CHANGE (all): after granting or not granting a profile to a user, the latter
   no longer needs to log out and log in again for their new rights to apply.
   Indeed, reloading the application in the internet browser is now enough for
   the user's rights to apply.
@@ -19,7 +98,7 @@ ZnetDK 3.1.0, 2023-12-21
   added to the JavaScript z4m.action.addCustomButton() method to specify a title
   for the custom action button.
 - BUG FIXING (ZnetDK 4 mobile only): a JS data list was wrongly refreshed after
-  a form submission if the 'success' property of the JSON response existed and 
+  a form submission if the 'success' property of the JSON response existed and
   was false (see z4m.list.setModal() method).
 - BUG FIXING (ZnetDK 4 mobile only): for better accessibility, 'title' and
   'aria-label' HTML attributes are added to the action buttons.
@@ -27,19 +106,19 @@ ZnetDK 3.1.0, 2023-12-21
   the confirmation message is now displayed as a snackbar message.
 - BUG FIXING (ZnetDK 4 mobile only): for better accessibility, form labels are
   now associated with their form fields.
-- BUG FIXING (ZnetDK 4 mobile only): items in the left vertical menu were not 
+- BUG FIXING (ZnetDK 4 mobile only): items in the left vertical menu were not
   focusable when navigating with keyboard (accessibility issue).
 - BUG FIXING (all): HTML title attribute added to the application's logo link
   and HTML alt attribute set from the PHP LC_HEAD_TITLE constant.
-- BUG FIXING (ZnetDK 4 mobile only): for SEO purpose when the 
-  CFG_VIEW_PAGE_RELOAD parameter is set to TRUE, the 'href' attribute of the 
+- BUG FIXING (ZnetDK 4 mobile only): for SEO purpose when the
+  CFG_VIEW_PAGE_RELOAD parameter is set to TRUE, the 'href' attribute of the
   level 2 horizontal menu items is now set to the $menuItemSEOlink value
   specified in the menu.php script on \MenuManager::addMenuItem() method call.
-- BUG FIXING (ZnetDK only): when an application was configured with 
+- BUG FIXING (ZnetDK only): when an application was configured with
   CFG_PAGE_LAYOUT set to 'custom', upon clicking a menu item, its associated
   view might not be displayed the first time and was ultimately only displayed
   upon clicking a second time.
-- BUG FIXING (ZnetDK only): when an application was configured with 
+- BUG FIXING (ZnetDK only): when an application was configured with
   CFG_PAGE_LAYOUT set to 'classic' or 'custom', the icon on the title bar of the
   login dialog was displayed on the right instead of the left.
 

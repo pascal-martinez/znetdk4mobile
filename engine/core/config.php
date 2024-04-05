@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core parameters of the applications
 *
-* File version: 1.14
-* Last update: 12/15/2023
+* File version: 1.15
+* Last update: 03/17/2024
 */
 
 /** Page layout chosen for the application.
@@ -97,7 +97,7 @@ define('CFG_ZNETDK_LOGIN_LOG_DIR', 'engine'. DIRECTORY_SEPARATOR . 'log' . DIREC
 define('CFG_JQUERY_JS','resources/jquery/jquery-1.12.4.min.js');
 
 /** Relative path of the jQuery Javascript file for Mobile page layout */
-define('CFG_MOBILE_JQUERY_JS', 'resources/jquery/jquery-3.6.0.min.js');
+define('CFG_MOBILE_JQUERY_JS', 'resources/jquery/jquery-3.7.1.min.js');
 
 /** Relative path of the jQueryUI Javascript file */
 define('CFG_JQUERYUI_JS','resources/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js');
@@ -501,3 +501,11 @@ define('CFG_REQUEST_VARIABLE_FILTERING_LEVEL', 'HIGH');
  * For example: ZNETDK_APP_ROOT . '/app/myscript.php'
  */
 define('CFG_EXEC_PHP_SCRIPT_AFTER_ACTION_DONE', NULL);
+
+/**
+ * Specifies whether to load the JS dependencies from the head tag or at the end 
+ * of the body tag.
+ * @return boolean TRUE to load the JS dependencies from the head tag, otherwise
+ * FALSE (by default) to load them at the end of the body tag.
+ */
+define('CFG_LOAD_JS_DEPENDENCIES_FROM_HTML_HEAD', FALSE);

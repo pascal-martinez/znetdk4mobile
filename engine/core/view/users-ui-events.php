@@ -6,8 +6,8 @@ License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
 --------------------------------------------------------------------
 Core authorizations view | UI Components events
 
-File version: 1.3
-Last update: 06/21/2023
+File version: 1.4
+Last update: 01/30/2024
 -->
 <script>
     $(document).ready(function () {
@@ -32,17 +32,20 @@ Last update: 06/21/2023
             if (!lbElement.hasClass('zdk-listbox')) {                
                 // First time, Listbox widget not yet instantiated
                 lbElement.addClass('zdk-listbox');
-                // user's profiles are selected once the profile list is loaded
-                const selectedProfiles = getSelectedProfiles();
-                if (selectedProfiles !== false) {
-                    lbElement.one('zdklistboxdataloaded.znetdk_user_dialog', function(){
-                        lbElement.zdklistbox('selectItemsByValues', selectedProfiles);
-                    });
-                } else {
-                    // Failed to get user's profiles, modal is closed...
-                    $('#znetdk_user_dialog').one('zdkmodalaftershow.znetdk_user_dialog', function(){
-                        $(this).zdkmodal('hide');
-                    });
+                if (preserveSelection === true) {
+                    // user's profiles are selected once the profile list is loaded
+                    const selectedProfiles = getSelectedProfiles();
+                    if (selectedProfiles !== false) {
+                        lbElement.one('zdklistboxdataloaded.znetdk_user_dialog', function(){
+                            lbElement.zdklistbox('selectItemsByValues', selectedProfiles);
+                        });
+                    } else {
+                        // Failed to get user's profiles, modal is closed...
+                        $('#znetdk_user_dialog').one('zdkmodalaftershow.znetdk_user_dialog', function(){
+                            $(this).zdkmodal('hide');
+                        });
+                        console.error("View 'users-ui-events': failed to get user's profiles, modal is closed...");
+                    }
                 }
                 // Loading the profile list for the first time...
                 lbElement.zdklistbox({
