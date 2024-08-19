@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core english translations of the application
 *
-* File version: 1.20
-* Last update: 03/21/2024
+* File version: 1.21
+* Last update: 08/10/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -173,6 +173,12 @@ define('LC_FORM_LBL_PRIV_ACC','private');
 define('LC_FORM_LBL_REMEMBER_ME', 'Remember me');
 define('LC_FORM_LBL_TOGGLE_PASSWORD', 'Show / hide password');
 define('LC_FORM_LBL_FORGOT_PASSWORD', 'Forgot password?');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LENGTH', 'Minimum 8 characters');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LOWERCASE', 'At least one lowercase letter');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_UPPERCASE', 'At least one uppercase letter');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_NUMBER', 'At least one number');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_SPECIAL', 'At least one special character: !*+-/=.,;:_@#?%"\'$&');
+define('LC_FORM_LBL_PASSWORDS_MUST_MATCH', 'Passwords must match');
 
 /* User Form labels */
 define('LC_FORM_FLD_USER_IDENTITY','Identity');
@@ -239,9 +245,9 @@ define('LC_MSG_CRI_ERR_GENERIC',"A technical problem has occurred while processi
 define('LC_MSG_ERR_EXCEPTION','Technical problem');
 define('LC_MSG_ERR_LOGIN','Login ID or password is invalid!');
 define('LC_MSG_ERR_DIFF_LOGIN','You must use the same login ID to renew the session!');
-define('LC_MSG_ERR_LOGIN_DISABLED','Your user account is disabled.<br>Contact your security manager to reactivate your account.');
-define('LC_MSG_ERR_LOGIN_EXPIRATION','Your password has expired! Please, renew your password.');
+define('LC_MSG_ERR_LOGIN_EXPIRATION','Please enter a <b>new password</b> (<i>2 times</i> with confirmation) as your current password is <i>no longer valid</i>.');
 define('LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS','The maximum number of attempts allowed has been achieved!<br>Your account has been disabled.');
+define('LC_MSG_ERR_LOGIN_THROTTLING_TOO_MUCH_ATTEMPTS', 'Due to too many login failures, please wait %1 seconds before logging in again.');
 define('LC_MSG_ERR_HTTP','<h3>HTTP Error %1!</h3><p><a href="%2">Click here</a> to return to the home page.</p>');
 define('LC_MSG_ERR_OFFLINE','<h3>NO INTERNET CONNECTION!</h3><p>You need an internet connection to use your application.<br><a href="%1">Try again</a>.</p>');
 define('LC_MSG_ERR_MAINTENANCE','<h3>MAINTENANCE IN PROGRESS</h3><p>Your application is temporarily unvailable due to maintenance work. Please try again later.<br><a href="%1">Try again</a>.</p>');
@@ -252,6 +258,7 @@ define('LC_MSG_ERR_MISSING_VALUE',"Please enter a value!");
 define('LC_MSG_ERR_MISSING_VALUE_FOR',"Please enter a value for '%1'!");
 define('LC_MSG_ERR_PWD_MISMATCH','The first password does not match the second password for confirmation!');
 define('LC_MSG_ERR_PWD_IDENTICAL','The new password must be different than the current password!');
+define('LC_MSG_ERR_PASSWORD_INVALID','Password invalid.');
 define('LC_MSG_ERR_PASSWORD_BADLENGTH','The password must contain a minimum of 8 characters with at least 1 uppercase letter, 1 lowercase letter and 1 number!'
             . '<br>The following special characters are also accepted: ! * + - / = . , ; : _ @ # ? % " \' $ &');
 define('LC_MSG_ERR_EMAIL_INVALID','The email address is not a valid email!');
@@ -289,7 +296,7 @@ define('LC_MSG_INF_USERSTORED',"User saved.");
 define('LC_MSG_INF_USERREMOVED',"User removed.");
 define('LC_MSG_INF_USER_PROFILE_STORED',"Profile saved.");
 define('LC_MSG_INF_USER_PROFILE_REMOVED',"Profile removed.");
-define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'A confirmation email has been sent to you.');
+define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'If that email address is in our database, we will send you an email to reset your password.');
 define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Your temporary password has been sent to you by email.<br><a href="%1">Clic here</a> to login.');
 define('LC_MSG_INF_LOGOUT','<h3>Logout succeed.</h3><p><a href="">Clic here</a> to login again.</p>');
 define('LC_MSG_INF_CANCEL_LOGIN','<h3>Login canceled.</h3><p><a href="">Clic here</a> to login.</p>');

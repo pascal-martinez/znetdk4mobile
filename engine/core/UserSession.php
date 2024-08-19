@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core User session API
  *
- * File version: 1.13
- * Last update: 02/16/2024
+ * File version: 1.14
+ * Last update: 08/07/2024
  */
 Class UserSession {
     static private $customVarPrefix = "zdkcust-";
@@ -129,7 +129,7 @@ Class UserSession {
     static private function getApplicationVersion() {
         return CFG_VIEW_PAGE_RELOAD === FALSE ? CFG_APPLICATION_VERSION : FALSE;
     }
-    
+
     /**
      * Returns the login log filename
      * @param string $loginName Login name
@@ -137,14 +137,14 @@ Class UserSession {
      * is missing and can't be created
      */
     static private function getLoginLogFilename($loginName) {
-        $fileDir = ZNETDK_ROOT . CFG_ZNETDK_LOGIN_LOG_DIR . DIRECTORY_SEPARATOR;        
+        $fileDir = ZNETDK_ROOT . CFG_ZNETDK_LOGIN_LOG_DIR . DIRECTORY_SEPARATOR;
         if (!is_dir($fileDir) && !mkdir($fileDir, 0755)) {
             General::writeErrorLog(__METHOD__, 'Unable to create the login log directory.');
             return FALSE;
         }
         return $fileDir . General::getApplicationID() . "_{$loginName}";
     }
-    
+
     /**
      * Traces the session ID of the logged in user in order to check if multiple
      * session exist for the same login name.
@@ -153,7 +153,7 @@ Class UserSession {
      * otherwise.
      */
     static private function traceLastLoginSessionId($loginName) {
-        if (CFG_AUTHENT_REQUIRED === TRUE && CFG_SESSION_ONLY_ONE_PER_USER === TRUE) {            
+        if (CFG_AUTHENT_REQUIRED === TRUE && CFG_SESSION_ONLY_ONE_PER_USER === TRUE) {
             $filePath = self::getLoginLogFilename($loginName);
             if ($filePath === FALSE) {
                 return FALSE;
@@ -165,12 +165,12 @@ Class UserSession {
         }
         return TRUE;
     }
-    
+
     /**
-     * Checks if the current user's session ID matches the session ID tracked 
-     * when user logged in for the last time. 
-     * @return boolean TRUE is session IDs match or if no login name is 
-     * currently stored in session or if authentication is not required and 
+     * Checks if the current user's session ID matches the session ID tracked
+     * when user logged in for the last time.
+     * @return boolean TRUE is session IDs match or if no login name is
+     * currently stored in session or if authentication is not required and
      * sessions are not limited to a login name per user.
      */
     static private function isLastLoginSessionId() {
@@ -273,12 +273,12 @@ Class UserSession {
             $response = new \Response(FALSE);
             $response->is_disconnected = is_null(self::getValue('login_name'))
                     || !$isTokenValid || !$isLastLoginSessionId;
-            if ($response->is_disconnected === FALSE 
+            if ($response->is_disconnected === FALSE
                     && ($appVersion = self::getApplicationVersion()) !== FALSE) {
                 $response->appver = $appVersion;
                 $response->reload_summary = LC_MSG_WARN_NEW_VERSION_SUMMARY;
                 $response->reload_msg = LC_MSG_WARN_NEW_VERSION_MSG;
-            } elseif ($response->is_disconnected === TRUE 
+            } elseif ($response->is_disconnected === TRUE
                     && \Request::getMethod() === 'POST') {
                 $summary = LC_MSG_WARN_LOGGED_OUT_SUMMARY;
                 $message = LC_MSG_WARN_LOGGED_OUT_MSG;
@@ -462,7 +462,10 @@ Class UserSession {
      * @return boolean TRUE if the user failed to authenticate 3 times or more
      */
     static public function isMaxNbrOfFailedAuthentReached() {
-        if (self::getNbrOfFailedAuthent() >= CFG_NBR_FAILED_AUTHENT) {
+        $isPositiveInteger = is_int(CFG_NBR_FAILED_AUTHENT)
+                && CFG_NBR_FAILED_AUTHENT > 0;
+        if ($isPositiveInteger 
+                && self::getNbrOfFailedAuthent() >= CFG_NBR_FAILED_AUTHENT) {
             return TRUE;
         } else {
             return FALSE;
@@ -476,6 +479,23 @@ Class UserSession {
     static public function resetAuthentHasFailed() {
         unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['nbr_of_failed_authent']);
         unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_failed_authent']);
+    }
+
+
+    /**
+     * Update data in user's session from user informations when user 
+     * authentication succeeded.
+     * @param array $userInfos User informations read from database.
+     * @param string $accessMode Value 'public' or 'private'.
+     */
+    static public function setUserAuthenticated($userInfos, $accessMode) {
+        self::setLoginName($userInfos['login_name']);
+        self::setUserId($userInfos['user_id']);
+        self::setUserName($userInfos['user_name']);
+        self::setUserEmail($userInfos['user_email']);
+        self::setFullMenuAccess($userInfos['full_menu_access']);
+        self::setUserProfiles(\UserManager::getUserProfilesAsArray($userInfos['user_id']));
+        self::setAccessMode($accessMode);
     }
 
     /**
@@ -606,7 +626,7 @@ Class UserSession {
     static public function getUIToken() {
         return self::getValue('ui_token');
     }
-    
+
     /**
      * Checks if the UI token sent in POST request is the same than the one
      * stored in user's session

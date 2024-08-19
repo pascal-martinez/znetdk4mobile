@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Navigation menu renderer
  *
- * File version: 1.4
- * Last update: 03/18/2024
+ * File version: 1.5
+ * Last update: 06/09/2024
  */
 
 /** ZnetDK core navigation menu renderer called by the \Layout class to generate
@@ -167,8 +167,8 @@ Class MenuRenderer {
     }
 
     /**
-     * Renders the generic HTML navigation menu for the 'custom' and 'mobile'
-     * layout.
+     * Renders the generic HTML navigation menu for the 'custom', 'mobile'
+     * and other page layouts.
      * The 'is-selected' CSS class is added to the menu items which are selected
      * (parent and child items).
      * The 'has-sub' CSS class is added to the parent menu items which have
@@ -184,7 +184,7 @@ Class MenuRenderer {
      * in user thru its profile definition.
      */
     static public function renderCustomMenu($level, $sortedMenuItems, $selectedMenuItem, $allowedMenuItems = null) {
-        $subMenuAllowed = \Parameters::getPageLayoutName() === 'custom' || $level === 1;
+        $subMenuAllowed = \Parameters::getPageLayoutName() !== 'mobile' || $level === 1;
         $isSetPageReload = \Parameters::isSetPageReload();
         $menuId = 'id="zdk-custom-menu"';
         $nbTabs = 3 + $level;

@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core french translations of the application
 *
-* File version: 1.20
-* Last update: 03/21/2024
+* File version: 1.21
+* Last update: 08/10/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -170,13 +170,19 @@ define('LC_FORM_LBL_LOGIN_ID','Identifiant');
 define('LC_FORM_LBL_PASSWORD','Mot de passe');
 define('LC_FORM_LBL_ORIG_PASSWORD','Mot de passe actuel');
 define('LC_FORM_LBL_NEW_PASSWORD','Nouveau mot de passe');
-define('LC_FORM_LBL_PASSWORD_CONFIRM','Confirmation');
+define('LC_FORM_LBL_PASSWORD_CONFIRM','Confirmation du mot de passe');
 define('LC_FORM_LBL_ACCESS','Acc&egrave;s');
 define('LC_FORM_LBL_PUBL_ACC','public (expiration de session)');
 define('LC_FORM_LBL_PRIV_ACC','priv&eacute;');
 define('LC_FORM_LBL_REMEMBER_ME', 'Se souvenir de moi');
 define('LC_FORM_LBL_TOGGLE_PASSWORD', 'Afficher / masquer le mot de passe');
 define('LC_FORM_LBL_FORGOT_PASSWORD', 'Mot de passe oublié ?');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LENGTH', 'Minimum 8 caractères');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LOWERCASE', 'Au moins une lettre minuscule');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_UPPERCASE', 'Au moins une lettre majuscule');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_NUMBER', 'Au moins un chiffre');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_SPECIAL', 'Au moins un caractère spécial : !*+-/=.,;:_@#?%"\'$&');
+define('LC_FORM_LBL_PASSWORDS_MUST_MATCH', 'Les mots de passe doivent être identiques');
 
 /* User Form labels */
 define('LC_FORM_FLD_USER_IDENTITY','Identité');
@@ -242,9 +248,9 @@ define('LC_MSG_CRI_ERR_GENERIC',"Un problème technique est survenu pendant le t
 /* ERROR messages */
 define('LC_MSG_ERR_LOGIN','Identifiant ou mot de passe invalide !');
 define('LC_MSG_ERR_DIFF_LOGIN',"Vous devez utiliser le même identifiant pour renouveler votre connexion !");
-define('LC_MSG_ERR_LOGIN_DISABLED',"Votre compte utilisateur est désactivé.<br>Veuillez contacter votre responsable sécurité pour réactiver votre compte.");
-define('LC_MSG_ERR_LOGIN_EXPIRATION',"Votre mot de passe a expiré.<br>Veuillez s'il vous plaît le renouveler.");
+define('LC_MSG_ERR_LOGIN_EXPIRATION',"Veuillez saisir un <b>nouveau mot de passe</b> (<i>2 fois</i> avec la confirmation) car votre mot de passe actuel <i>n'est plus valide</i>.");
 define('LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS',"Le nombre d'essais autorisés pour vous authentifier a été dépassé !<br>Votre compte utilisateur a été désactivé.");
+define('LC_MSG_ERR_LOGIN_THROTTLING_TOO_MUCH_ATTEMPTS', 'En raison du trop grand nombre d\'échecs de connexion, veuillez attendre %1 secondes avant de vous connecter à nouveau.');
 define('LC_MSG_ERR_HTTP','<h3>Erreur HTTP %1 !</h3><p><a href="%2">Cliquez ici</a> pour retourner à la page d\'accueil.</p>');
 define('LC_MSG_ERR_OFFLINE','<h3>PAS DE CONNEXION INTERNET</h3><p>Une connexion internet est nécessaire pour utiliser votre application.<br><a href="%1">Essayer à nouveau</a>.</p>');
 define('LC_MSG_ERR_MAINTENANCE','<h3>MAINTENANCE EN COURS</h3><p>Votre application est momentanément indisponible en raison de travaux de maintenance. Veuillez réessayer plus tard.<br><a href="%1">Essayer à nouveau</a>.</p>');
@@ -255,6 +261,7 @@ define('LC_MSG_ERR_MISSING_VALUE',"Veuillez saisir une valeur !");
 define('LC_MSG_ERR_MISSING_VALUE_FOR',"Veuillez saisir une valeur pour '%1'!");
 define('LC_MSG_ERR_PWD_MISMATCH','Le mot de passe et sa confirmation de saisie sont différents !');
 define('LC_MSG_ERR_PWD_IDENTICAL','Le nouveau mot de passe doit être différent du mot de passe actuel !');
+define('LC_MSG_ERR_PASSWORD_INVALID','Mot de passe invalide.');
 define('LC_MSG_ERR_PASSWORD_BADLENGTH','Le mot de passe doit contenir un minimum de 8 caractères, au moins 1 lettre majuscule et minuscule et 1 chiffre !'
     . '<br>Les caractères spéciaux suivants sont également acceptés : ! * + - / = . , ; : _ @ # ? % " \' $ &');
 define('LC_MSG_ERR_EMAIL_INVALID',"L'adresse email n'est pas une adresse valide !");
@@ -292,7 +299,7 @@ define('LC_MSG_INF_USERSTORED',"Utilisateur enregistré.");
 define('LC_MSG_INF_USERREMOVED',"Utilisateur supprimé.");
 define('LC_MSG_INF_USER_PROFILE_STORED',"Profil enregistré.");
 define('LC_MSG_INF_USER_PROFILE_REMOVED',"Profil supprimé.");
-define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'Une email de confirmation vous a été envoyé.');
+define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'Si cette adresse email est bien dans notre base de données, vous allez recevoir un email pour réinitialiser votre mot de passe.');
 define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Votre mot de passe provisoire vous a été envoyé par email.<br><a href="%1">Cliquez ici</a> pour vous connecter.');
 define('LC_MSG_INF_LOGOUT','<h3>Déconnexion réussie.</h3><p><a href="">Cliquez ici</a> pour vous reconnecter.</p>');
 define('LC_MSG_INF_CANCEL_LOGIN','<h3>Connexion annulée.</h3><p><a href="">Cliquez ici</a> pour vous connecter.</p>');

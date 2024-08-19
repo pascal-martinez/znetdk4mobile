@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Front controller of the application
  *
- * File version: 1.9
- * Last update: 03/17/2024
+ * File version: 1.10
+ * Last update: 06/05/2024
  */
 
 /**
@@ -66,10 +66,12 @@ Class MainController {
      * action or not. Set to TRUE by default.
      * @param boolean $doError Indicates whether an HTTP error 404 must be returned
      * when no controller is found. The default value is FALSE.
-     * @return string|boolean Class name found for the specified controller and
-     * action. Returns FALSE if the controller is found but not the action.
+     * @param boolean $returnAll If TRUE, all the classes found are returned.
+     * @return string|array|boolean Class name found for the specified controller and
+     * action. Returns an array of classes found or an empty array if $returnAll is TRUE.
+     * Returns FALSE if the controller and action are not found.
      */
-    static public function getControllerName($controller, $method, $isAction = TRUE, $doError = FALSE) {
+    static public function getControllerName($controller, $method, $isAction = TRUE, $doError = FALSE, $returnAll = FALSE) {
         $controllerSearchPaths = array(array('app\\controller\\' . $controller,FALSE));
         $modulesWithMatchingController = \General::getModules('mod'
                 . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR
@@ -81,14 +83,19 @@ Class MainController {
             }
         }
         $controllerSearchPaths[] = array('controller\\' . $controller,$doError);
+        $classesFound = [];
         foreach ($controllerSearchPaths as $searchPath) {
             if (self::isControllerClass($searchPath[0], $searchPath[1]) && (
                     ($isAction && $searchPath[0]::isAction($method)) ||
                     (!$isAction && method_exists($searchPath[0], $method)))) {
-                return $searchPath[0]; // Controller exists
+                if ($returnAll === TRUE) {
+                    $classesFound[] = $searchPath[0];
+                } else {
+                    return $searchPath[0]; // Controller exists
+                }
             }
         }
-        return FALSE;
+        return $returnAll === TRUE ? $classesFound : FALSE;
     }
 
     /**
@@ -191,8 +198,13 @@ Class MainController {
     }
 
     /** Executes a public method of the specified controller.
-     * The method is searched in the app folder, next in the core folder.
+     * The method is searched in the app/controller/ folder, next in the 
+     * mod/controller/ folder and finally in the core/controller/ folder.
      * The public method is not necessarily an action and can be just a public method.
+     * @param string $controller Class name
+     * @param string $method Method name
+     * @return mixed The value returned by the called method or FALSE if the
+     * specified method is not found.
      */
     static public function execute($controller, $method) {
         $className = self::getControllerName($controller, $method, FALSE);
@@ -212,6 +224,27 @@ Class MainController {
         } else {
             return FALSE;
         }
+    }
+    
+    /** Executes all the public methods found for the specified class.
+     * The class and method are searched in the controller/app/ folder, next in
+     * the mod/controller/ module folders and finally in the core/controller/
+     * folder.
+     * The public method is not necessarily an action and can be just a public
+     * method.
+     * @param string $controller Class name
+     * @param string $method Method name
+     * @return boolean TRUE if at least one method is found and executed, FALSE
+     * otherwise.
+     */
+    static public function executeAll($controller, $method) {
+        $classNames = self::getControllerName($controller, $method, FALSE, FALSE, TRUE);
+        foreach ($classNames as $className) {
+            $numargs = func_num_args();
+            $parameters = $numargs > 1 ? array_slice(func_get_args(), 2) : array();
+            call_user_func_array(array($className, $method), $parameters);
+        }
+        return count($classNames) > 0 ? TRUE : FALSE;
     }
 
 }

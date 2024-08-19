@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Validator : check user informations for new and existing users
  *
- * File version: 1.3
- * Last update: 08/31/2022
+ * File version: 1.4
+ * Last update: 08/14/2024
  */
 
 namespace validator;
@@ -55,7 +55,7 @@ class User extends \validator\Password {
 
     /**
      * Checks the user's email address validity 
-     * @param string $value
+     * @param string $value Email address
      * @return boolean FALSE if email address is invalid
      */
     protected function check_user_email($value) {
@@ -75,7 +75,7 @@ class User extends \validator\Password {
 
     /**
      * Checks the login name validity
-     * @param string $value
+     * @param string $value Login name
      * @return boolean FALSE if login name is invalid
      */
     protected function check_login_name($value) {
@@ -96,7 +96,7 @@ class User extends \validator\Password {
 
     /**
      * Checks the expiration date validity
-     * @param string $value
+     * @param string $value Expiration date
      * @return boolean FALSE if expiration date is invalid
      */
     protected function check_expiration_date($value) {
@@ -110,12 +110,25 @@ class User extends \validator\Password {
 
     /**
      * Checks the activation status of the user
-     * @param boolean $value
+     * @param boolean $value Value of the activation status
      * @return boolean FALSE if value is not equal to -1, 0 or 1
      */
     protected function check_user_enabled($value) {
         if ($value < -1 || $value > 1) {
             $this->setErrorMessage(LC_FORM_LBL_USER_STATUS . ' - ' . LC_MSG_ERR_VALUE_INVALID);
+            return FALSE;
+        }
+        return TRUE;
+    }
+    
+    /**
+     * Checks the full menu access value of the user
+     * @param boolean $value Value of the full menu access status
+     * @return boolean FALSE if value is not equal to 0 or 1
+     */
+    protected function check_full_menu_access($value) {
+        if ($value < 0 || $value > 1) {
+            $this->setErrorMessage(LC_FORM_LBL_USER_MENU_ACCESS . ' - ' . LC_MSG_ERR_VALUE_INVALID);
             return FALSE;
         }
         return TRUE;

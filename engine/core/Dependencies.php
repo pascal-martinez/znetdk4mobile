@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core renderer of the ressource dependencies
  *
- * File version: 1.11
- * Last update: 02/18/2024
+ * File version: 1.12
+ * Last update: 06/11/2024
  */
 
 /**
@@ -43,7 +43,7 @@ class Dependencies {
             if (is_null($type) || $type === 'js') {
                 self::renderJSforMobile();
             }
-        } else {
+        } elseif (in_array($layout, ['classic', 'office', 'custom'])) {
             if (is_null($type) || $type === 'css') {
                 if (CFG_NON_MOBILE_PWA_ENABLED === FALSE) {
                     $icon = defined('LC_HEAD_ICO_LOGO') ? LC_HEAD_ICO_LOGO : LC_HEAD_IMG_LOGO;
@@ -53,6 +53,21 @@ class Dependencies {
             }
             if (is_null($type) || $type === 'js') {
                 self::renderJS();
+            }
+        } else {
+            if (is_null($type) || $type === 'css') {
+                $cssDependencies = [];
+                echo "\t\t<!-- CSS Dependencies -->" . PHP_EOL;
+                self::addModulesDependencies('css', $cssDependencies);
+                self::addApplicationDependencies('css', $cssDependencies);
+                self::renderDependencies('CSS', "\t\t", $cssDependencies);
+            }
+            if (is_null($type) || $type === 'js') {
+                $jsDependencies = [];
+                echo "\t\t<!-- JS Dependencies -->" . PHP_EOL;
+                self::addModulesDependencies('js', $jsDependencies);
+                self::addApplicationDependencies('js', $jsDependencies);
+                self::renderDependencies('JS', "\t\t", $jsDependencies);
             }
         }
     }

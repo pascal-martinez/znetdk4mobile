@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core User Management API
  *
- * File version: 1.10
- * Last update: 03/20/2024
+ * File version: 1.11
+ * Last update: 06/05/2024
  */
 
 /**
@@ -242,6 +242,7 @@ class UserManager {
      * array. If the 'user_id' key is set, the user is updated. Otherwise the user
      * is inserted.
      * @param array $userProfiles User profiles granted to the user
+     * @return int The stored user identifier.
      */
     static public function storeUser($userRow, $userProfiles) {
         $userDAO = new \model\Users();
@@ -260,6 +261,7 @@ class UserManager {
             self::addProfilesToUser($userID, $userProfiles);
         }
         $userDAO->commit();
+        return $userID;
     }
 
     /**
@@ -301,14 +303,16 @@ class UserManager {
      * @param string $userID User identifier in database
      */
     static public function removeUser($userID) {
-        $userDAO = new \model\Users();
-        $userDAO->beginTransaction();
-        // First existing user's profiles are removed
-        self::removeUserProfiles($userID);
-        //Finally, the user is removed
         try {
+            $userDAO = new \model\Users();
+            $userDAO->beginTransaction();
+            // Removal hooks are called to remove custom user data
+            MainController::executeAll('Users', 'onRemove', $userID);
+            // Next existing user's profiles are removed
+            self::removeUserProfiles($userID);
+            //Finally, the user is removed
             $userDAO->remove($userID, FALSE);
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             $response = new \Response();
             $response->setCriticalMessage("USR-007: unable to remove the user with user ID '$userID'", $e, TRUE);
         }

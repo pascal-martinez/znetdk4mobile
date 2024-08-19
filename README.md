@@ -27,7 +27,7 @@ Supported versions of **PHP** are versions **7.4** to **8.3**.
 ## DEPENDENCIES
 ZnetDK 4 Mobile is developed in **PHP**, **MySQL**, **HTML5** and **JavaScript** and from the following libraries and additional resources:
 - **jQuery** version 3.7.1
-- **W3.CSS** version 4.12
+- **W3.CSS** version 4.15
 - **FontAwesome** version 4.7.0
 - **Google Font Exo Regular** version 7.
 ## INSTALLATION

@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for user management
  *
- * File version: 1.12
- * Last update: 09/15/2023
+ * File version: 1.13
+ * Last update: 06/03/2024
  */
 
 namespace controller;
@@ -162,12 +162,12 @@ class Users extends \AppController {
             // Password 2 is always removed (not stored)
             unset($userRow['login_password2']);
             // Storing data into the database
-            \UserManager::storeUser($userRow, $request->profiles);
+            $userRow['user_id'] = \UserManager::storeUser($userRow, $request->profiles);
             $response->setSuccessMessage(CFG_PAGE_LAYOUT === 'mobile' ? NULL : $summary, LC_MSG_INF_USERSTORED);
             $loginName = \UserSession::getLoginName();
             if (isset($loginName) && $loginName !== $userRow['login_name'] && $doesPasswordChanged === TRUE) {
                 try { // Notifying user for his account creation or his password change
-                    \MainController::execute('Users', 'notify', $isNewUser, $passwordInClear, $userRow);
+                    \MainController::executeAll('Users', 'notify', $isNewUser, $passwordInClear, $userRow);
                 } catch (\Exception $e) {
                     $response->setWarningMessage($summary, $e->getMessage());
                 }
@@ -245,17 +245,20 @@ class Users extends \AppController {
 
     /**
      * Changes the user password from the HTTP parameters
-     * @return boolean|string TRUE if the password has been changed successfully
-     * else the error message returned by the password validator
+     * @return boolean|array TRUE if the password has been changed successfully
+     * else the error message and error variable returned by the password
+     * validator
      */
     static public function changePassword() {
         $validator = new \validator\Password(FALSE);
         if ($validator->validate()) { // Password validation is OK
-            $hashedPassword = \MainController::execute('Users', 'hashPassword', $validator->getValue('login_password'));
-            \UserManager::changeUserPassword($validator->getValue('login_name'), $hashedPassword);
+            $hashedPassword = \MainController::execute('Users', 'hashPassword',
+                    $validator->getValue('login_password'));
+            \UserManager::changeUserPassword($validator->getValue('login_name'),
+                    $hashedPassword);
             return TRUE;
         } else {
-            return $validator->getErrorMessage();
+            return [$validator->getErrorMessage(), $validator->getErrorVariable()];
         }
     }
 

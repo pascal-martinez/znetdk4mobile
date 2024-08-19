@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core Layout controller
  *
- * File version: 1.11
- * Last update: 03/17/2024 
+ * File version: 1.12
+ * Last update: 06/09/2024 
  */
 
 /**
@@ -150,8 +150,7 @@ Class Layout {
             case "classic":
                 $menuRenderingMethod = 'renderTabViewMenu';
                 break;
-            case "custom":
-            case "mobile":
+            default:
                 $menuRenderingMethod = 'renderCustomMenu';
         }
 

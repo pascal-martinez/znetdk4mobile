@@ -17,13 +17,14 @@
  * --------------------------------------------------------------------
  * ZnetDK Javascript library for mobile page layout
  *
- * File version: 1.11
- * Last update: 03/20/2024
+ * File version: 1.12
+ * Last update: 07/26/2024
  */
 
 /* global FormData, BeforeInstallPromptEvent */
 
 var znetdkMobile = {
+    hideClass: 'w3-hide',
     ajax: {
         requestContext: [],
         loaderElementId: "zdk-ajax-loading",
@@ -34,6 +35,7 @@ var znetdkMobile = {
         loginFormId: '#zdk-login-modal',
         urlLoginParamName: 'login',
         changePasswordFormId: '#zdk-changepwd-modal',
+        changePasswordView: 'Z4MChangePwdCtrl',
         connectedUserPanelId: '#zdk-userpanel-modal',
         rememberMeLocalStorageKey: 'znetdkmobile_authentication_remember_me',
         loginNameStorageKey: 'znetdkmobile_authentication_login_name',
@@ -59,10 +61,12 @@ var znetdkMobile = {
         menuDefinitionId: '#zdk-custom-menu',
         verticalMenuId: '#zdk-side-nav-menu',
         horizontalMenuId: '#zdk-tab-menu',
+        verticalMenuItemClasses: 'w3-bar-item w3-button w3-hover-theme',
         verticalMenuActiveItemClass: 'w3-theme-l2',
         horizontalMenuActiveItemClass: 'w3-theme-l2',
         horizontalMenuItemBorderClass: 'w3-border-theme',
         horizontalMenuActiveItemBorderClass: 'w3-border-red',
+        menuIconTemplate: '<i class="fa fa-lg"></i>',
         autoReloadViewClass: 'zdk-viewreload',
         events: {
             beforeViewDisplayName: 'beforeviewdisplay',
@@ -83,11 +87,14 @@ var znetdkMobile = {
     messages: {
         element: null,
         containerId: '#zdk-messages',
+        messageTemplateId: '#zdk-message-tpl',
+        snackbarTemplateId: '#zdk-snackbar-tpl',
         colors: {
             info: 'w3-blue',
             warn: 'w3-yellow',
             error: 'w3-red',
-            critical: 'w3-blue-grey'
+            critical: 'w3-blue-grey',
+            snackbar: 'w3-green'
         },
         icons: {
             info: 'fa-info-circle',
@@ -129,6 +136,9 @@ var znetdkMobile = {
         element: null,
         inputData: null,
         inputInErrorClass: 'z4m-form-invalid',
+        messageTemplate: '<div class="w3-panel"><p><i class="icon fa"></i>&nbsp;&nbsp;<span class="msg"></span></p></div>',
+        revealPwdIcon: 'fa-eye',
+        hidePwdIcon: 'fa-eye-slash',
         remoteActions: {
             submit: {
                 controller: null,
@@ -144,6 +154,7 @@ var znetdkMobile = {
         }
     },
     action: {
+        buttonTemplateId: '#zdk-action-tpl',
         buttonGap: 60,
         buttons: {
             add: {id: '#zdk-mobile-action-add'},
@@ -211,7 +222,7 @@ var znetdkMobile = {
     file: {}
 };
 
-if (typeof z4m === 'undefined') {
+if (z4m === undefined) {
     var z4m = znetdkMobile; // Short alias of znetdkMobile global variable
 }
 
@@ -245,6 +256,7 @@ z4m.initApp = function () {
     if (z4m.authentication.isRequired()) { // Authentication is required
         // No navigation available
         z4m.navigation.setNoNavigation();
+        z4m.header.hideConnectionArea(true);
         // Show login form
         z4m.authentication.showLoginForm();
     } else { // No Authentication required (user authenticated or authentication disabled
@@ -324,6 +336,25 @@ z4m.ajax.setCustomAjaxURL = function(url, paramName, paramValue) {
 };
 
 /**
+ * Toggle Ajax loader
+ * @param {boolean} isVisible If true, loader is visible, otherwise is hidden.
+ */
+z4m.ajax.toggleLoader = function(isVisible) {
+    const overlayId = 'zdkmobile-ajax-loading-overlay',
+            loaderId = z4m.ajax.loaderElementId;
+    if (isVisible) {
+        let loaderDef = $('body').data('ajaxloader'),
+            loaderEl = $(loaderDef);
+        loaderEl.attr('id', loaderId);
+        $('body').append(loaderEl);
+        $('body').append('<div id="' + overlayId+ '"/>');
+    } else {
+        $('#' + loaderId).remove();
+        $('#' + overlayId).remove();
+    }
+};
+
+/**
  * Send an AJAX request to a ZnetDK PHP application controller
  * @param {Object} options The request parameters:
  * controller: the application controller name (mandatory)
@@ -352,11 +383,7 @@ z4m.ajax.request = function (options) {
              */
             beforeSend: function () {
                 if (!z4m.ajax.requestInProgress) {
-                    var loaderDefinition = $('body').data('ajaxloader'),
-                            loaderElement = $(loaderDefinition);
-                    loaderElement.attr('id', z4m.ajax.loaderElementId);
-                    $('body').append(loaderElement);
-                    $('body').append('<div id="zdkmobile-ajax-loading-overlay"/>');
+                    z4m.ajax.toggleLoader(true);
                 }
                 z4m.ajax.requestInProgress += 1;
             },
@@ -438,7 +465,7 @@ z4m.ajax.request = function (options) {
                     errorSummary = msgArray[0];
                     errorMsg = msgArray[1];
                     errorLevel = 'error';
-                } else if (typeof errorMsg === 'undefined') {
+                } else if (errorMsg === undefined) {
                     errorMsg = "The JSON response returned by the controller='" + options.control + "' and the action='" + options.action +
                             "' can't be parsed! HTTP status: " + response.status + ' ' + response.statusText;
                     errorSummary = 'Error parsing server response';
@@ -524,8 +551,7 @@ z4m.ajax.request = function (options) {
      */
     function hideLoaderImage() {
         if (z4m.ajax.requestInProgress === 1) {
-            $('#' + z4m.ajax.loaderElementId).remove();
-            $("#zdkmobile-ajax-loading-overlay").remove();
+            z4m.ajax.toggleLoader(false);
         }
         z4m.ajax.requestInProgress -= 1;
     }
@@ -869,16 +895,19 @@ z4m.header.getMenuButton = function () {
 /**
  * Hide the header connection area
  */
-z4m.header.hideConnectionArea = function () {
-    $(this.connectionAreaId).addClass('w3-hide');
+z4m.header.hideConnectionArea = function (isDisconnected) {
+    $(this.connectionAreaId).addClass(z4m.hideClass);
     $(this.headerId).find('.banner-title-small,.banner-title-large').addClass('no-connection');
+    if (isDisconnected === true) {
+        $(this.headerId).find('.banner-title-small,.banner-title-large').addClass('is-disconnected');
+    }
 };
 
 /**
  * Show the header connection area
  */
 z4m.header.showConnectionArea = function () {
-    $(this.connectionAreaId).removeClass('w3-hide');
+    $(this.connectionAreaId).removeClass(z4m.hideClass);
     $(this.headerId).find('.banner-title-small,.banner-title-large').removeClass('no-connection');
 };
 
@@ -965,7 +994,7 @@ z4m.content.getDefaultContainer = function () {
  * Display the view container of the application
  */
 z4m.content.showContainer = function () {
-    this.getContainer().parent().removeClass('w3-hide');
+    this.getContainer().parent().removeClass(z4m.hideClass);
 };
 
 /**
@@ -1117,7 +1146,7 @@ z4m.content.doesViewExistInDom = function (viewId) {
  * @returns {Boolean} Value true when anchor exists and is displayed
  */
 z4m.content.goToAnchor = function (anchor) {
-    if (typeof anchor === 'undefined') {// No anchor specified
+    if (anchor === undefined) {// No anchor specified
         anchor = location.hash; // Read from URL
         if (anchor.length === 0) { // No anchor in URL
             return false;
@@ -1146,14 +1175,14 @@ z4m.content.goToAnchor = function (anchor) {
  * Hide the footer
  */
 z4m.footer.hide = function () {
-    $(this.footerId).addClass('w3-hide');
+    $(this.footerId).addClass(z4m.hideClass);
 };
 
 /**
  * Show the footer
  */
 z4m.footer.show = function () {
-    $(this.footerId).removeClass('w3-hide');
+    $(this.footerId).removeClass(z4m.hideClass);
 };
 
 /**
@@ -1194,25 +1223,6 @@ z4m.messages.getContainer = function () {
 };
 
 /**
- * Instanciate the message to display within the message container
- * @param {jQuery} messageElement The DIV element of the message as jQuery element
- * @returns {Object|null} The message as an Object or null if instanciation failed
- */
-z4m.messages.make = function (messageElement) {
-    if (messageElement instanceof jQuery === false) {
-        z4m.log.error('Not a jQuery element!');
-        return null;
-    }
-    if (messageElement.length !== 1) {
-        z4m.log.error('Message element is empty!');
-        return null;
-    }
-    var messageObject = Object.create(this);
-    messageObject.element = messageElement;
-    return messageObject;
-};
-
-/**
  * Display the specified message
  * @param {String} severity The severity of the message: 'info', 'warn', 'error'
  * or 'critical'
@@ -1223,17 +1233,15 @@ z4m.messages.make = function (messageElement) {
  * 'autoCloseDuration' property
  */
 z4m.messages.add = function (severity, summary, detail, autoHide) {
-    const menuCloseButtonTitle = z4m.navigation.getVerticalMenu().find('button.close').attr('aria-label');
-    var message = $('<div class="w3-panel w3-card w3-animate-top w3-display-container '
-            + this.colors[severity] + '">'
-            + '<a class="close w3-button w3-large w3-display-topright" href="#" aria-label="'
-            + menuCloseButtonTitle + '"><i class="fa fa-times" aria-hidden="true" title="'
-            + menuCloseButtonTitle + '"></i></a>'
-            + '<h3><i class="fa ' + this.icons[severity] + '"></i>&nbsp;' + summary + '</h3><p>' + detail + '</p></div>');
-    var addedMessage = message.appendTo(this.getContainer());
-    if (severity !== 'critical' && (typeof autoHide === 'undefined' || autoHide === true)) {
+    const newEl = $(this.messageTemplateId).contents().filter('div').clone();
+    newEl.addClass(this.colors[severity]).find('.icon').addClass(this.icons[severity]);
+    newEl.find('.summary').html(summary);
+    newEl.find('.detail').html(detail);
+    newEl.appendTo(this.getContainer());
+    if (severity !== 'critical' && (autoHide === undefined || autoHide === true)) {
         window.setTimeout(function () {
-            z4m.messages.make(addedMessage).remove();
+            newEl.remove();
+            z4m.content.setTopSpacing();
         }, this.autoCloseDuration);
     }
     z4m.content.setTopSpacing();
@@ -1259,20 +1267,6 @@ z4m.messages.addMulti = function (messages) {
 };
 
 /**
- * Remove the message from the message container
- * @returns {Boolean} Value true when succeeded
- */
-z4m.messages.remove = function () {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Not a jQuery element!');
-        return false;
-    }
-    this.element.remove();
-    z4m.content.setTopSpacing();
-    return true;
-};
-
-/**
  * Remove all the messages from the message container
  */
 z4m.messages.removeAll = function () {
@@ -1289,21 +1283,13 @@ z4m.messages.removeAll = function () {
  * the snackbar message (useful for display over a modal dialog).
  */
 z4m.messages.showSnackbar = function (text, isWarning, parentContainer) {
-    var color = isWarning === true ? 'w3-yellow' : 'w3-green',
-            icon = isWarning === true ? 'fa-exclamation-triangle' : 'fa-check-circle',
-            message = $('<div class="z4m-snackbar w3-panel w3-card w3-animate-bottom ' + color + '">'
-                    + '<p class="w3-center"><i class="fa ' + icon + '"></i>&nbsp;' + text + '</p></div>');
-    message.css({
-        position: 'fixed',
-        bottom: '0px',
-        left: '25%',
-        width: '50%',
-        "z-index": '10'
-    });
-    var addedMessage = message.appendTo(typeof parentContainer === 'undefined'
-        ? $('body') : parentContainer);
+    const newEl = $(this.snackbarTemplateId).contents().filter('div').clone();
+    newEl.addClass(isWarning === true ? this.colors.warn : this.colors.snackbar);
+    newEl.find('.icon').addClass(isWarning === true ? this.icons.warn : this.icons.info);
+    newEl.find('.msg').html(text);
+    newEl.appendTo(parentContainer === undefined ? $('body') : parentContainer);
     window.setTimeout(function () {
-        addedMessage.remove();
+        newEl.remove();
     }, 2500);
 };
 
@@ -1371,8 +1357,9 @@ z4m.messages.ask = function (title, question, buttons, callback) {
  * Close a message when its close button is pressed
  */
 z4m.messages.events.handleAllClose = function () {
-    $('#zdk-messages').on('click.znetdkmobile_messages', 'a.close', function (event) {
-        z4m.messages.make($(this).parent()).remove();
+    z4m.messages.getContainer().on('click.znetdkmobile_messages', 'a.close', function (event) {
+        $(this).parent().remove();
+        z4m.content.setTopSpacing();
         event.preventDefault();
     });
 };
@@ -1432,21 +1419,26 @@ z4m.authentication.isRequired = function () {
 };
 
 /**
- * Show the change password modal dialog
- * @param {String} loginName The user login name
- * @param {String} errorMessage In option an error message to display into the
+ * Show the change password modal dialog (loaded on demand)
+ * When this modal displayed while password has expired, the old password field
+ * is pre-filled and is hidden (only new password and its confirmation are
+ * entered by user).
+ * @param {String} login The user login name
+ * @param {String} oldPwd In option, the old user password
+ * @param {String} msg In option a message to display into the
  *  change password form
  */
-z4m.authentication.changePassword = function (loginName, errorMessage) {
-    var $this = this,
-            isUserConnected = typeof errorMessage === 'undefined',
-            modal = z4m.modal.make($(this.changePasswordFormId)),
-            innerForm = modal.getInnerForm();
-    innerForm.init({login_name: loginName});
-    modal.open(
-            function (response) { // On submit
-                if (response.success === true) {
-                    innerForm.reset();
+z4m.authentication.changePassword = function (login, oldPwd, msg) {
+    const $this = this, isUserConnected = msg === undefined;
+    z4m.modal.make(this.changePasswordFormId, this.changePasswordView, function(){
+        const modal = this, form = this.getInnerForm();
+        form.init({login_name: login});
+        if (oldPwd !== undefined) {
+            form.setInputValue('password', oldPwd);
+        }
+        this.open(function (response) { // On submit
+            if (response.success) {
+                    form.reset();
                     modal.close();
                     z4m.messages.showSnackbar(response.msg);
                     if (!isUserConnected) {
@@ -1454,18 +1446,18 @@ z4m.authentication.changePassword = function (loginName, errorMessage) {
                     }
                     return false; // Message has been already displayed as Snackbar
                 }
-            },
-            function () { // On close
-                innerForm.reset();
+            }, function () { // On close
+                form.reset();
                 if (!isUserConnected) {
                     $this.cancelLogin(modal);
                     return false; // Modal not closed by default event handler
                 }
-            }
-    );
-    if (typeof errorMessage === 'string') {
-        innerForm.showError(errorMessage);
-    }
+            }, isUserConnected ? 'password' : 'login_password'
+        );
+        if (msg) {
+            form.showInfo(msg, true);
+        }
+    });
 };
 
 /**
@@ -1504,7 +1496,7 @@ z4m.authentication.showUserPanel = function () {
             modal.close();
             onClick.call($this);
         });
-        button.removeClass('w3-hide');
+        button.removeClass(z4m.hideClass);
     }
 };
 
@@ -1541,7 +1533,7 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
                 if (response.newpasswordrequired) { // Change password required
                     modal.close();
                     $this.changePassword(modal.getInnerForm().getInputValue('login_name'),
-                            response.msg);
+                        modal.getInnerForm().getInputValue('password'), response.msg);
                     // The error message must not be displayed
                     // by the form submit event default handler.
                     return false;
@@ -1631,7 +1623,7 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
                 }
             });
             event.preventDefault();
-        }).removeClass('w3-hide');
+        }).removeClass(z4m.hideClass);
     }
 };
 
@@ -1686,7 +1678,7 @@ z4m.authentication.cancelLogin = function (modal) {
  */
 z4m.authentication.setNoConnectionState = function (message) {
     /* Connection area in header is hidden */
-    z4m.header.hideConnectionArea();
+    z4m.header.hideConnectionArea(true);
     /* Installation message is hidden */
     z4m.install.hideInstallableMessage();
     /* Custom messages are all removed */
@@ -1763,7 +1755,7 @@ z4m.navigation.getMenuItemId = function(menuElement) {
  */
 z4m.navigation.getFirstChildMenuItemId = function(parent) {
     function _getFirstChildMenuItem(parent) {
-        if (typeof parent === 'undefined') {
+        if (parent === undefined) {
             parent = $this.getMenuDefinition().find('ul > li').first();
         }
         if (parent.length) {
@@ -1819,13 +1811,15 @@ z4m.navigation.build = function () {
         $this.getMenuDefinition().find('li.has-sub > ul').hide();
     }
     function _addW3cssClassesToMenu() {
-        $this.getMenuDefinition().find('a').addClass('w3-bar-item w3-button w3-hover-theme');
+        $this.getMenuDefinition().find('a').addClass($this.verticalMenuItemClasses);
     }
     function _displayMenuIcons() {
         $this.getMenuDefinition().find('li > a').each(function () {
             var icon = $(this).data('icon');
-            if (typeof icon === 'string' && icon.substr(0, 3) === 'fa-') {
-                $(this).prepend('<i class="fa ' + icon + ' fa-lg"></i>');
+            if (typeof icon === 'string') {
+                const iconEl = $($this.menuIconTemplate);
+                iconEl.addClass(icon);
+                $(this).prepend(iconEl);
             }
         });
     }
@@ -1914,7 +1908,7 @@ z4m.navigation.build = function () {
         if ($this.isPageToBeReloaded()) { /* Page reload */
             // The page is reloaded to be replaced by the one matching the new view ID
             // If an anchor is specified, it is added at the end of the URI
-            var uriAnchor = typeof anchor === 'undefined' ? '' : '#' + anchor;
+            var uriAnchor = anchor === undefined ? '' : '#' + anchor;
             location.assign(menuItemElement.children('a').first().attr('href') + uriAnchor);
             return;
         }
@@ -2023,7 +2017,7 @@ z4m.navigation.build = function () {
     }
     function _setHorizontalItemActive(viewID) {
         var menuItem = null;
-        if (typeof viewID === 'undefined') {
+        if (viewID === undefined) {
             menuItem = $this.getHorizontalMenu().find('.items a:first');
         } else {
             _resetTabItemActive();
@@ -2032,12 +2026,12 @@ z4m.navigation.build = function () {
                 z4m.log.error("Horizontal tab menu: view ID='" + viewID + "' unknown.");
             }
         }
-        menuItem.find('.w3-bottombar')
+        menuItem.find('.menu-item')
                 .addClass($this.horizontalMenuActiveItemClass)
                 .addClass($this.horizontalMenuActiveItemBorderClass)
                 .removeClass($this.horizontalMenuItemBorderClass);
         function _resetTabItemActive() {
-            $this.getHorizontalMenu().find('.items .w3-bottombar')
+            $this.getHorizontalMenu().find('.items .menu-item')
                     .removeClass($this.horizontalMenuActiveItemClass)
                     .removeClass($this.horizontalMenuActiveItemBorderClass)
                     .addClass($this.horizontalMenuItemBorderClass);
@@ -2049,7 +2043,7 @@ z4m.navigation.build = function () {
                 icon = link.data('icon'),
                 label = link.text(),
                 newItem = tabmenu.find('.template > a').clone();
-        if (typeof icon === 'undefined') {
+        if (icon === undefined) {
             newItem.find('i').remove(); // No icon set
         } else {
             newItem.find('i').addClass(icon); // Icon exists
@@ -2101,7 +2095,7 @@ z4m.navigation.isPageToBeReloaded = function () {
  * Hide the vertical and horizontal menus of the application
  */
 z4m.navigation.setNoNavigation = function () {
-    $('.w3-main').css('margin-left', '0');
+    $('main').css('margin-left', '0');
     this.getVerticalMenu().css('visibility', 'hidden');
     this.getHorizontalMenu().css('visibility', 'hidden');
     z4m.header.getMenuButton().css('visibility', 'hidden');
@@ -2345,7 +2339,7 @@ z4m.modal.close = function (checkDataFormsModified) {
     });
     return true;
     function _areDataFormsModified(callback) {
-        if (checkDataFormsModified === false || typeof checkDataFormsModified === 'undefined') {
+        if (checkDataFormsModified === false || checkDataFormsModified === undefined) {
             return callback(); // No checking
         }
         var isModified = false;
@@ -2387,7 +2381,8 @@ z4m.modal.setTitle = function (title) {
 };
 
 /**
- * Handle Click events on the modal close buttons and then close the modal
+ * Handle Click events on the modal close buttons and then close the modal.
+ * Modal can also be closed by typing the ESC key.
  */
 z4m.modal.events.handleAllClose = function () {
     var modalClass = '.' + z4m.modal.cssClass,
@@ -2399,6 +2394,13 @@ z4m.modal.events.handleAllClose = function () {
         if (modalObject !== null
                 && modalObject.events.triggerBeforeClose.call(modalObject) !== false) {
             modalObject.close(true);
+        }
+    });
+    $(document).on('keydown.znetdkmobile_modal', function(event){
+        let modalEl = event.target.closest('.' + z4m.modal.cssClass);
+        modalEl = modalEl === null ? $('.' + z4m.modal.cssClass + ':visible') : $(modalEl);
+        if (modalEl.length === 1 && event.key === 'Escape') {
+            modalEl.find('header .close').trigger('click');
         }
     });
 };
@@ -2458,14 +2460,23 @@ z4m.form.make = function (formElementSelector, submitCallback) {
 };
 
 /**
- * Set the focus on the first input field into the form
- * @returns {Boolean} Value true when succeeded, false otherwise
+ * Check if form is instantiated
+ * @returns {Boolean} true if instantiated, false otherwise
  */
-z4m.form.setFocusOnFirstInput = function () {
+z4m.form.isInstance = function() {
     if (this.element instanceof jQuery === false) {
         z4m.log.error('Form is not instantiated!');
         return false;
     }
+    return true;
+};
+
+/**
+ * Set the focus on the first input field into the form
+ * @returns {Boolean} Value true when succeeded, false otherwise
+ */
+z4m.form.setFocusOnFirstInput = function () {
+    if (!this.isInstance()) return false;
     var selector = 'textarea:visible:not([disabled]):not([readonly])'
         + ',select:visible:not([disabled]):not([readonly])'
         + ',input:visible:not([disabled]):not([readonly])',
@@ -2483,10 +2494,7 @@ z4m.form.setFocusOnFirstInput = function () {
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
 z4m.form.setFocus = function (inputName) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (typeof inputName === 'string') {
         var focusedElement = this.element.find('input[name="' + inputName + '"]'
                 + ',textarea[name="' + inputName + '"]'
@@ -2507,10 +2515,7 @@ z4m.form.setFocus = function (inputName) {
  * boolean value.
  */
 z4m.form.setDataModifiedState = function (isModified) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (typeof isModified !== 'boolean') {
         return false;
     }
@@ -2528,10 +2533,7 @@ z4m.form.setDataModifiedState = function (isModified) {
  * @returns {Boolean} Value true if the form data are modified by the user
  */
 z4m.form.isModified = function() {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     return this.element.data('is-modified') === 'y';
 };
 
@@ -2542,11 +2544,9 @@ z4m.form.isModified = function() {
  * @returns {Boolean} Value true when the input form is reset, false otherwise.
  */
 z4m.form.reset = function () {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     this.hideError();
+    this.hideInfo();
     this.element[0].reset();
     // Hidden fields are also reset
     this.element.find('input[type=hidden]').val('');
@@ -2572,11 +2572,8 @@ z4m.form.init = function (valueObject, isFormResetBefore) {
         z4m.log.error('The value object is empty!');
         return false;
     }
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
-    if (typeof isFormResetBefore === 'undefined' || isFormResetBefore === true) {
+    if (!this.isInstance()) return false;
+    if (isFormResetBefore === undefined || isFormResetBefore === true) {
         this.reset();
     }
     for (var inputName in valueObject) {
@@ -2595,10 +2592,7 @@ z4m.form.init = function (valueObject, isFormResetBefore) {
  * otherwise
  */
 z4m.form.load = function (id, callback) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (!this.hasOwnProperty('remoteActions')
             || !this.remoteActions.hasOwnProperty('load')
             || !this.remoteActions.load.hasOwnProperty('controller')
@@ -2623,23 +2617,63 @@ z4m.form.load = function (id, callback) {
 };
 
 /**
+ * Display an info message on the top of the form
+ * @param {String} msg The info message
+ * @param {Boolean} isWarn If true, the message is displayed as a warning
+ * @param {Boolean} hidePrevInfos If true, the previous displayed infos are
+ * hidden
+ * @returns {Boolean} Value true when succeeded, false otherwise
+ */
+z4m.form.showInfo = function (msg, isWarn, hidePrevInfos) {
+    if (!this.isInstance()) return false;
+    if (hidePrevInfos === true) {
+        this.hideInfo();
+    }
+    const newEl = $(this.messageTemplate);
+    newEl.addClass(isWarn ? ['z4m-warn', z4m.messages.colors.warn]
+        :['z4m-info', z4m.messages.colors.info]);
+    newEl.find('.icon').addClass(isWarn ? z4m.messages.icons.warn
+        : z4m.messages.icons.info);
+    newEl.find('.msg').html(msg);
+    this.element.prepend(newEl);
+    this.element[0].scrollIntoView();
+    return true;
+};
+
+/**
+ * Hide the info message currently displayed into the form
+ * @returns {Boolean} Value true when succeeded, false otherwise
+ */
+z4m.form.hideInfo = function () {
+    if (!this.isInstance()) return false;
+    this.element.find('div.z4m-info, div.z4m-warn').remove();
+    return true;
+};
+
+/**
  * Display an error message on the top of the form or directly on the entry
  * field (input, textarea and select) if inputName is specified (call of
  * setCustomValidity() method).
  * @param {String} message The error message
  * @param {String} inputName The name of the input on which the focus is set (in
  * option)
+ * @param {Boolean} hidePrevErrors If true, the previous displayed errors are
+ * hidden
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
-z4m.form.showError = function (message, inputName) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
+z4m.form.showError = function (message, inputName, hidePrevErrors) {
+    if (!this.isInstance()) return false;
+    if (hidePrevErrors === true) {
+        this.hideError();
     }
     if (this.setFocus(inputName)) {
         this.setLastInputInError(this.element.find('[name="' + inputName + '"]'), message);
     } else {
-        this.element.prepend('<div class="alert w3-panel w3-red"><p><i class="fa fa-warning"></i>&nbsp;&nbsp;' + message + '</p></div>');
+        const newEl = $(this.messageTemplate);
+        newEl.addClass(['alert', z4m.messages.colors.error]);
+        newEl.find('.icon').addClass(z4m.messages.icons.error);
+        newEl.find('.msg').html(message);
+        this.element.prepend(newEl);
         this.element[0].scrollIntoView();
     }
     return true;
@@ -2650,10 +2684,7 @@ z4m.form.showError = function (message, inputName) {
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
 z4m.form.hideError = function () {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     this.unsetLastInputInError();
     this.element.find('div.alert').remove();
     return true;
@@ -2670,10 +2701,7 @@ z4m.form.hideError = function () {
  * element or if an input element is already set in error.
  */
 z4m.form.setLastInputInError = function (inputEl, errorMessage) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (inputEl instanceof jQuery === false) {
         z4m.log.error('Specified input element is invalid!');
         return false;
@@ -2706,10 +2734,7 @@ z4m.form.setLastInputInError = function (inputEl, errorMessage) {
  * not a jQuery object.
  */
 z4m.form.getLastInputInError = function () {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     var lastInputInError = this.element.find('.' + z4m.form.inputInErrorClass);
     if (lastInputInError.length > 0) {
         return lastInputInError;
@@ -2724,10 +2749,7 @@ z4m.form.getLastInputInError = function () {
  * instantiated form object.
  */
 z4m.form.unsetLastInputInError = function () {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     var lastInputInError = this.getLastInputInError();
     if (lastInputInError instanceof jQuery) {
         lastInputInError[0].setCustomValidity('');
@@ -2744,10 +2766,7 @@ z4m.form.unsetLastInputInError = function () {
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
 z4m.form.doesInputExist = function (inputName) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     return typeof inputName === 'string'
             && this.element.find('[name="' + inputName + '"]').length > 0;
 };
@@ -2758,10 +2777,7 @@ z4m.form.doesInputExist = function (inputName) {
  * @returns {String|Boolean} The value of the input field, false otherwise
  */
 z4m.form.getInputValue = function (inputName) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (typeof inputName !== 'string') {
         z4m.log.error('String type expected for the inputName parameter!');
         return false;
@@ -2777,7 +2793,7 @@ z4m.form.getInputValue = function (inputName) {
                 'hidden', 'month', 'number', 'password', 'range', 'search', 'tel',
                 'time', 'url', 'week'],
                     currentInputType = inputElement.attr('type');
-            if (typeof currentInputType === 'undefined'
+            if (currentInputType === undefined
                     || inputTypes.indexOf(currentInputType) !== -1) {
                 return inputElement.val();
             } else if (currentInputType === 'checkbox') {
@@ -2839,10 +2855,7 @@ z4m.form.getInputValue = function (inputName) {
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
 z4m.form.setInputValue = function (inputName, inputValue, silent) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
+    if (!this.isInstance()) return false;
     if (typeof inputName !== 'string') {
         z4m.log.error('The input name must be a string!');
         return false;
@@ -2914,11 +2927,8 @@ z4m.form.setInputValue = function (inputName, inputValue, silent) {
  * @returns {Boolean} Value true when succeeded, false otherwise
  */
 z4m.form.setReadOnly = function (isReadOnly) {
-    if (this.element instanceof jQuery === false) {
-        z4m.log.error('Form is not instantiated!');
-        return false;
-    }
-    var readOnlyState = typeof isReadOnly === 'undefined' || isReadOnly === true;
+    if (!this.isInstance()) return false;
+    var readOnlyState = isReadOnly === undefined || isReadOnly === true;
     this.element.find('input:not([type=hidden]), textarea').each(function () {
         $(this).prop('readonly', readOnlyState);
     });
@@ -2996,6 +3006,14 @@ z4m.form.events.handleAllSubmit = function () {
                         z4m.messages.add(severity, response.summary, response.msg);
                     }
                 }
+            },
+            errorCallback: function(response) {
+                if (response.hasOwnProperty('status') && response.hasOwnProperty('responseJSON')
+                        && response.status === 403 && response.responseJSON.hasOwnProperty('msg')) {
+                    formObject.showError(response.responseJSON.msg, null, true);
+                    return false;
+                }
+                return true;
             }
         });
         event.preventDefault();
@@ -3027,10 +3045,10 @@ z4m.form.events.handleTogglePassword = function () {
                 inputType = passwordInput.attr('type');
         if (inputType === 'password') {
             passwordInput.attr('type', 'text');
-            $(this).children('i.fa').removeClass('fa-eye-slash').addClass('fa-eye');
+            $(this).children('i').removeClass(z4m.form.hidePwdIcon).addClass(z4m.form.revealPwdIcon);
         } else if (inputType === 'text') {
             passwordInput.attr('type', 'password');
-            $(this).children('i.fa').removeClass('fa-eye').addClass('fa-eye-slash');
+            $(this).children('i').removeClass(z4m.form.revealPwdIcon).addClass(z4m.form.hidePwdIcon);
         }
         event.preventDefault();
     });
@@ -3122,9 +3140,9 @@ z4m.action.toggle = function () {
             });
             verticalPos += $this.buttonGap;
             // Button is shown
-            $($this.buttons[button].id).removeClass('w3-hide');
+            $($this.buttons[button].id).removeClass(z4m.hideClass);
         } else { // Button is set hidden
-            $($this.buttons[button].id).addClass('w3-hide');
+            $($this.buttons[button].id).addClass(z4m.hideClass);
         }
     });
     return true;
@@ -3135,7 +3153,7 @@ z4m.action.toggle = function () {
 z4m.action.hide = function () {
     $.each(this.buttons, function () {
         var buttonId = this.id;
-        $(buttonId).addClass('w3-hide');
+        $(buttonId).addClass(z4m.hideClass);
     });
 };
 
@@ -3176,12 +3194,11 @@ z4m.action.addCustomButton = function (name, iconCssClass, colorCssClass, title)
     }
     buttonId = buttonIdPrefix + buttonIdSuffix;
     const buttonTitle = typeof title === 'string' ? title : name;
-    $('#zdk-mobile-action-search').after(
-            '<a id="' + buttonId
-            + '" class="zdk-mobile-action ' + name + ' w3-hide w3-btn w3-circle w3-ripple w3-xlarge '
-            + colorCssClass + ' w3-card-4" href="javascript:void(0)" aria-label="'
-            + buttonTitle + '"><i class="fa ' + iconCssClass + '" aria-hidden="true" title="'
-            + buttonTitle + '"></i></a>');
+    const newEl = $(this.buttonTemplateId).contents().filter('a').clone();
+    newEl.attr('id', buttonId).attr('aria-label', buttonTitle)
+            .addClass([name, colorCssClass]);
+    newEl.find('.icon').addClass(iconCssClass).attr('title', buttonTitle);
+    $('#zdk-mobile-action-search').after(newEl);
     this.buttons[name] = {id: '#'+buttonId};
     return true;
 };
@@ -3324,13 +3341,13 @@ z4m.list.make = function (listElementId, refresh, search) {
             z4m.content.getParentViewId(listObject.element),
             {
                 search: {
-                    isVisible: search === true || typeof search === 'undefined',
+                    isVisible: search === true || search === undefined,
                     callback: function () {
                         listObject.showSearchModal();
                     }
                 },
                 refresh: {
-                    isVisible: refresh === true || typeof refresh === 'undefined',
+                    isVisible: refresh === true || refresh === undefined,
                     callback: function () {
                         listObject.refresh();
                     }
@@ -3352,7 +3369,7 @@ z4m.list.make = function (listElementId, refresh, search) {
         });
     }
     // 'Click' Events of the Remove filter buttons are handled for refreshing the list
-    if (search === true || typeof search === 'undefined') {
+    if (search === true || search === undefined) {
         listObject.element.parent().on('click.znetdkmobile_list', '.search-filter-container .remove', function () {
             var searchTag = $(this).closest('.search-tag'),
                 filterContainer = $(this).closest('.search-filter-container');
@@ -3571,7 +3588,7 @@ z4m.list.applyFilterAndSortCriterium = function (filterValue,
     if (filterValue !== '' || isSortCriteriumToApply) {
         if (filterContainer.length === 0) {
             filterContainer = $(this.searchModalId).find('.search-filter-container').clone();
-            filterContainer.removeClass('w3-hide');
+            filterContainer.removeClass(z4m.hideClass);
             filterContainer.insertBefore(this.element);
         }
         // Display keyword filters
@@ -3581,19 +3598,18 @@ z4m.list.applyFilterAndSortCriterium = function (filterValue,
             filterElement.attr('data-filter-jsondata', getFilterValueJsonData());
             filterElement.attr('data-filter-key', 'keyword');
             filterElement.appendTo(filterContainer);
-            filterElement.removeClass('w3-hide');
+            filterElement.removeClass(z4m.hideClass);
         }
         // Display sort criterium
         if (isSortCriteriumToApply) {
             var orderClass = sortorder === '1' ? 'asc' : 'desc',
                     sortElement = $(this.searchModalId).find('.filter-sort-criterium.' + orderClass).clone();
-            sortElement.find('.label').text(
-                    typeof sortlabel === 'undefined'
+            sortElement.find('.label').text(sortlabel === undefined
                         ? this.customSortCriteria[sortfield] : sortlabel);
             sortElement.attr('data-sortfield', sortfield);
             sortElement.attr('data-sortorder', sortorder);
             sortElement.appendTo(filterContainer);
-            sortElement.removeClass('w3-hide');
+            sortElement.removeClass(z4m.hideClass);
         }
         if (noRefresh === true) {
             return true;
@@ -3661,7 +3677,7 @@ z4m.list.refresh = function () {
         return false;
     }
     // The list is shown if initialy hidden
-    this.element.removeClass('w3-hide');
+    this.element.removeClass(z4m.hideClass);
     // Pagination infos are reset
     this.setNextPageToLoad(1);
     this.setTotalRowCount(this.rowsPerPage);
@@ -3834,7 +3850,7 @@ z4m.list.setModal = function (modalElementId, isFormModifiable, onAdd, onEdit) {
         return false;
     }
     var $this = this,
-            isModifiable = isFormModifiable === true || typeof isFormModifiable === 'undefined';
+            isModifiable = isFormModifiable === true || isFormModifiable === undefined;
     // Set Add action
     if (onAdd !== false) {
         z4m.action.registerView(z4m.content.getParentViewId(this.element),
@@ -3919,7 +3935,7 @@ z4m.list.showSearchModal = function () {
     // The sort criteria dropdown is emptied
     sortDropdown.empty();
     // The sort crtieria inputs are hidden by default
-    sortInputs.addClass('w3-hide');
+    sortInputs.addClass(z4m.hideClass);
     // If custom sort criteria are set...
     if (this.customSortCriteria !== null && typeof this.customSortCriteria === 'object') {
         // The dropdown is filled
@@ -3928,7 +3944,7 @@ z4m.list.showSearchModal = function () {
                     + '">' + this.customSortCriteria[criterium] + '</option>');
         }
         // The sort crtieria inputs are shown
-        sortInputs.removeClass('w3-hide');
+        sortInputs.removeClass(z4m.hideClass);
         // The keyword input is no longer set required
         keywordInput.prop('required', false);
     }
@@ -4042,7 +4058,7 @@ z4m.list.events.handleEdit = function () {
         var listElement = $(this).closest('ul'),
                 rowElement = $(this).closest('li'),
                 rowId = rowElement.data('id');
-        if (typeof rowId === 'undefined') {
+        if (rowId === undefined) {
             z4m.log.warn("The 'data-id' attribute is missing!");
             return false;
         }
@@ -4102,7 +4118,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
         z4m.log.error("The input type must be 'search'!", inputElement);
         return null;
     }
-    if (typeof controllerAction === 'undefined') {
+    if (controllerAction === undefined) {
         z4m.log.error("The controller action is missing!");
         return null;
     }
@@ -4174,7 +4190,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
                 if (autocompleteObject.element.is(':focus') && response.length > 0) {
                     _addSuggestionsToList(response, queryString);
                     _addToCacheData(response, queryString);
-                    list.removeClass('w3-hide');
+                    list.removeClass(z4m.hideClass);
                     _registerClickOutOfTheAutocomplete();
                     _registerKeyboardAction();
                 }
@@ -4184,13 +4200,13 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
     }
     function _removeSuggestions() {
         list.empty();
-        list.addClass('w3-hide');
+        list.addClass(z4m.hideClass);
         _registerClickOutOfTheAutocomplete(true);
         _registerKeyboardAction(true);
     }
     function _addSuggestionsToList(response, queryString) {
         $.each(response, function () {
-            if (typeof this.label === 'undefined') {
+            if (this.label === undefined) {
                 z4m.log.warn("'label' property is missing in autocomplete suggestions!", this, 'error');
                 return false; // Break
             }
@@ -4251,7 +4267,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
         for (let i=0; i < autocompleteObject.itemCache.length; i++) {
             if (autocompleteObject.itemCache[i].queryString === queryString) {
                 _addSuggestionsToList(autocompleteObject.itemCache[i].listOfItems, queryString);
-                list.removeClass('w3-hide');
+                list.removeClass(z4m.hideClass);
                 return true;
             }
         }
@@ -4438,7 +4454,7 @@ z4m.install.showInstallableMessage = function(onlyIfAutomaticDisplayEnabled) {
             z4m.install.hideInstallableMessage();
         }
     });
-    messageEl.removeClass('w3-hide');
+    messageEl.removeClass(z4m.hideClass);
     z4m.content.setTopSpacing();
     return true;
 };
@@ -4447,7 +4463,7 @@ z4m.install.showInstallableMessage = function(onlyIfAutomaticDisplayEnabled) {
  * Hides the installation message if displayed
  */
 z4m.install.hideInstallableMessage = function() {
-    $(z4m.install.installMessageId).addClass('w3-hide');
+    $(z4m.install.installMessageId).addClass(z4m.hideClass);
     z4m.content.setTopSpacing();
 };
 

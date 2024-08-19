@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core spanish translations of the application
 *
-* File version: 1.20
-* Last update: 03/21/2024
+* File version: 1.21
+* Last update: 08/10/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -179,6 +179,12 @@ define('LC_FORM_LBL_PRIV_ACC','privado');
 define('LC_FORM_LBL_REMEMBER_ME', 'Recuérdame');
 define('LC_FORM_LBL_TOGGLE_PASSWORD', 'Mostrar / ocultar contraseña');
 define('LC_FORM_LBL_FORGOT_PASSWORD', 'Contraseña olvidada ?');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LENGTH', 'Mínimo 8 caracteres');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_LOWERCASE', 'Al menos una letra minúscula');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_UPPERCASE', 'Al menos una letra mayuscula');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_NUMBER', 'al menos un dígito');
+define('LC_FORM_LBL_PASSWORD_EXPECTED_SPECIAL', 'Al menos un carácter especial: !*+-/=.,;:_@#?%"\'$&');
+define('LC_FORM_LBL_PASSWORDS_MUST_MATCH', 'Las contraseñas deben coincidir');
 
 /* User Form labels */
 define('LC_FORM_FLD_USER_IDENTITY','Datos personales');
@@ -244,9 +250,9 @@ define('LC_MSG_CRI_ERR_GENERIC',"Ha ocurrido un problema. Vuelva a intentarlo m�
 /* ERROR messages */
 define('LC_MSG_ERR_LOGIN','Login o contraseña incorrecta !');
 define('LC_MSG_ERR_DIFF_LOGIN','Tiene que utilizar el mismo login para conectarse de nuevo!');
-define('LC_MSG_ERR_LOGIN_DISABLED','Su cuenta de usuario ha sido desactivada.<br>Pongase en contacto con su responsable de la seguridad para activar de nuevo su cuenta.');
-define('LC_MSG_ERR_LOGIN_EXPIRATION','Su contraseña ha expirado! Renueve su contraseña por favor.');
+define('LC_MSG_ERR_LOGIN_EXPIRATION','Ingrese una <b>nueva contraseña</b> (<i>2 veces</i> con confirmación) ya que su contraseña actual <i>ya no es válida</i>.');
 define('LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS','El maximo de intentos autorizados ha sido alcanzado!<br>Su cuenta de usuario ha sido desactivada.');
+define('LC_MSG_ERR_LOGIN_THROTTLING_TOO_MUCH_ATTEMPTS', 'Debido a demasiados fallos de inicio de sesión, espere %1 segundos antes de iniciar sesión nuevamente.');
 define('LC_MSG_ERR_HTTP','<h3>Error HTTP %1!</h3><p><a href="%2">Haga clic aquí</a> para volver a la página de inicio.</p>');
 define('LC_MSG_ERR_OFFLINE','<h3>NO CONEXION INTERNET</h3><p>Se necesita una una conexión internet para usar este aplicación. <br><a href="%1">Intentar de nuevo</a>.</p>');
 define('LC_MSG_ERR_MAINTENANCE','<h3>MANTENIMIENTO EN PROGRESO</h3><p>Su aplicación no está disponible temporalmente debido a trabajos de mantenimiento. Por favor, inténtelo de nuevo más tarde.<br><a href="%1">Intentar de nuevo</a>.</p>');
@@ -257,6 +263,7 @@ define('LC_MSG_ERR_MISSING_VALUE',"Por favor, introduzca un valor!");
 define('LC_MSG_ERR_MISSING_VALUE_FOR',"Por favor, introduzca un valor por '%1'!");
 define('LC_MSG_ERR_PWD_MISMATCH','La contraseña y su confirmación no corresponden!');
 define('LC_MSG_ERR_PWD_IDENTICAL','La nueva contraseña tiene que ser diferente de la contraseña actual!');
+define('LC_MSG_ERR_PASSWORD_INVALID','Contraseña invalida.');
 define('LC_MSG_ERR_PASSWORD_BADLENGTH','La contraseña debe contener un mínimo de 8 caracteres, al menos 1 letra mayúscula y minúscula y 1 número.'
             .'<br>También se aceptan los siguientes caracteres especiales: ! * + - / = . , ; : _ @ # ? % " \' $ &');
 define('LC_MSG_ERR_EMAIL_INVALID','El email no es válido!');
@@ -294,7 +301,7 @@ define('LC_MSG_INF_USERSTORED',"Usuario guardado.");
 define('LC_MSG_INF_USERREMOVED',"Usuario eliminado.");
 define('LC_MSG_INF_USER_PROFILE_STORED',"Perfil guardado.");
 define('LC_MSG_INF_USER_PROFILE_REMOVED',"Perfil eliminado.");
-define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'Se le ha enviado un correo electrónico de confirmación.');
+define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'Si esa dirección de correo electrónico está en nuestra base de datos, le enviaremos un correo electrónico para restablecer su contraseña.');
 define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Su contraseña temporal le ha sido enviada por correo electrónico.<br><a href="%1">Haga clic aquí</a> para conectarse.');
 define('LC_MSG_INF_LOGOUT','<h3>Desconexión correcta.</h3><p><a href="">Haga clic aquí</a> para conectarse de nuevo.</p>');
 define('LC_MSG_INF_CANCEL_LOGIN','<h3>Conexión cancelada.</h3><p><a href="">Haga clic aquí</a> para conectarse.</p>');

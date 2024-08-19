@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core parameters of the applications
 *
-* File version: 1.15
-* Last update: 03/17/2024
+* File version: 1.16
+* Last update: 06/02/2024
 */
 
 /** Page layout chosen for the application.
@@ -236,18 +236,84 @@ define('CFG_AUTHENT_REQUIRED',FALSE);
  */
 define('CFG_DEFAULT_PWD_VALIDITY_PERIOD',6);
 
-/** Regular expression used to check if a new entered password is valid
- * @return string Regular expression for new password checking.
- * Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter
+/** Regular expression used to check globally if a new entered password is valid
+ * @return string|NULL Regular expression for new password checking.
+ * If NULL, no global checking is carried out (see indivual checking PHP 
+ * constants starting by CFG_CHECK_PWD_*).
+ * For example:
+ * '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!*+.\-_\/;@#\?%\$&\'"=,:]{8,}$/'
+ * - Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter
  * and 1 number.
- * The following special characters are allowed: !*+-/=.,;:_@#?%"'$&
+ * - The following special characters are allowed: !*+-/=.,;:_@#?%"'$&
  */
-define('CFG_CHECK_PWD_VALIDITY','/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!*+.\-_\/;@#\?%\$&\'"=,:]{8,}$/');
+define('CFG_CHECK_PWD_VALIDITY', NULL);
 
-/** Number attempts allowed to user to type in his password successfully
- * @return integer Number of login attempts allowed to user
+/**
+ * Checks the password length via Regular Expression
+ * @return string|NULL The regular expression as string. If NULL, password
+ * length is not checked.
+ * For example: '.{8,}' for a minimum length of 8 characters.
  */
-define('CFG_NBR_FAILED_AUTHENT',3);
+define('CFG_CHECK_PWD_LENGTH_REGEXP', '.{8,}');
+
+/**
+ * Checks lowercase letter existence in the password via Regular Expression
+ * @return string|NULL The regular expression as string. If NULL, no checking is
+ * carried out.
+ * For example: '[a-z]' for at least one lowercase letter.
+ */
+define('CFG_CHECK_PWD_LOWERCASE_REGEXP', '[a-z]');
+
+/**
+ * Checks uppercase letter existence in the password via Regular Expression
+ * @return string|NULL The regular expression as string. If NULL, no checking is
+ * carried out.
+ * For example: '[A-Z]' for at least one uppercase letter.
+ */
+define('CFG_CHECK_PWD_UPPERCASE_REGEXP', '[A-Z]');
+
+/**
+ * Checks number existence in the password via Regular Expression
+ * @return string|NULL The regular expression as string. If NULL, no checking is
+ * carried out.
+ * For example: '[0-9]' for at least one number.
+ */
+define('CFG_CHECK_PWD_NUMBER_REGEXP', '[0-9]');
+
+/**
+ * Checks special character existence in the password via Regular Expression
+ * @return string|NULL The regular expression as string. If NULL, no checking is
+ * carried out.
+ * For example: '[#.?!@$%^&*-]' for at least one special character.
+ */
+define('CFG_CHECK_PWD_SPECIAL_REGEXP', NULL);
+
+/** Number of attempts allowed to user to type in his password successfully 
+ * before their account being disabled.
+ * @return integer Number of login attempts allowed to user. If is 0, account is
+ * never disabled.
+ */
+define('CFG_NBR_FAILED_AUTHENT', 0);
+
+/**
+ * Number of login attempts before login lockout
+ * @return integer Positive number of login attempts.
+ */
+define('CFG_LOGIN_THROTTLING_ATTEMPTS_BEFORE_LOCKOUT', 5);
+
+/**
+ * Duration in seconds of the login lockout.
+ * @return integer Number of seconds.
+ */
+define('CFG_LOGIN_THROTTLING_LOCKOUT_DELAY', 60);
+
+/**
+ * Time window during which the number of failed connections must not exceed the
+ * maximum number set through the CFG_LOGIN_THROTTLING_ATTEMPTS_BEFORE_LOCKOUT
+ * parameter.
+ * @return integer Number of seconds.
+ */
+define('CFG_LOGIN_THROTTLING_ATTEMPTS_WINDOW_TIME', 30);
 
 /** Displays a 'Forgot your password?' anchor on the login form
  * @return boolean Anchor visible when set to TRUE (FALSE by default)

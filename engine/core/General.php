@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core General purpose API
  *
- * File version: 1.17
- * Last update: 03/21/2024
+ * File version: 1.18
+ * Last update: 08/03/2024
  */
 
 /**
@@ -59,8 +59,8 @@ Class General {
      * SOLVING: \Request::getFilteredServerValue() method that sanitize the
      * requested server parameter using both filter_input and filter_var as done
      * by the \Request::getRemoteAddress() method.
-     * @param boolean $onlyTheLeaf If set to FALSE, an array of subpaths is 
-     * returned when the number of subpaths is greater than 1.  
+     * @param boolean $onlyTheLeaf If set to FALSE, an array of subpaths is
+     * returned when the number of subpaths is greater than 1.
      * @return string|boolean|array FALSE if not found, otherwise the leaf extra
      * part as string or as array.
      */
@@ -642,12 +642,19 @@ Class General {
      * @param String $action Action name
      * @param Array $extraParameters POST or GET parameters expected by the
      *  remote action. For example: [my_param1 => 'val1', my_param2 => 'val2']
+     * @param Array $extraHeaders Extra header lines to add to the HTTP header
+     * sent to the remote action.
+     * @param Boolean $returnHeader If TRUE, the HTTP header is also returned.
      * @return Mixed Data returned by the remote action. If JSON data are
      * returned, they can be converted with the PHP json_decode function.
+     * if $returnHeader is TRUE, an array is returned and the header is returned
+     * as second value of the array.
      */
-    static public function callRemoteAction($swUrl, $method, $controller, $action, $extraParameters = []) {
+    static public function callRemoteAction($swUrl, $method, $controller, $action,
+            $extraParameters = [], $extraHeaders = [], $returnHeader = FALSE) {
         $parsedUrl = parse_url($swUrl);
-        $userPwd = "{$parsedUrl['user']}:{$parsedUrl['pass']}";
+        $userPwd = key_exists('user', $parsedUrl) && key_exists('pass', $parsedUrl)
+            ? "{$parsedUrl['user']}:{$parsedUrl['pass']}" : NULL;
         $params = [
                 'control' => $controller,
                 'action' => $action
@@ -655,28 +662,43 @@ Class General {
         if (count($extraParameters)) {
             $params = array_merge($params, $extraParameters);
         }
+        $headers = [];
         if ($method === 'POST') {
+            $headers[] = 'Content-type: application/x-www-form-urlencoded';
             if (key_exists('query', $parsedUrl) && strlen($parsedUrl['query']) > 0) {
                 $urlParameters = [];
                 parse_str($parsedUrl['query'], $urlParameters);
                 $params = array_merge($params, $urlParameters);
             }
-            $basicAuth = base64_encode($userPwd);
-            $postHeader = "Content-type: application/x-www-form-urlencoded\r\n";
-            $authHeader = 'Authorization: Basic ' . $basicAuth;
+            if (!is_null($userPwd)) {
+                $basicAuth = base64_encode($userPwd);
+                $headers[] = 'Authorization: Basic ' . $basicAuth;
+            }
+            $header = implode("\r\n", array_merge($headers, $extraHeaders));
             $context = stream_context_create(['http' => [
                     'method'  => $method,
-                    'header' => $postHeader . $authHeader,
+                    'header' => $header,
                     'content' => http_build_query($params)
             ]]);
-            $url = "{$parsedUrl['scheme']}://{$parsedUrl['host']}{$parsedUrl['path']}";
+            $port = key_exists('port', $parsedUrl) && is_int($parsedUrl['port'])
+                    ? ':' . strval($parsedUrl['port']) : '';
+            $url = "{$parsedUrl['scheme']}://{$parsedUrl['host']}{$port}{$parsedUrl['path']}";
         } else {
             $context = NULL;
+            if (count($extraHeaders) > 0) {
+                $context = stream_context_create([
+                    'http' => [
+                      'method' => $method,
+                      'header' => implode("\r\n", $extraHeaders),
+                    ]
+                ]);
+            }
             $url = $swUrl
                 . (key_exists('query', $parsedUrl) && strlen($parsedUrl['query']) > 0 ? '&' : '?')
                 . http_build_query($params);
         }
-        return file_get_contents($url, FALSE, $context);
+        $response = file_get_contents($url, FALSE, $context);
+        return $returnHeader ? [$response, $http_response_header] : $response;
     }
 
     static public function generateHtaccess() {

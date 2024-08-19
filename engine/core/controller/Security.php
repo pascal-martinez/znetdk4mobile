@@ -19,13 +19,47 @@
  * --------------------------------------------------------------------
  * Core application controller for authentication
  *
- * File version: 1.9
- * Last update: 03/20/2024
+ * File version: 1.10
+ * Last update: 08/09/2024
  */
 
 namespace controller;
 
+/**
+ * User authentication APP controller class: login and logout
+ */
 class Security extends \AppController {
+
+
+    /**
+     * Access to this controller'actions are restricted to POST requests with
+     * valid UI token.
+     * @param String $action Controller action
+     * @return boolean TRUE if action can be executed, FALSE otherwise.
+     */
+    static public function isActionAllowed($action) {
+        if (!parent::isActionAllowed($action)) {
+            return FALSE;
+        }
+        if (\Request::getMethod() !== 'POST') {
+            \General::writeErrorLog(__METHOD__, 'Not POST method.');
+            return FALSE; // Only POST method allowed
+        }
+        $sessionTk = \UserSession::getUIToken();
+        if (is_null($sessionTk)) {
+            return FALSE; // No token in session
+        }
+        $requestTk = \Request::getUIToken();
+        if (is_null($requestTk)) {
+            \General::writeErrorLog(__METHOD__, 'No token in request.');
+            return FALSE; // Not token in request
+        }
+        if ($sessionTk !== $requestTk) {
+            \General::writeErrorLog(__METHOD__, 'UI token mismatch.');
+            return FALSE;
+        }
+        return TRUE;
+    }
 
     /**
      * Action to check if the user is currently connected and his session has
@@ -52,108 +86,36 @@ class Security extends \AppController {
     }
 
     /**
-     * Action called to authenticate the user attempting to connect
+     * Action called to authenticate the user attempting to log in
      * @param array $credentials The login name, password and access values
      * for direct authentication throw HTTP Basic authentication
      * @return \Response Response returned to the main controller
      */
     static protected function action_login($credentials = NULL) {
-        $loginOk = TRUE;
-        $errorMsg = '';
         $response = new \Response(FALSE);
-        $validator = new \validator\Authentication(FALSE);
-        if (!is_null($credentials)) {
-            $validator->setValues($credentials);
-        }
-        $changePasswordRequested = !($validator->getValue('login_password') === null && $validator->getValue('login_password2') === null);
-        if (!$validator->validate()) {
-            //Data validation failed...
-            $response->setFailedMessage(LC_FORM_TITLE_LOGIN, $validator->getErrorMessage(), $validator->getErrorVariable());
-            $loginOk = FALSE;
-            $errorMsg = $validator->getErrorMessage();
-        } else { // Data validation is OK
-            // Get user infos from the DB security tables
-            $user = \UserManager::getUserInfosByCredential($validator->getValue('login_name'));
-            // Check user credential: log in with login name or email address
-            if ($user && $user['login_name'] !== $validator->getValue('login_name')
-                    && $user['user_email'] !== $validator->getValue('login_name')) {
-                // Case sensitive mismatch
-                $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN, 'login_name');
-                $loginOk = FALSE;
-                $errorMsg = LC_MSG_ERR_LOGIN;
-            } elseif ($user && \MainController::execute('Security', 'isPasswordValid', $validator->getValue('password'), $user['login_password'])) {
-                // Authentication has succeed
-                \UserSession::resetAuthentHasFailed();
-                if ($user['user_enabled'] === '0') { // But user account is disabled
-                    $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN_DISABLED, 'login_name');
-                    $loginOk = FALSE;
-                    $errorMsg = LC_MSG_ERR_LOGIN_DISABLED;
-                } elseif ($user['user_enabled'] === '-1') { // But user account is archived
-                    $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN, 'login_name');
-                    $loginOk = FALSE;
-                    $errorMsg = LC_MSG_ERR_LOGIN;
-                } elseif (new \DateTime($user['expiration_date']) < new \DateTime('now') && !$changePasswordRequested) {
-                    // But password has expired
-                    $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN_EXPIRATION, 'login_name');
-                    $response->newpasswordrequired = TRUE;
-                } else { // Authentication has succeeded
-                    $result = TRUE;
-                    if ($changePasswordRequested) {
-                        $response->setSuccessMessage(LC_FORM_TITLE_CHANGE_PASSWORD, LC_MSG_INF_PWDCHANGED);
-                        $result = \MainController::execute('Users', 'changePassword');
-                    } else {
-                        $summaryLabel = CFG_PAGE_LAYOUT === 'mobile'
-                                ? NULL // Summary is NULL for 'mobile' template so the message is shown as Snackbar
-                                : LC_FORM_TITLE_LOGIN;
-                        $response->setSuccessMessage($summaryLabel, LC_MSG_INF_LOGIN);
-                    }
-                    if ($result === TRUE) {
-                        \UserSession::setLoginName($user['login_name']);
-                        \UserSession::setUserId($user['user_id']);
-                        \UserSession::setUserName($user['user_name']);
-                        \UserSession::setUserEmail($user['user_email']);
-                        \UserSession::setFullMenuAccess($user['full_menu_access']);
-                        \UserSession::setUserProfiles(\UserManager::getUserProfilesAsArray($user['user_id']));
-                        \UserSession::setAccessMode($validator->getValue('access'));
-                    } else {
-                        $response->setFailedMessage(LC_FORM_TITLE_LOGIN, $result, 'login_password');
-                        $loginOk = FALSE;
-                        $errorMsg = $result;
-                    }
-                }
-            } elseif ($user && $user['user_enabled'] === '1') { // Password is invalid but user exists and they account is enabled...
-                // The counter of allowed login attempts is incremented
-                \UserSession::setAuthentHasFailed($user['login_name']);
-                if (\UserSession::isMaxNbrOfFailedAuthentReached() && \MainController::execute('Users', 'disableUser', $user['login_name'])) {
-                    // The max number of authentications allowed has been reached
-                    // User account has been disabled
-                    $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS,'login_name');
-                    $response->toomuchattempts = TRUE;
-                    $loginOk = FALSE;
-                    $errorMsg = LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS;
-                } else { // Number of login attempts not yet exceeded
-                    $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN, $changePasswordRequested ? 'password' : 'login_name');
-                    $loginOk = FALSE;
-                    $errorMsg = LC_MSG_ERR_LOGIN;
-                }
-            } else { // User unknown or user exists but he's disabled and his password is invalid.
-                $response->setFailedMessage(LC_FORM_TITLE_LOGIN, LC_MSG_ERR_LOGIN, $changePasswordRequested ? 'password' : 'login_name');
-                $loginOk = FALSE;
-                $errorMsg = LC_MSG_ERR_LOGIN;
+        $loginHelper = new \LoginHelper($credentials);
+        try {
+            $loginHelper->check();
+            $summaryLabel = CFG_PAGE_LAYOUT !== 'mobile' ? LC_FORM_TITLE_LOGIN : NULL; // shown as Snackbar
+            $successMsg = LC_MSG_INF_LOGIN;
+            if ($loginHelper->changePasswordIfRequested()) {
+                $summaryLabel = LC_FORM_TITLE_CHANGE_PASSWORD; $successMsg = LC_MSG_INF_PWDCHANGED;
             }
+            $loginHelper->setUserAuthenticatedInSession();
+            $response->setSuccessMessage($summaryLabel, $successMsg);
+            $response->login_with_email = $loginHelper->isLoggedInWithEmailAddress() ? '1' : '0';
+        } catch (\Exception $ex) {
+            $msg = $ex->getMessage(); $varName = $loginHelper->getLastErrorVariable();
+            if ($loginHelper->disableUserIfTooMuchAttempts()) {
+                $msg = LC_MSG_ERR_LOGIN_TOO_MUCH_ATTEMPTS; $varName = 'login_name';
+                $response->toomuchattempts = TRUE;
+            }
+            if ($loginHelper->hasPasswordExpired()) { // Password must be changed
+                $response->newpasswordrequired = TRUE;
+            }
+            $response->setFailedMessage(LC_FORM_TITLE_LOGIN, $msg, $varName);
         }
-        // For tracking connections purpose (just declare a 'Security::loginResult'
-        // public static method in your application or module controller class).
-        \MainController::execute('Security', 'loginResult', array(
-            'login_date' => \General::getCurrentW3CDate(TRUE),
-            'login_name' => $loginOk ? $user['login_name'] : $validator->getValue('login_name'),
-            'ip_address' => \Request::getRemoteAddress(),
-            'status' => $loginOk,
-            'message' => $changePasswordRequested && $loginOk ? LC_MSG_INF_PWDCHANGED : $errorMsg
-        ));
-        if ($loginOk) {
-            $response->login_with_email = $validator->getValue('login_name') === $user['user_email'] ? '1' : '0'; 
-        }
+        $loginHelper->notify();
         return $response;
     }
 

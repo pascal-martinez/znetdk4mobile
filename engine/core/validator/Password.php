@@ -2,7 +2,7 @@
 
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * --------------------------------------------------------------------
- * Core Validator : check password validity of a user 
+ * Core Validator : check password validity of a user
  *
- * File version: 1.0
- * Last update: 09/18/2015
+ * File version: 1.1
+ * Last update: 06/03/2024
  */
 
 namespace validator;
 
 /**
- * Checks the new password validity when it is renewed 
+ * Checks the new password validity when it is renewed
  */
 class Password extends \Validator {
 
@@ -46,9 +46,32 @@ class Password extends \Validator {
      */
     protected function check_login_password($value) {
         $userID = $this->getValue('user_id');
-        if ((isset($userID) && $value !== \General::getDummyPassword()) || !isset($userID)) {
-            if (!preg_match(CFG_CHECK_PWD_VALIDITY, $value)) {
-                $this->setErrorMessage(LC_MSG_ERR_PASSWORD_BADLENGTH);
+        if (isset($userID) && $value === \General::getDummyPassword()) {
+            return TRUE;
+        }
+        if (is_string(CFG_CHECK_PWD_VALIDITY) && !preg_match(CFG_CHECK_PWD_VALIDITY, $value)) {
+            $this->setErrorMessage(LC_MSG_ERR_PASSWORD_BADLENGTH);
+            return FALSE;
+        } elseif (!is_string(CFG_CHECK_PWD_VALIDITY)) {
+            $errMsg = LC_MSG_ERR_PASSWORD_INVALID . ' ';
+            if (is_string(CFG_CHECK_PWD_LOWERCASE_REGEXP) && !preg_match('/' . CFG_CHECK_PWD_LOWERCASE_REGEXP . '/', $value)) {
+                $this->setErrorMessage($errMsg . LC_FORM_LBL_PASSWORD_EXPECTED_LOWERCASE);
+                return FALSE;
+            }
+            if (is_string(CFG_CHECK_PWD_UPPERCASE_REGEXP) && !preg_match('/' . CFG_CHECK_PWD_UPPERCASE_REGEXP . '/', $value)) {
+                $this->setErrorMessage($errMsg . LC_FORM_LBL_PASSWORD_EXPECTED_UPPERCASE);
+                return FALSE;
+            }
+            if (is_string(CFG_CHECK_PWD_NUMBER_REGEXP) && !preg_match('/' . CFG_CHECK_PWD_NUMBER_REGEXP . '/', $value)) {
+                $this->setErrorMessage($errMsg . LC_FORM_LBL_PASSWORD_EXPECTED_NUMBER);
+                return FALSE;
+            }
+            if (is_string(CFG_CHECK_PWD_SPECIAL_REGEXP) && !preg_match('/' .CFG_CHECK_PWD_SPECIAL_REGEXP . '/', $value)) {
+                $this->setErrorMessage($errMsg . LC_FORM_LBL_PASSWORD_EXPECTED_SPECIAL);
+                return FALSE;
+            }
+            if (is_string(CFG_CHECK_PWD_LENGTH_REGEXP) && !preg_match('/' . CFG_CHECK_PWD_LENGTH_REGEXP . '/', $value)) {
+                $this->setErrorMessage($errMsg . LC_FORM_LBL_PASSWORD_EXPECTED_LENGTH);
                 return FALSE;
             }
         }
@@ -83,6 +106,7 @@ class Password extends \Validator {
         // New password must be different than the previous one
         if ($value === $this->getValue('login_password')) {
             $this->setErrorMessage(LC_MSG_ERR_PWD_IDENTICAL);
+            $this->setErrorVariable('login_password');
             return FALSE;
         }
         return TRUE;

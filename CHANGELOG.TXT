@@ -1,3 +1,95 @@
+ZnetDK 3.3.0, 2024-08-19
+------------------------
+- CHANGE (all): login throttling applied during 60 seconds after 5 login
+  failures occurred in a 30 seconds time window for the same login name. This
+  mechanism can be customized through the new following constants:
+  CFG_LOGIN_THROTTLING_ATTEMPTS_BEFORE_LOCKOUT,
+  CFG_LOGIN_THROTTLING_LOCKOUT_DELAY and
+  CFG_LOGIN_THROTTLING_ATTEMPTS_WINDOW_TIME.
+- CHANGE (all): for security purpose, on user login if their user account is
+  disabled, the displayed error message is now LC_MSG_ERR_LOGIN instead of
+  LC_MSG_ERR_LOGIN_DISABLED.
+- CHANGE (all): The CFG_NBR_FAILED_AUTHENT constant is now set to 0 by default
+  (the user account is no longer disabled after 3 login failures).
+- CHANGE (all): when the CFG_NBR_FAILED_AUTHENT constant value is 0 or is not a
+  positive integer, user accounts are never disabled after multiple failed login
+  attempts.
+- CHANGE (all): for security purpose, actions of the \Security controller can be
+  only executed if the request method is POST and if a valid UI token is sent.
+- CHANGE (all): new argument $extraHeaders added to the ZnetDK
+  \General::callRemoteAction() method to add extra header lines to the HTTP
+  request sent to the remote controller action.
+- CHANGE (all): new argument $returnHeader added to the ZnetDK
+  \General::callRemoteAction() method to include in the returned value, the HTTP
+  header received from the remote controller action.
+- CHANGE (all): the value specified for the CFG_PAGE_LAYOUT constant now can be
+  set to a value different than 'classic', 'office', 'custom' and 'mobile'.
+  For example, if CFG_PAGE_LAYOUT is set to 'my_page_layout' in the config.php
+  of the App, the custom page layout
+  'INSTALL_DIR/applications/default/app/layout/my_page_layout.php' is used as
+  page layout. In this case, the dependencies added to the page layout are only
+  those set for CFG_APP_JS and CFG_APPLICATION_CSS constants and the JS and CSS
+  dependencies of the installed modules.
+- CHANGE (all): the controller\Users::notify() and
+  controller\Security::loginResult() hook methods are now executed for all
+  existing methods found at application and module level. In previous versions,
+  these hook methods were executed only once for the first method found, at
+  application level first, next at module level if the hook method was missing
+  at application level.
+- CHANGE (all): new controller\Users::onRemove() hook method called on user
+  removal to delete custom user rows in database. This method can be implemented
+  at application and module level.
+- CHANGE (ZnetDK 4 mobile only): as a new password is entered, dynamic display
+  of compliance with the password entry rules (minimum length, upper and lower
+  case letters, numbers, etc.).
+- CHANGE (ZnetDK 4 mobile only): when the change password modal is displayed in
+  case the user's password has expired, the user no longer needs to enter the
+  old password. Now only the new password and its confirmation need to be
+  entered by the user.
+- CHANGE (ZnetDK 4 mobile only): a modal dialog opened with the z4m.modal.open()
+  method can now be closed by the user by pressing the ESC key on the keyboard.
+- CHANGE (ZnetDK 4 mobile only): new z4m.form.showInfo() and z4m.form.hideInfo()
+  to show and hide an information message in the form.
+- CHANGE (ZnetDK 4 mobile only): new hidePrevErrors argument added to the
+  z4m.form.showError() method to hide previous error messages before displaying
+  a new error message.
+- CHANGE (ZnetDK 4 mobile only): new z4m.ajax.toggleLoader() method to show or
+  hide the AJAX Loader image on demand.
+- CHANGE (ZnetDK 4 mobile only): eye buttons added to the password input fields
+  of the change password modal to reveal the entered password.
+- CHANGE (ZnetDK 4 mobile only): W3.CSS library upgraded to version 4.15.
+- CHANGE (all): new \User class to manage users programmatically.
+- BUG FIXING (all): message LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED changed to be
+  more explicit.
+- BUG FIXING (all): errors 'E_WARNING - Undefined array key "user"' and
+  'E_WARNING - Undefined array key "pass"' when calling the
+  \General::callRemoteAction() method without user and password in the URL passed
+  as argument.
+- BUG FIXING (all): TCP/IP port was wrongly removed from the service web URL
+  when calling the \General::callRemoteAction() method with POST method.
+- BUG FIXING (ZnetDK 4 mobile only): on form submit, when an HTTP error 403 was
+  returned by the PHP application controller action (see
+  ZnetDK \AppController::setAllowedActions() method), the error message could be
+  displayed behind the modal dialog containing the data form. Now, the error
+  message is directly displayed in the form.
+- BUG FIXING (ZnetDK 4 mobile only): the App title was not right-aligned on
+  small devices when authentication was enabled and the user was not logged in.
+- BUG FIXING (ZnetDK 4 mobile only): the views below, not useful for ZnetDK
+  4 Mobile, are no longer included in the 'engine/core/view/' subfolder of the
+  ZnetDK 4 Mobile delivery ZIP archive: try_themes.php, check_connection.php,
+  check_connection-ui-init.php, check_widgets.php, myuserrights.php,
+  profiles.php, profiles-ui-init.php, profiles-ui-events.php, users.php,
+  users-ui-init.php and users-ui-events.php.
+- BUG FIXING (all): the user identifier (user_id) was not passed to the
+  overloaded controller\Users::notify() method when it was called back by ZnetDK
+  for customization purpose.
+- BUG FIXING (all): the \UserManager::storeUser() method did not return the user
+  identifier (user_id).
+- BUG FIXING (ZnetDK 4 mobile only): Yes and No buttons were not properly
+  aligned on the left in the confirmation modal dialog displayed when calling
+  the z4m.messages.ask() method.
+
+
 ZnetDK 3.2.0, 2024-03-21
 ------------------------
 - CHANGE (all): users now can authenticate to the application by using their
@@ -6,8 +98,8 @@ ZnetDK 3.2.0, 2024-03-21
   parameter and user is not authenticated (CFG_AUTHENTICATION_REQUIRED is TRUE),
   the login name is initialized from this parameter and the input focus is set
   to the password field.
-- CHANGE (ZnetDK 4 mobile only): when CFG_VIEW_PAGE_RELOAD is set to TRUE, an 
-  external link URL can be set for the $menuItemSEOlink argument when calling 
+- CHANGE (ZnetDK 4 mobile only): when CFG_VIEW_PAGE_RELOAD is set to TRUE, an
+  external link URL can be set for the $menuItemSEOlink argument when calling
   the \MenuManager::addMenuItem() method within the 'menu.php' script.
 - CHANGE (ZnetDK 4 mobile only): when CFG_VIEW_PAGE_RELOAD is set to TRUE, views
   not tied to a level 1 or level 2 menu can be displayed in the application
@@ -19,7 +111,7 @@ ZnetDK 3.2.0, 2024-03-21
   \MenuManager::addMenuItem('view1', 'view2', 'View #2', NULL, 'view2seolink');
 - CHANGE (ZnetDK 4 mobile only): the 'beforeunload' JS event listener is no
   longer added once the application is loaded to ask the user for confirmation
-  to exit the application. It is now only added when data has been modified in 
+  to exit the application. It is now only added when data has been modified in
   an input form.
 - CHANGE (all): extra HTML code can be injected at the end of the page layout
   (before JS dependencies) by the application and by the modules by adding in
@@ -38,16 +130,16 @@ ZnetDK 3.2.0, 2024-03-21
   ::renderView() method failed due to a missing view, the PHP script was not
   interrupted and the output error message was followed by unexpected HTML code.
 - BUG FIXING (ZnetDK 4 mobile only): issue 'Unload event listeners are
-  deprecated and will be removed.' displayed in Chrome's console. The JS 
+  deprecated and will be removed.' displayed in Chrome's console. The JS
   'unload' event handler is no longer added to the application.
-- BUG FIXING (all): error 'Uncaught ReferenceError: $ is not defined' displayed 
+- BUG FIXING (all): error 'Uncaught ReferenceError: $ is not defined' displayed
   in browser's console when CFG_VIEW_PRELOAD is set to TRUE and jQuery code
-  exists in the preloaded views. To prevent this error, the new parameter 
+  exists in the preloaded views. To prevent this error, the new parameter
   CFG_LOAD_JS_DEPENDENCIES_FROM_HTML_HEAD can be set to TRUE to force the JS
   dependencies loading from the HTML <head> tag.
 - BUG FIXING (ZnetDK 4 mobile only): snackbar messages were masked by elements
   with a CSS 'z-index' higher than 1. The snackbar element is now set with a CSS
-  'z-index' value of 10 by default. This value can be increased in CSS by 
+  'z-index' value of 10 by default. This value can be increased in CSS by
   selecting the snackbar through the 'z4m-snackbar' class name.
 - BUG FIXING (all): the error message LC_MSG_WARN_LOGGED_OUT_MSG is not longer
   displayed by the \UserSession::isAuthenticated() method if the request method

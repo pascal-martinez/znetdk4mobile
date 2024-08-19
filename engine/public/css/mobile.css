@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * Mobile layout view styles
  *
- * File version: 1.5
- * Last update: 10/16/2023
+ * File version: 1.6
+ * Last update: 07/09/2024
  */
 
 /* GENERAL */
@@ -123,6 +123,9 @@ body > h1 {
 }
 .banner-title-small.no-connection {
     width: 85%;
+}
+.banner-title-small.is-disconnected {
+    left: 12px;
 }
 .banner-title-large.no-connection {
     width: 180%;
@@ -240,15 +243,19 @@ footer {
     z-index: 10;
 }
 
-#zdk-login-modal form div.zdk-password {
+form .zdk-password {
     position: relative;
 }
 
-#zdk-login-modal form a.zdk-toggle-password {
+form a.zdk-toggle-password {
     position: absolute;
-    top: 3px;
+    top: 26px;
     right: 10px;
     font-size: 1.5em;
+}
+
+form .zdk-password input::-ms-reveal {
+    display: none;
 }
 
 /* MODALS */
@@ -318,4 +325,13 @@ input[type=search] ~ ul > li {
 /* CONFIRMATION DIALOG */
 #zdk-confirmation-modal button {
     width: 49%;
+}
+
+/* SNACKBAR */
+.z4m-snackbar {
+    position: fixed;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    z-index: 10;
 }

@@ -2,7 +2,7 @@
 
 /*
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website http://www.znetdk.fr 
+ * See official website http://www.znetdk.fr
  * Copyright (C) 2015 Pascal MARTINEZ (contact@znetdk.fr)
  * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  * --------------------------------------------------------------------
@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * --------------------------------------------------------------------
- * Core parameters access  
+ * Core parameters access
  *
- * File version: 1.2
- * Last update: 05/24/2019
+ * File version: 1.3
+ * Last update: 06/09/2024
  */
 
 /**
@@ -30,7 +30,7 @@ class Parameters {
     /**
      * Checks whether the parameter in the 'config.php' file is properly set.
      * @param string $name Parameter name to check.
-     * @throws \Exception Thrown is parameter is not supported (PRM-001), is null 
+     * @throws \Exception Thrown is parameter is not supported (PRM-001), is null
      * (PRM-002) or is empty (PRM-003).
      */
     static public function checkConfigParameter($name) {
@@ -47,21 +47,13 @@ class Parameters {
             throw new \ZDKException($message);
         }
     }
-    
+
     /**
-     * Returns the configured page layout name 
+     * Returns the configured page layout name
      * @return string Page layout name
      */
     static public function getPageLayoutName() {
-        switch (CFG_PAGE_LAYOUT) {
-            case "office":
-            case "classic":
-            case "custom":
-            case "mobile":
-                return CFG_PAGE_LAYOUT;
-            default:  // The page layout does not exist!
-                return "classic"; // Default layout
-        }
+        return CFG_PAGE_LAYOUT;
     }
 
     /**
@@ -75,15 +67,15 @@ class Parameters {
                 "The page layout '".$currentPageLayout."' has been loaded instead.", TRUE);
         }
     }
-    
+
     /**
      * Checks whether the application is configured for page reloading
      * @return boolean TRUE if the application main page is to be reloaded for
-     * displaying a new view. 
+     * displaying a new view.
      */
     static public function isSetPageReload($silent = TRUE) {
         if (!$silent) {
-            if (CFG_VIEW_PAGE_RELOAD && CFG_AUTHENT_REQUIRED) { // Not supported if authentication is enabled 
+            if (CFG_VIEW_PAGE_RELOAD && CFG_AUTHENT_REQUIRED) { // Not supported if authentication is enabled
                 $msg = "PRM-004: the 'CFG_VIEW_PAGE_RELOAD' parameter can't be set to TRUE while "
                         . "the 'CFG_AUTHENT_REQUIRED' parameter is set to TRUE! Please, review the application settings.";
             } elseif (CFG_VIEW_PAGE_RELOAD && CFG_VIEW_PRELOAD) {

@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.2
- * Last update: 02/15/2024
+ * File version: 1.3
+ * Last update: 06/01/2024
  */
 $appUrl = str_replace('index.php', '', General::getApplicationURI());
 $internetAddressText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INTERNET_ADDRESS, "<a href=\"{$appUrl}\">{$appUrl}</a>");
@@ -27,7 +27,6 @@ $safariShareIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAIAAA
 $safariShareIconTag = '<img src="' . $safariShareIcon . '" alt="Safari icon" width="18">';
 $installOnAppleText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INSTALL_APPLE, $safariShareIconTag);
 $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, strip_tags(LC_HEAD_TITLE), $appUrl);
-/* Sur l'écran d'accueil */
 ?>
 <div id="mzdk-userpanel-install" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
