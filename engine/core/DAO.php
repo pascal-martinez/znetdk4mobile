@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Data Access Object API
  *
- * File version: 1.14
- * Last update: 12/15/2023
+ * File version: 1.15
+ * Last update: 11/06/2024
  */
 abstract class DAO {
 
@@ -71,7 +71,7 @@ abstract class DAO {
     public function __construct($customDbConnection = NULL) {
         $this->initDaoProperties();
         if (!isset($this->query) && isset($this->table)) {
-            $this->query = 'SELECT * FROM ' . $this->table;
+            $this->query = "SELECT * FROM `{$this->table}`";
         } elseif (!isset($this->query)) {
             $message = "DAO-001: the property 'table' or 'query' must be set for the class '" . get_class($this) .
                     "' to instanciate it!";
@@ -579,14 +579,14 @@ abstract class DAO {
         }
         if (isset($rowID) && $rowID !== '') {
             /* Row update */
-            $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
-            $sql .= implode(" = ?, ", array_keys($row));
-            $sql .= ' = ? WHERE ' . $this->IdColumnName . ' = ?';
+            $sql = 'UPDATE `' . $this->getTableName() . '` SET `';
+            $sql .= implode("` = ?, `", array_keys($row));
+            $sql .= '` = ? WHERE `' . $this->IdColumnName . '` = ?';
             $row[] = $rowID;
         } else {
             /* Row insertion */
-            $sql = 'INSERT INTO ' . $this->getTableName();
-            $sql .= " (" . implode(", ", array_keys($row)) . ")";
+            $sql = 'INSERT INTO `' . $this->getTableName();
+            $sql .= "` (`" . implode("`, `", array_keys($row)) . "`)";
             $markers = array_fill(0, count($row), '?');
             $sql .= " VALUES (" . implode(", ", $markers) . ")";
         }
@@ -652,8 +652,8 @@ abstract class DAO {
             $filterValues = $this->filterValues;
         }
         $sql = $this->isTableAliasRequired($filterClause)
-            ? 'DELETE ' . $this->tableAlias . ' FROM ' . $this->getTableName() . ' AS ' . $this->tableAlias
-            : 'DELETE FROM ' . $this->getTableName();
+            ? 'DELETE ' . $this->tableAlias . ' FROM `' . $this->getTableName() . '` AS ' . $this->tableAlias
+            : 'DELETE FROM `' . $this->getTableName() . '`';
         $sql .= ' ' . $filterClause;
         /* Execute SQL statement */
         $dbConnection = $this->getDbConnection();

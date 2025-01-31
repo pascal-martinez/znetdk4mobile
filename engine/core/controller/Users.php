@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for user management
  *
- * File version: 1.13
- * Last update: 06/03/2024
+ * File version: 1.14
+ * Last update: 09/21/2024
  */
 
 namespace controller;
@@ -48,7 +48,7 @@ class Users extends \AppController {
         return CFG_AUTHENT_REQUIRED === TRUE
             ? self::hasMenuItem($menuItem) // User has right on menu item
             : \MenuManager::getMenuItem($menuItem) !== NULL; // Menu item declared in 'menu.php'
-    }
+    }            
 
     // Action methods
 
@@ -287,6 +287,7 @@ class Users extends \AppController {
      * @return boolean TRUE if the user has access to the specified menu item
      */
     static public function hasMenuItem($menuItem) {
+        \UserSession::isAuthenticated(); // HTTP error 401 if user's session has expired
         $loginName = \UserSession::getLoginName();
         if (is_null($loginName)) {
             return FALSE;

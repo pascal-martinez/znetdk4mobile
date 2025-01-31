@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core english translations of the application
 *
-* File version: 1.21
-* Last update: 08/10/2024
+* File version: 1.22
+* Last update: 12/15/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -52,11 +52,11 @@ define('LC_HEAD_USERPANEL_UNINSTALL','Uninstallation');
 
 /* Header images */
 define('LC_HEAD_IMG_LOGO_LINK_TITLE', 'Back to Home');
-define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.png');
+define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.svg?v=1');
 
 /* Footer labels */
 define('LC_FOOTER_LEFT',"Version ".ZNETDK_VERSION);
-define('LC_FOOTER_CENTER','Copyright 2014-2024 Pascal MARTINEZ');
+define('LC_FOOTER_CENTER','Copyright 2014-2025 Pascal MARTINEZ');
 define('LC_FOOTER_RIGHT','Realized with <a href="https://www.znetdk.fr" target="_blank">ZnetDK</a>');
 
 /* User Panel Installation labels */
@@ -132,7 +132,9 @@ define('LC_WINMGR_CLOSE_ALL',"Close all");
 /* FORM titles */
 define('LC_FORM_TITLE_LOGIN','Authentication');
 define('LC_FORM_TITLE_CHANGE_PASSWORD','Change password');
+define('LC_FORM_TITLE_MY_ACCOUNT','My account');
 define('LC_FORM_TITLE_NEW_PASSWORD_REQUEST','Request a new password');
+define('LC_FORM_TITLE_SEARCH', 'Search');
 define('LC_FORM_TITLE_HELP','Online help - ');
 define('LC_FORM_TITLE_USER_NEW','New user');
 define('LC_FORM_TITLE_USER_MODIFY',"Edit a user");
@@ -201,6 +203,7 @@ define('LC_FORM_LBL_USER_PROFILES','Profiles');
 define('LC_FORM_LBL_NO_FILE_SELECTED','&lt; No file selected! &gt;');
 define('LC_ACTION_ROWS_LABEL','Rows per page');
 define('LC_FORM_SEARCH_KEYWORD_LABEL', 'Searched keyword');
+define('LC_FORM_SEARCH_KEYWORD_CAPTION', 'The searched keyword is for the login ID, user name, or profile assigned to the user.');
 define('LC_FORM_SEARCH_KEYWORD_PLACEHOLDER', 'Enter the keyword to search for...');
 define('LC_FORM_SEARCH_SORT_FIELD_LABEL', 'Sort result by');
 define('LC_FORM_SEARCH_SORT_ORDER_LABEL', 'Sort order');
@@ -235,6 +238,9 @@ define('LC_BTN_ARCHIVE','Archive...');
 define('LC_BTN_RESET_SORT', 'Default sort');
 define('LC_ACTION_SEARCH_KEYWORD_BTN_RUN','Launch the search');
 define('LC_ACTION_SEARCH_KEYWORD_BTN_CLEAR','Clear the search keyword');
+
+/* Link labels */
+define('LC_LNK_SHOW_NEXT_RESULTS', 'Show next results');
 
 /* CRITICAL ERROR messages */
 define('LC_MSG_CRI_ERR_SUMMARY','Technical hitch');

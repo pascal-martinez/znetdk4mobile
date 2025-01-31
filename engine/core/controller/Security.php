@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core application controller for authentication
  *
- * File version: 1.10
- * Last update: 08/09/2024
+ * File version: 1.11
+ * Last update: 09/17/2024
  */
 
 namespace controller;
@@ -41,12 +41,16 @@ class Security extends \AppController {
         if (!parent::isActionAllowed($action)) {
             return FALSE;
         }
+        if ($action !== 'login') {
+            return TRUE;
+        }
         if (\Request::getMethod() !== 'POST') {
             \General::writeErrorLog(__METHOD__, 'Not POST method.');
             return FALSE; // Only POST method allowed
         }
         $sessionTk = \UserSession::getUIToken();
         if (is_null($sessionTk)) {
+            \UserSession::isAuthenticated(); // HTTP error 401 if user's session has expired
             return FALSE; // No token in session
         }
         $requestTk = \Request::getUIToken();

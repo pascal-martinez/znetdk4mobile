@@ -1,16 +1,16 @@
 <?php
 /**
  * ZnetDK, Starter Web Application for rapid & easy development
- * See official website https://mobile.znetdk.fr
+ * See official website http://www.znetdk.fr
  * ------------------------------------------------------------
  * Home view of the starter mobile application
  * YOU CAN FREELY CUSTOMIZE THE CONTENT OF THIS FILE
  */
 ?>
 
-<div class="w3-container w3-center w3-theme-l3 w3-padding-64 w3-text-theme" style="margin:-1px  -16px 0px -16px;">
-    <img class="w3-padding-16" src="<?php echo ZNETDK_ROOT_URI . 'engine/public/images/logoznetdk.png'; ?>" alt="banner logo">
-    <h1 class="w3-margin w3-jumbo">ZnetDK 4 Mobile</h1>
+<div class="w3-container w3-center w3-theme-l4 w3-padding-64" style="margin:-1px  -16px 0px -16px;">
+    <img class="w3-padding-16" src="<?php echo ZNETDK_ROOT_URI . 'engine/public/images/logoznetdk.svg'; ?>" width="150" alt="ZnetDK logo">
+    <h1 class="w3-margin w3-jumbo w3-text-theme">ZnetDK 4 Mobile</h1>
     <h3 class="w3-xlarge">Starter Web Application...</h3>
 </div>
 
@@ -22,7 +22,7 @@
         <div class="w3-twothird">
             <h2>Congratulations!</h2>
             <h5 class="w3-padding-32">Your Starter Application is properly installed and ready to customize and enhance.</h5>
-            <p class="w3-text-grey">To get access to the online documentation, go to the <a class="w3-text-theme w3-hover-opacity" href="https://mobile.znetdk.fr/getting-started" target="_blank">mobile.znetdk.fr/getting-started</a> website page.</p>
+            <p class="w3-text-dark-grey">To get access to the online documentation, go to the <a class="w3-text-indigo w3-hover-opacity" href="https://mobile.znetdk.fr/getting-started" target="_blank">mobile.znetdk.fr/getting-started</a> website page.</p>
         </div>
     </div>
 </div>
@@ -39,9 +39,9 @@
                 $connectionString = 'User: <strong>' . CFG_SQL_APPL_USR . '@' . CFG_SQL_HOST
                         . '</strong>, DB: <strong>' . CFG_SQL_APPL_DB . '</strong>';
                 if (CFG_SQL_APPL_USR === NULL || CFG_SQL_HOST === NULL || CFG_SQL_APPL_DB === NULL) : ?>
-                    <b class="w3-text-red"><?php echo $connectionStringError; ?></b>
+                    <b class="w3-tag w3-red"><?php echo $connectionStringError; ?></b>
 <?php           else : ?>
-                    <span class="w3-text-green"><?php echo $connectionString; ?></span>
+                    <span class="w3-tag w3-green"><?php echo $connectionString; ?></span>
 <?php           endif; ?>
             </div>
             <div class="w3-section">
@@ -50,10 +50,10 @@
                 $connectionFailed = FALSE;
                 \Database::getCoreDbConnection();
                 \Database::getApplDbConnection(); ?>
-                <span class="w3-text-green">tested successfully</span>
+                <span class="w3-tag w3-green">tested successfully</span>
 <?php       } catch (Exception $e) {
                 $connectionFailed = TRUE; ?>
-                <b class="w3-text-red">error detected...</b>
+                <b class="w3-tag w3-red">error detected...</b>
                 <div class="w3-panel w3-card w3-animate-top w3-display-container w3-red">
                     <h3><i class="fa fa-times-circle"></i>&nbsp;Failed to connect!</h3>
                     <p><?php echo $e->getMessage(); ?></p>
@@ -65,13 +65,13 @@
 <?php       $securityTableError = 'Connection to database failed.';
             if ($connectionFailed 
                 || !\Database::areCoreTablesProperlyInstalled($securityTableError)) : ?>
-                <b class="w3-text-red">error detected!</b>
+                <b class="w3-tag w3-red">error detected!</b>
                 <div class="w3-panel w3-card w3-animate-top w3-display-container w3-red">
                     <h3><i class="fa fa-times-circle"></i>&nbsp;Error details...</h3>
                     <p><?php echo $securityTableError; ?></p>
                 </div>
 <?php       else : ?>
-                <span class="w3-text-green">properly installed</span>
+                <span class="w3-tag w3-green">properly installed</span>
 <?php       endif; ?>
             </div>
             <button class="w3-btn w3-theme-action" onclick="znetdkMobile.content.reloadView('home', 'z4m-sa-home-db-status')">

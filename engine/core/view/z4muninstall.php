@@ -18,14 +18,15 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.2
- * Last update: 02/15/2024
+ * File version: 1.3
+ * Last update: 10/19/2024
  */
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <div id="mzdk-userpanel-uninstall" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <span class="fa-stack">
                     <i class="fa fa-hdd-o fa-stack-1x"></i>
@@ -34,16 +35,16 @@
                 <span class="title"><?php echo LC_HEAD_USERPANEL_UNINSTALL; ?></span>
             </h4>
         </header>
-        <div class="w3-container w3-theme-light">
+        <div class="w3-container <?php echo $color['modal_content']; ?>">
             <p><?php echo LC_HEAD_USERPANEL_UNINSTALL_TEXT_GENERAL; ?></p>
             <p><?php echo LC_HEAD_USERPANEL_UNINSTALL_TEXT_SPECIFIC; ?></p>
             <ul class="w3-ul">
-                <li><span class="w3-tag w3-theme-l2"><i class="fa fa-chrome"></i>&nbsp;Chrome</span> <b>chrome://apps</b></li>
-                <li><span class="w3-tag w3-theme-l2"><i class="fa fa-edge"></i>&nbsp;Edge</span> <b>edge://apps</b></li>
+                <li><span class="w3-tag <?php echo $color['tag']; ?>"><i class="fa fa-chrome"></i>&nbsp;Chrome</span> <b>chrome://apps</b></li>
+                <li><span class="w3-tag <?php echo $color['tag']; ?>"><i class="fa fa-edge"></i>&nbsp;Edge</span> <b>edge://apps</b></li>
             </ul>
         </div>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-padding-16 w3-border-top <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CLOSE; ?>
             </button>

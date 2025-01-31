@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * ZnetDK core exception class  
  *
- * File version: 1.2
- * Last update: 09/02/2022
+ * File version: 1.3
+ * Last update: 12/06/2024
  */
 
 /**
@@ -39,7 +39,7 @@ class ZDKException extends \Exception {
      * @param \Exception $previous The previous exception used for the exception
      * chaining.
      */
-    public function __construct($message, \Exception $previous = NULL) {
+    public function __construct($message, ?\Exception $previous = NULL) {
         if (is_string($message) && strlen($message) > 7) {
             $this->code = substr($message, 0, 7);
             $this->messageWithoutCode = trim(substr($message, 8));

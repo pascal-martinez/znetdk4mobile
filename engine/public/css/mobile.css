@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * Mobile layout view styles
  *
- * File version: 1.6
- * Last update: 07/09/2024
+ * File version: 1.7
+ * Last update: 11/10/2024
  */
 
 /* GENERAL */
@@ -44,7 +44,8 @@ body > h1 {
     height:0;
 }
 
-#zdk-connection-area .adjust-centering {
+#zdk-connection-area .adjust-centering,
+#zdk-tab-menu .adjust-centering {
     width:200px;
     height:34px;
 }
@@ -64,7 +65,7 @@ body > h1 {
 /* VERTICAL MAIN MENU */
 #zdk-side-nav-menu {
     width: 200px;
-    z-index: 4;
+    z-index: 5;
 }
 
 #zdk-company-logo img {
@@ -75,8 +76,12 @@ body > h1 {
     outline: auto;
 }
 
-#zdk-side-nav-menu i.fa {
-    margin-right: 8px;
+#zdk-custom-menu i.fa {
+    margin-right: 4px;
+}
+
+#zdk-custom-menu .w3-bar-item {
+    padding: 8px;
 }
 
 #zdk-custom-menu > ul {
@@ -94,9 +99,13 @@ body > h1 {
     text-overflow: ellipsis;
 }
 
+#zdk-custom-menu > ul > li:not(.is-active) > a {
+    border-left-color: transparent !important;
+}
+
 /* HORIZONTAL SECONDARY MENU */
-#zdk-tab-menu a {
-    text-decoration: none;
+#zdk-tab-menu a:not(.is-active) {
+    border-bottom-color: transparent !important;
 }
 
 #zdk-tab-menu i.fa {
@@ -170,7 +179,7 @@ header + div {
 
 /* MODAL */
 body .w3-modal {
-    z-index: 5;
+    z-index: 6;
 }
 
 .w3-modal-content {
@@ -265,19 +274,19 @@ form .zdk-password input::-ms-reveal {
 }
 
 /* FORMS */
-label.zdk-required:after { 
+.zdk-required:after { 
     content: " * ";
-    color: red;
+    color: #df1a0c;
     font-size: 1.1em;
 }
 
 label > b:has(+ [required]):after {
     content: ' *';
-    color: red;
+    color: #df1a0c;
 }
 
 form .z4m-form-invalid {
-    box-shadow: 0 0 0 2px red;
+    box-shadow: 0 0 0 2px #df1a0c;
 }
 
 input[type=checkbox][readonly],
@@ -335,3 +344,15 @@ input[type=search] ~ ul > li {
     width: 50%;
     z-index: 10;
 }
+
+/* W3CSS Colors override for best WCAG legibility */
+.w3-green {background-color: #2b882e !important}
+.w3-text-green {color: #28802b !important}
+.w3-red {background-color: #df1a0c !important}
+.w3-text-red {color: #df1a0c !important}
+.w3-blue {background-color: #0b78d0 !important}
+.w3-text-blue {color: #0b78d0 !important}
+.w3-blue-grey, .w3-blue-gray {background-color: #5e7a87 !important}
+.w3-pink {background-color: #df2a66 !important}
+.w3-teal {background-color: #0f8579 !important}
+.w3-deep-orange {color: #000 !important}

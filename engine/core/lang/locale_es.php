@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core spanish translations of the application
 *
-* File version: 1.21
-* Last update: 08/10/2024
+* File version: 1.22
+* Last update: 12/15/2024
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -52,11 +52,11 @@ define('LC_HEAD_USERPANEL_UNINSTALL','Desinstalación');
 
 /* Header images */
 define('LC_HEAD_IMG_LOGO_LINK_TITLE', 'Retorno al inicio');
-define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.png');
+define('LC_HEAD_IMG_LOGO',ZNETDK_ROOT_URI . CFG_ZNETDK_IMG_DIR . '/logoznetdk.svg?v=1');
 
 /* Footer labels */
 define('LC_FOOTER_LEFT','Versión '.ZNETDK_VERSION);
-define('LC_FOOTER_CENTER','Copyright 2014-2024 Pascal MARTINEZ');
+define('LC_FOOTER_CENTER','Copyright 2014-2025 Pascal MARTINEZ');
 define('LC_FOOTER_RIGHT','Realizado con <a href="https://www.znetdk.fr" target="_blank">ZnetDK</a>');
 
 /* User Panel Installation labels */
@@ -133,7 +133,9 @@ define('LC_WINMGR_CLOSE_ALL',"Cerrar todo");
 /* FORM titles */
 define('LC_FORM_TITLE_LOGIN','Conexión');
 define('LC_FORM_TITLE_CHANGE_PASSWORD','Cambio de contraseña');
+define('LC_FORM_TITLE_MY_ACCOUNT','Mi cuenta');
 define('LC_FORM_TITLE_NEW_PASSWORD_REQUEST','Pide una nueva contraseña');
+define('LC_FORM_TITLE_SEARCH', 'Buscar');
 define('LC_FORM_TITLE_HELP','Ayuda en línea - ');
 define('LC_FORM_TITLE_USER_NEW','Nuevo usuario');
 define('LC_FORM_TITLE_USER_MODIFY',"Modificar un usuario");
@@ -207,6 +209,7 @@ define('LC_FORM_LBL_USER_PROFILES','Perfiles');
 define('LC_FORM_LBL_NO_FILE_SELECTED','&lt; No archivo seleccionnado! &gt;');
 define('LC_ACTION_ROWS_LABEL','Líneas por página');
 define('LC_FORM_SEARCH_KEYWORD_LABEL', 'Palabra clave');
+define('LC_FORM_SEARCH_KEYWORD_CAPTION', 'La palabra clave buscada se relaciona con el ID de inicio de sesión, el nombre de usuario o el perfil asignado al usuario.');
 define('LC_FORM_SEARCH_KEYWORD_PLACEHOLDER', 'Entra la palabra clave de su búsqueda...');
 define('LC_FORM_SEARCH_SORT_FIELD_LABEL', 'Clasificar el resultado por');
 define('LC_FORM_SEARCH_SORT_ORDER_LABEL', 'Orden de clasificación');
@@ -241,6 +244,9 @@ define('LC_BTN_ARCHIVE','Archivar...');
 define('LC_BTN_RESET_SORT', 'Ordenar por defecto');
 define('LC_ACTION_SEARCH_KEYWORD_BTN_RUN','Iniciar la búsqueda');
 define('LC_ACTION_SEARCH_KEYWORD_BTN_CLEAR','Eliminar la palabra clave');
+
+/* Link labels */
+define('LC_LNK_SHOW_NEXT_RESULTS', 'Ver los siguientes resultados');
 
 /* CRITICAL ERROR messages */
 define('LC_MSG_CRI_ERR_SUMMARY','Problema técnico');

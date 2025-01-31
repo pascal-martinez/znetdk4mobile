@@ -1,7 +1,7 @@
 <?php
 /**
 * ZnetDK, Starter Web Application for rapid & easy development
-* See official website https://mobile.znetdk.fr 
+* See official website http://www.znetdk.fr 
 * ------------------------------------------------------------
 * Custom parameters of the application
 * YOU CAN FREELY CUSTOMIZE THE CONTENT OF THIS FILE

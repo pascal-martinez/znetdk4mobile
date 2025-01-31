@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Installation" view for mobile
  *
- * File version: 1.3
- * Last update: 06/01/2024
+ * File version: 1.4
+ * Last update: 10/21/2024
  */
 $appUrl = str_replace('index.php', '', General::getApplicationURI());
 $internetAddressText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INTERNET_ADDRESS, "<a href=\"{$appUrl}\">{$appUrl}</a>");
@@ -27,40 +27,41 @@ $safariShareIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA8CAIAAA
 $safariShareIconTag = '<img src="' . $safariShareIcon . '" alt="Safari icon" width="18">';
 $installOnAppleText = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_TEXT_INSTALL_APPLE, $safariShareIconTag);
 $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, strip_tags(LC_HEAD_TITLE), $appUrl);
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <div id="mzdk-userpanel-install" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-hdd-o fa-lg"></i>
                 <span class="title"><?php echo LC_HEAD_USERPANEL_INSTALL; ?></span>
             </h4>
         </header>
-        <div class="w3-container w3-theme-light">
-            <div class="is-installed w3-panel w3-green w3-hide">
+        <div class="w3-container <?php echo $color['modal_content']; ?>">
+            <div class="is-installed w3-panel <?php echo $color['msg_info']; ?> w3-hide">
                 <p><i class="fa fa-check fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_STATUS_IS_INSTALLED; ?></p>
             </div>
-            <div class="not-installed w3-panel w3-orange w3-hide">
+            <div class="not-installed w3-panel <?php echo $color['msg_warn']; ?> w3-hide">
                 <p><i class="fa fa-exclamation-triangle fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLED; ?></p>
             </div>
-            <div class="not-installable w3-panel w3-red w3-hide">
+            <div class="not-installable w3-panel <?php echo $color['msg_error']; ?> w3-hide">
                 <p><i class="fa fa-times fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_STATUS_NOT_INSTALLABLE; ?></p>
             </div>
             <div class="install-button w3-hide">
                 <div class="w3-padding-16"></div>
-                <button class="w3-button w3-block w3-green" type="button"><i class="fa fa-hdd-o fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL; ?></button>
+                <button class="w3-button w3-block <?php echo $color['btn_submit']; ?>" type="button"><i class="fa fa-hdd-o fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_BUTTON_INSTALL; ?></button>
                 <div class="w3-padding-16"></div>
             </div>
             <h2><i class="fa fa-question-circle"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_HELPFUL_INFOS; ?></h2>
             <div class="w3-card w3-margin-bottom">
-                <header class="info-web-address w3-container w3-theme-l4">
+                <header class="info-web-address w3-container <?php echo $color['horizontal_nav_menu']; ?>">
                     <h4><i class="fa fa-globe fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_INTERNET_ADDRESS; ?></h4>
                 </header>
                 <div class="w3-container">
                     <p><?php echo $internetAddressText; ?></p>
                     <p><?php echo LC_HEAD_USERPANEL_INSTALL_TEXT_COPY_CLIPBOARD; ?>
-                        <button class="paste-to-clipboard w3-button w3-block w3-theme-action" type="button"
+                        <button class="paste-to-clipboard w3-button w3-block <?php echo $color['btn_action']; ?>" type="button"
                                 data-url="<?php echo $appUrl; ?>" 
                                 data-success="<?php echo LC_HEAD_USERPANEL_INSTALL_SUCCESS_COPY_CLIPBOARD; ?>" 
                                 data-failed="<?php echo LC_HEAD_USERPANEL_INSTALL_FAILED_COPY_CLIPBOARD; ?>">
@@ -68,14 +69,14 @@ $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, 
                         </button>
                     </p>
                     <p><?php echo LC_HEAD_USERPANEL_INSTALL_TEXT_SEND_SMS; ?>
-                        <button class="send-by-sms w3-button w3-block w3-theme-action" type="button" data-sms="<?php echo $smsMessage; ?>">
+                        <button class="send-by-sms w3-button w3-block <?php echo $color['btn_action']; ?>" type="button" data-sms="<?php echo $smsMessage; ?>">
                             <i class="fa fa-paper-plane fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_BUTTON_SEND_SMS; ?>
                         </button>
                     </p>
                 </div>
             </div>
             <div class="info-iphone-install w3-card w3-margin-bottom">
-                <header class="w3-container w3-theme-l4">
+                <header class="w3-container <?php echo $color['horizontal_nav_menu']; ?>">
                     <h4><i class="fa fa-apple fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_INSTALL_APPLE; ?></h4>
                 </header>
                 <div class="w3-container">
@@ -83,21 +84,21 @@ $smsMessage = General::getFilledMessage(LC_HEAD_USERPANEL_INSTALL_MSG_SEND_SMS, 
                 </div>
             </div>
             <div id="mzdk-userpanel-install-info-browser-compatibility" class="info-browser-compatibility w3-card w3-margin-bottom">
-                <header class="w3-container w3-theme-l4">
+                <header class="w3-container <?php echo $color['horizontal_nav_menu']; ?>">
                     <h4><i class="fa fa-tablet fa-lg"></i>&nbsp;<?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_COMPATIBILITY; ?></h4>
                 </header>
                 <div class="w3-container">
                     <p><?php echo LC_HEAD_USERPANEL_INSTALL_TEXT_COMPATIBILITY; ?></p>
                   <ul class="w3-ul">
-                      <li><span class="w3-tag w3-theme-l2"><i class="fa fa-android"></i>&nbsp;Android</span> <i class="fa fa-chrome"></i>&nbsp;<b>Chrome</b>, Samsung Internet, Opera</li>
-                      <li><span class="w3-tag w3-theme-l2"><i class="fa fa-apple"></i>&nbsp;iOS</span> <i class="fa fa-safari"></i>&nbsp;<b>Safari</b> (<?php echo LC_HEAD_USERPANEL_INSTALL_SEE_COMPATIBILITY; ?> <i><?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_INSTALL_APPLE; ?></i>)</li>
-                      <li><span class="w3-tag w3-theme-l2"><i class="fa fa-windows"></i>&nbsp;Windows</span> <i class="fa fa-edge"></i>&nbsp;<b>Edge</b>, Chrome, Opera</li>
+                      <li><span class="w3-tag <?php echo $color['tag']; ?>"><i class="fa fa-android"></i>&nbsp;Android</span> <i class="fa fa-chrome"></i>&nbsp;<b>Chrome</b>, Samsung Internet, Opera</li>
+                      <li><span class="w3-tag <?php echo $color['tag']; ?>"><i class="fa fa-apple"></i>&nbsp;iOS</span> <i class="fa fa-safari"></i>&nbsp;<b>Safari</b> (<?php echo LC_HEAD_USERPANEL_INSTALL_SEE_COMPATIBILITY; ?> <i><?php echo LC_HEAD_USERPANEL_INSTALL_TITLE_INSTALL_APPLE; ?></i>)</li>
+                      <li><span class="w3-tag <?php echo $color['tag']; ?>"><i class="fa fa-windows"></i>&nbsp;Windows</span> <i class="fa fa-edge"></i>&nbsp;<b>Edge</b>, Chrome, Opera</li>
                   </ul>
                 </div>
             </div>
         </div>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-padding-16 w3-border-top <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CLOSE; ?>
             </button>

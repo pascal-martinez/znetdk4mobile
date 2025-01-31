@@ -18,25 +18,26 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "My user rights" view for mobile
  *
- * File version: 1.3
- * Last update: 02/15/2024
+ * File version: 1.4
+ * Last update: 10/19/2024
  */
 $profileNamesAsList = '';
 $profileIDs = [];
 UserManager::getUserProfiles(UserSession::getUserId(), $profileNamesAsList, $profileIDs);
 $profiles = count($profileIDs) > 0 ? explode(', ', $profileNamesAsList) : [];
 $hasFullMenuAccess = UserSession::hasFullMenuAccess();
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <div id="mzdk-my-user-rights" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-key fa-lg"></i>
                 <span class="title"><?php echo LC_HEAD_USERPANEL_MY_USER_RIGHTS; ?></span>
             </h4>
         </header>
-        <div class="w3-container w3-theme-light">
+        <div class="w3-container <?php echo $color['modal_content']; ?>">
 <?php if (count($profiles) > 0) : ?>
             <ul class="w3-ul w3-border w3-margin-top">
                 <li><h3><i class="fa fa-users"></i>&nbsp;<?php echo LC_TABLE_COL_USER_PROFILES; ?></h3></li>
@@ -48,15 +49,15 @@ $hasFullMenuAccess = UserSession::hasFullMenuAccess();
             <ul class="w3-ul w3-border w3-margin-top w3-margin-bottom">
                 <li><h3><i class="fa fa-bars"></i>&nbsp;<?php echo LC_FORM_LBL_USER_MENU_ACCESS; ?></h3></li>
                 <li>
-                    <span class="w3-tag w3-theme-l2"><?php echo LC_FORM_LBL_USER_MENU_ACCESS_FULL; ?></span>
+                    <span class="w3-tag <?php echo $color['tag']; ?>"><?php echo LC_FORM_LBL_USER_MENU_ACCESS_FULL; ?></span>
                     <span><?php echo $hasFullMenuAccess 
                         ? '<i class="fa fa-check fa-lg w3-text-green"></i>&nbsp;' . LC_BTN_YES 
                         : '<i class="fa fa-times fa-lg w3-text-red"></i>&nbsp;' . LC_BTN_NO; ?></span>
                 </li>
             </ul>
         </div>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-padding-16 w3-border-top <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CLOSE; ?>
             </button>

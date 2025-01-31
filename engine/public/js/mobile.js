@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Javascript library for mobile page layout
  *
- * File version: 1.12
- * Last update: 07/26/2024
+ * File version: 1.13
+ * Last update: 01/17/2025
  */
 
 /* global FormData, BeforeInstallPromptEvent */
@@ -61,12 +61,8 @@ var znetdkMobile = {
         menuDefinitionId: '#zdk-custom-menu',
         verticalMenuId: '#zdk-side-nav-menu',
         horizontalMenuId: '#zdk-tab-menu',
-        verticalMenuItemClasses: 'w3-bar-item w3-button w3-hover-theme',
-        verticalMenuActiveItemClass: 'w3-theme-l2',
-        horizontalMenuActiveItemClass: 'w3-theme-l2',
-        horizontalMenuItemBorderClass: 'w3-border-theme',
-        horizontalMenuActiveItemBorderClass: 'w3-border-red',
-        menuIconTemplate: '<i class="fa fa-lg"></i>',
+        verticalMenuItemClasses: 'w3-bar-item w3-button w3-leftbar',
+        menuIconTemplate: '<i class="fa fa-lg fa-fw"></i>',
         autoReloadViewClass: 'zdk-viewreload',
         events: {
             beforeViewDisplayName: 'beforeviewdisplay',
@@ -89,13 +85,7 @@ var znetdkMobile = {
         containerId: '#zdk-messages',
         messageTemplateId: '#zdk-message-tpl',
         snackbarTemplateId: '#zdk-snackbar-tpl',
-        colors: {
-            info: 'w3-blue',
-            warn: 'w3-yellow',
-            error: 'w3-red',
-            critical: 'w3-blue-grey',
-            snackbar: 'w3-green'
-        },
+        colors: {},
         icons: {
             info: 'fa-info-circle',
             warn: 'fa-warning',
@@ -169,13 +159,18 @@ var znetdkMobile = {
         element: null,
         rowTemplate: null,
         noRowMessage: '<li><h3>No row found!</h3></li>',
+        nextRowsLinkTemplateId: '#zdk-show-next-rows-tpl',
         customSortCriteria: null,
         defaultCustomSortCriterium: null,
         rowsPerPage: 20,
         heightDiffForNewPage: 200,
+        infiniteScroll: true,
+        displayRowCountInMenuTab: true,
         isAutocompleteOnSearchEnabled: false,
         uniqueSearchedKeyword: false,
         searchedKeywordAsJson: false,
+        searchKeywordCaption: null,
+        searchKeywordMinStringLengh: 3,
         beforeSearchRequestCallback: null,
         beforeInsertRowCallback: null,
         afterInsertRowCallback: null,
@@ -207,9 +202,8 @@ var znetdkMobile = {
         delay: 300,
         maxNumberOfCachedItems: 0,
         cacheLifetime: 'page', /* 'selection', 'page' or 'localStorage' (TODO) */
-        listTemplate: '<ul class="autocomplete w3-ul w3-card w3-hoverable w3-hide"/>',
-        itemTemplate: '<li class="w3-hover-theme"/>',
-        selectedItemCssClass: 'w3-theme-dark',
+        listTemplateId: '#zdk-autocomplete-tpl',
+        itemTemplateId: '#zdk-autocomplete-item-tpl',
         prevQueryString: null,
         itemCache: [],
         remoteActions: {
@@ -234,12 +228,27 @@ if (z4m === undefined) {
  */
 $(document).ready(function () {
     if (z4m.isZnetDK4MobileApp()) {
-        z4m.initApp();; // Is a ZnetDK 4 Mobile App
+        z4m.initColors();
+        z4m.initApp(); // Is a ZnetDK 4 Mobile App
     }
 });
 
 z4m.isZnetDK4MobileApp = function() {
     return $('meta[name=generator][content^=ZnetDK]').length === 1;
+};
+
+/**
+ * Initializes the color CSS classes used by the API
+ */
+z4m.initColors = function() {
+    for (const color of ['info', 'warn', 'error', 'critical', 'snackbar']) {
+        z4m.messages.colors[color] = $(z4m.messages.messageTemplateId).data(color);
+    }
+    z4m.navigation.verticalMenuItemClasses += ' ' + $(z4m.navigation.verticalMenuId).data('hover')
+        + ' ' + $(z4m.navigation.verticalMenuId).data('borderSelect');
+    z4m.navigation.activeMenuItemClass = $(z4m.navigation.verticalMenuId).data('select');
+    z4m.navigation.activeMenuItemBorderClass = $(z4m.navigation.verticalMenuId).data('borderSelect');
+    z4m.autocomplete.selectedItemCssClass = $(z4m.autocomplete.itemTemplateId).data('select');
 };
 
 /**
@@ -431,8 +440,10 @@ z4m.ajax.request = function (options) {
                     z4m.navigation.closeVerticalMenu();
                     z4m.messages.add('critical', 'OOPS!',
                             'A Javascript error occured while processing the AJAX request response! See your browser console for details.');
-                    z4m.log.error("JS error dectected while processing the response of the '"
-                            + options.control + ':' + options.action + "' controller's action. Message: " + error);
+                    z4m.log.error("JS error dectected while processing the response of the '" + options.control
+                        + ':' + options.action + "' controller's action."
+                        + (typeof response === 'object' ? "\nResponse: " + JSON.stringify(response) : '')
+                        + "\nJS error: " + (error.hasOwnProperty('stack') ? error.stack : error.message));
                     z4m.ajax.emptyRequestContext(); // Request context is emptied
                 }
             },
@@ -796,7 +807,7 @@ z4m.browser.disableTemporarily = function(element) {
  * viewport is resized or when its orientation changes.
  */
 z4m.browser.events.handleViewportResize = function () {
-    $(window).on('resize.znetdkmobile', function () {
+    $(window).on('resize.z4m', function () {
         /* The page content top spacing is adjusted */
         z4m.content.setTopSpacing();
         /* The action buttons are positioned according to the footer height */
@@ -818,7 +829,7 @@ z4m.browser.events.handleBeforeUnload = function () {
     if (z4m.browser.confirmationOnApplicationClose
             && !z4m.navigation.isPageToBeReloaded()
             && !z4m.authentication.isRequired()) {
-        $(window).on('beforeunload.znetdkmobile', function (event) {
+        $(window).on('beforeunload.z4m', function (event) {
             event.preventDefault();
             return (event.returnValue = '');
         });
@@ -829,7 +840,7 @@ z4m.browser.events.handleBeforeUnload = function () {
  * Detach the handlers declared for the 'beforeunload' events
  */
 z4m.browser.events.detachBeforeUnload = function () {
-    $(window).off('beforeunload.znetdkmobile');
+    $(window).off('beforeunload.z4m');
 };
 
 /**
@@ -837,7 +848,7 @@ z4m.browser.events.detachBeforeUnload = function () {
  * temporarily
  */
 z4m.browser.events.preventMultipleClicks = function() {
-    $('body').on('click.znetdkmobile-browser-prevent-multiple-clicks', 'a, button:not(:submit)', function() {
+    $('body').on('click.z4m-browser-prevent-multiple-clicks', 'a, button:not(:submit)', function() {
         z4m.browser.disableTemporarily($(this));
     });
 };
@@ -894,6 +905,8 @@ z4m.header.getMenuButton = function () {
 
 /**
  * Hide the header connection area
+ * @@param {boolean} isDisconnected if true, header is displayed for
+ * disconnected state.
  */
 z4m.header.hideConnectionArea = function (isDisconnected) {
     $(this.connectionAreaId).addClass(z4m.hideClass);
@@ -1351,13 +1364,14 @@ z4m.messages.ask = function (title, question, buttons, callback) {
         }
     });
     modal.show();
+    modal.find('button.no').trigger('focus');
 };
 
 /**
  * Close a message when its close button is pressed
  */
 z4m.messages.events.handleAllClose = function () {
-    z4m.messages.getContainer().on('click.znetdkmobile_messages', 'a.close', function (event) {
+    z4m.messages.getContainer().on('click.z4m_messages', 'a.close', function (event) {
         $(this).parent().remove();
         z4m.content.setTopSpacing();
         event.preventDefault();
@@ -1576,8 +1590,8 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
         };
     }
     function handleRememberMeClick() {
-        $('#zdk-login-modal-remember-me').off('change.znetdkmobile')
-                .on('change.znetdkmobile', function () {
+        $('#zdk-login-modal-remember-me').off('change.z4m')
+                .on('change.z4m', function () {
             var accessElement = $(this).closest('form').find('input[name=access]'),
                 accessValue = $(this).is(':checked') ? 'private' : 'public';
             accessElement.val(accessValue);
@@ -1605,8 +1619,8 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
         z4m.browser.storeLocalData($this.loginWithEmailStorageKey, loginWithEmail);
     }
     function handleForgotPasswordClick() {
-        modal.getInnerForm(true).find('.zdk-forgot-pwd').off('click.znetdkmobile')
-                .one('click.znetdkmobile', function(event) {
+        modal.getInnerForm(true).find('.zdk-forgot-pwd').off('click.z4m')
+                .one('click.z4m', function(event) {
             z4m.ajax.loadView('forgotpassword', $('body'), function() {
                 modal.close();
                 var resetPwdModal = z4m.modal.make('#mzdk_forgot_password_dialog');
@@ -1828,23 +1842,23 @@ z4m.navigation.build = function () {
     }
     function _bindEvents() {
         // Click on the vertical menu button
-        z4m.header.getMenuButton().on('click.znetdkmobile', function (event) {
+        z4m.header.getMenuButton().on('click.z4m', function (event) {
             $this.openVerticalMenu();
             event.preventDefault();
         });
         // Click on the vertical menu close button
-        $this.getVerticalMenu().find('button.close').on('click.znetdkmobile', function () {
+        $this.getVerticalMenu().find('button.close').on('click.z4m', function () {
             $this.closeVerticalMenu();
         });
         // Click on the company logo
-        $($this.companyLogoId).on('click.znetdkmobile', function (event) {
+        $($this.companyLogoId).on('click.z4m', function (event) {
             if (!$this.isPageToBeReloaded()) {
                 _displayInitialView();
                 event.preventDefault();
             }
         });
         // Click on a vertical menu item
-        $this.getMenuDefinition().on('click.znetdkmobile_navigation', 'a', function (event) {
+        $this.getMenuDefinition().on('click.z4m_navigation', 'a', function (event) {
             var menuItemId = $(this).next('ul').length === 0
                     ? $this.getMenuItemId($(this).parent()) // No subitem
                     : $this.getFirstChildMenuItemId($(this).parent()); // Subitems exist
@@ -1852,14 +1866,14 @@ z4m.navigation.build = function () {
             event.preventDefault();
         });
         // Click on a horizontal menu item
-        $this.getHorizontalMenu().on('click.znetdkmobile_navigation', 'a', function (event) {
+        $this.getHorizontalMenu().on('click.z4m_navigation', 'a', function (event) {
             // Handled only if click on a hyperlink
             var menuItemId = $(this).data('view_id');
             _displayView(menuItemId);
             event.preventDefault();
         });
         // Display view sent event
-        $('body').on('displayview.znetdkmobile_navigation', function (event, viewID, anchor, reload) {
+        $('body').on('displayview.z4m_navigation', function (event, viewID, anchor, reload) {
             _displayView(viewID, anchor, reload);
         });
     }
@@ -2008,11 +2022,12 @@ z4m.navigation.build = function () {
     function _setVerticalMenuItemActive(viewID) {
         var menuItem = _getMenuItem(viewID);
         _resetMenuItemActive();
-        menuItem.addClass($this.verticalMenuActiveItemClass);
-        _getRootMenuItem(menuItem).addClass($this.verticalMenuActiveItemClass);
+        _getRootMenuItem(menuItem).addClass($this.activeMenuItemClass)
+            .addClass('is-active');
         function _resetMenuItemActive() {
-            $this.getMenuDefinition().find('li.' + $this.verticalMenuActiveItemClass)
-                    .removeClass($this.verticalMenuActiveItemClass);
+            $this.getMenuDefinition().find('li.' + $this.activeMenuItemClass)
+                .removeClass($this.activeMenuItemClass)
+                .removeClass('is-active');
         }
     }
     function _setHorizontalItemActive(viewID) {
@@ -2026,15 +2041,10 @@ z4m.navigation.build = function () {
                 z4m.log.error("Horizontal tab menu: view ID='" + viewID + "' unknown.");
             }
         }
-        menuItem.find('.menu-item')
-                .addClass($this.horizontalMenuActiveItemClass)
-                .addClass($this.horizontalMenuActiveItemBorderClass)
-                .removeClass($this.horizontalMenuItemBorderClass);
+        menuItem.addClass($this.activeMenuItemClass).addClass('is-active');
         function _resetTabItemActive() {
             $this.getHorizontalMenu().find('.items .menu-item')
-                    .removeClass($this.horizontalMenuActiveItemClass)
-                    .removeClass($this.horizontalMenuActiveItemBorderClass)
-                    .addClass($this.horizontalMenuItemBorderClass);
+                .removeClass($this.activeMenuItemClass).removeClass('is-active');
         }
     }
     function _addItemToHorizontalMenu(menuItem, onlyOne) {
@@ -2042,7 +2052,7 @@ z4m.navigation.build = function () {
                 link = menuItem.children('a'),
                 icon = link.data('icon'),
                 label = link.text(),
-                newItem = tabmenu.find('.template > a').clone();
+                newItem = tabmenu.find('template').contents().filter('a').clone();
         if (icon === undefined) {
             newItem.find('i').remove(); // No icon set
         } else {
@@ -2288,7 +2298,7 @@ z4m.modal.open = function (onSubmit, onClose, focusedInputName) {
         if (typeof closeCallback !== 'function') {
             return false;
         }
-        var eventName = modalObject.events.beforeUiModalCloseNane + '.znetdkmobile_modal';
+        var eventName = modalObject.events.beforeUiModalCloseNane + '.z4m_modal';
         modalObject.element.off(eventName);
         modalObject.element.on(eventName, function () {
             return closeCallback();
@@ -2389,14 +2399,14 @@ z4m.modal.events.handleAllClose = function () {
             selector = modalClass + ' span.close, '
             + modalClass + ' a.close, '
             + modalClass + ' button.cancel';
-    $('body').on('click.znetdkmobile_modal', selector, function () {
+    $('body').on('click.z4m_modal', selector, function () {
         var modalObject = z4m.modal.make($(this).closest(modalClass));
         if (modalObject !== null
                 && modalObject.events.triggerBeforeClose.call(modalObject) !== false) {
             modalObject.close(true);
         }
     });
-    $(document).on('keydown.znetdkmobile_modal', function(event){
+    $(document).on('keydown.z4m_modal', function(event){
         let modalEl = event.target.closest('.' + z4m.modal.cssClass);
         modalEl = modalEl === null ? $('.' + z4m.modal.cssClass + ':visible') : $(modalEl);
         if (modalEl.length === 1 && event.key === 'Escape') {
@@ -2451,7 +2461,7 @@ z4m.form.make = function (formElementSelector, submitCallback) {
         if (typeof submitCallback !== 'function') {
             return false;
         }
-        var eventName = formObject.events.afterSubmitSuccessName + '.znetdkmobile_form';
+        var eventName = formObject.events.afterSubmitSuccessName + '.z4m_form';
         formElement.off(eventName);
         formElement.on(eventName, function (event, response) {
             return submitCallback(response);
@@ -2496,9 +2506,7 @@ z4m.form.setFocusOnFirstInput = function () {
 z4m.form.setFocus = function (inputName) {
     if (!this.isInstance()) return false;
     if (typeof inputName === 'string') {
-        var focusedElement = this.element.find('input[name="' + inputName + '"]'
-                + ',textarea[name="' + inputName + '"]'
-                + ',select[name="' + inputName + '"]');
+        var focusedElement = this.element.find('[name="' + inputName + '"]');
         if (focusedElement.length > 0) {// Multiple inputs accepted (case of radio buttons)
             focusedElement.focus().select();
             return true;
@@ -2656,7 +2664,8 @@ z4m.form.hideInfo = function () {
  * setCustomValidity() method).
  * @param {String} message The error message
  * @param {String} inputName The name of the input on which the focus is set (in
- * option)
+ * option). When multiple inputs exist with the same name, the position of the
+ * input can be indicated after the input name (for example 'my_input:5').
  * @param {Boolean} hidePrevErrors If true, the previous displayed errors are
  * hidden
  * @returns {Boolean} Value true when succeeded, false otherwise
@@ -2666,8 +2675,21 @@ z4m.form.showError = function (message, inputName, hidePrevErrors) {
     if (hidePrevErrors === true) {
         this.hideError();
     }
-    if (this.setFocus(inputName)) {
-        this.setLastInputInError(this.element.find('[name="' + inputName + '"]'), message);
+    let inputFound = [], pos;
+    if (typeof inputName === 'string') {
+        const withPos = inputName.split(':', 2);
+        pos = withPos.length === 2 && !isNaN(parseInt(withPos[1],10))
+            ? parseInt(withPos[1],10) : null;
+        inputFound = this.element.find('[name="' + withPos[0] + '"]');
+    }
+    if (inputFound.length > 0) {
+        if (pos === null) {
+            this.setFocus(inputName);
+        } else {
+            inputFound = inputFound.eq(pos);
+            inputFound.focus().select();
+        }
+        this.setLastInputInError(inputFound, message);
     } else {
         const newEl = $(this.messageTemplate);
         newEl.addClass(['alert', z4m.messages.colors.error]);
@@ -2715,7 +2737,7 @@ z4m.form.setLastInputInError = function (inputEl, errorMessage) {
         inputEl[0].setCustomValidity(getHtmlAsText(errorMessage));
         inputEl[0].reportValidity();
     }
-    this.element.on('change.znetdkmobile_form_showerror', function(){
+    this.element.on('change.z4m_form_showerror', function(){
         $this.unsetLastInputInError();
     });
     return true;
@@ -2754,7 +2776,7 @@ z4m.form.unsetLastInputInError = function () {
     if (lastInputInError instanceof jQuery) {
         lastInputInError[0].setCustomValidity('');
         lastInputInError.removeClass(z4m.form.inputInErrorClass);
-        this.element.off('change.znetdkmobile_form_showerror');
+        this.element.off('change.z4m_form_showerror');
     }
     return true;
 };
@@ -2929,11 +2951,10 @@ z4m.form.setInputValue = function (inputName, inputValue, silent) {
 z4m.form.setReadOnly = function (isReadOnly) {
     if (!this.isInstance()) return false;
     var readOnlyState = isReadOnly === undefined || isReadOnly === true;
-    this.element.find('input:not([type=hidden]), textarea').each(function () {
+    this.element.find('input:not([type=hidden],[type=radio],[type=checkbox]), textarea').each(function () {
         $(this).prop('readonly', readOnlyState);
     });
-    this.element.find('select').each(function () {
-        // a select element can't be set readonly, so it is disabled
+    this.element.find('select, input[type=radio],input[type=checkbox]').each(function () {
         $(this).prop('disabled', readOnlyState);
     });
     this.element.find('button[type=submit], input[type=submit]').prop('disabled', readOnlyState);
@@ -2944,7 +2965,7 @@ z4m.form.setReadOnly = function (isReadOnly) {
  * (see HTML 'data-is-modified' attribute).
  */
 z4m.form.events.handleAllInput = function () {
-    $('body').on('input.znetdkmobile_form_submit', 'form[data-zdk-submit]', function (event) {
+    $('body').on('input.z4m_form_submit', 'form[data-zdk-submit]', function (event) {
         if ($(event.target).is(':input')) {
             var formElement = $(this),
                     formObject = z4m.form.make(formElement);
@@ -2963,7 +2984,7 @@ z4m.form.events.handleAllInvalid = function (formElement) {
         z4m.log.error('Form is not a jQuery object!');
         return false;
     }
-    var eventName = 'invalid.znetdkmobile_form_invalid';
+    var eventName = 'invalid.z4m_form_invalid';
     formElement.find(':input').off(eventName).on(eventName, function(){
         let formElement = $(this).closest('form'),
             formObject = z4m.form.make(formElement);
@@ -2978,7 +2999,7 @@ z4m.form.events.handleAllInvalid = function (formElement) {
  *  attribute.
  */
 z4m.form.events.handleAllSubmit = function () {
-    $('body').on('submit.znetdkmobile_form_submit', 'form[data-zdk-submit]', function (event) {
+    $('body').on('submit.z4m_form_submit', 'form[data-zdk-submit]', function (event) {
         if ('submitter' in event.originalEvent) {
             z4m.browser.disableTemporarily($(event.originalEvent.submitter));
         }
@@ -3009,8 +3030,11 @@ z4m.form.events.handleAllSubmit = function () {
             },
             errorCallback: function(response) {
                 if (response.hasOwnProperty('status') && response.hasOwnProperty('responseJSON')
-                        && response.status === 403 && response.responseJSON.hasOwnProperty('msg')) {
-                    formObject.showError(response.responseJSON.msg, null, true);
+                        && response.responseJSON.hasOwnProperty('msg')) {
+                    const error = (response.responseJSON.hasOwnProperty('summary')
+                        ? '<b>' + response.responseJSON.summary + '</b><br>' : '')
+                        + response.responseJSON.msg;
+                    formObject.showError(error, null, true);
                     return false;
                 }
                 return true;
@@ -3040,7 +3064,7 @@ z4m.form.events.triggerAfterSubmitSuccess = function (response) {
  * Handle the click events of the show/hide button on the password input fields
  */
 z4m.form.events.handleTogglePassword = function () {
-    $('body').on('click.znetdkmobile_form_password', 'a.zdk-toggle-password', function (event) {
+    $('body').on('click.z4m_form_password', 'a.zdk-toggle-password', function (event) {
         var passwordInput = $(this).prev('input'),
                 inputType = passwordInput.attr('type');
         if (inputType === 'password') {
@@ -3246,7 +3270,7 @@ z4m.action.removeCustomButton = function (name) {
  *  function when an action button is clicked
  */
 z4m.action.events.handleClick = function () {
-    $('body').on('click.znetdkmobile_action', 'a.zdk-mobile-action', function (event) {
+    $('body').on('click.z4m_action', 'a.zdk-mobile-action', function (event) {
         event.preventDefault();
         var viewId = z4m.content.getDisplayedViewId();
         if (viewId === null) {
@@ -3337,40 +3361,43 @@ z4m.list.make = function (listElementId, refresh, search) {
     // Row template is removed to avoid flash effect
     listObject.element.find('li').remove();
     // View is registered for action buttons
-    z4m.action.registerView(
-            z4m.content.getParentViewId(listObject.element),
-            {
-                search: {
-                    isVisible: search === true || search === undefined,
-                    callback: function () {
-                        listObject.showSearchModal();
-                    }
-                },
-                refresh: {
-                    isVisible: refresh === true || refresh === undefined,
-                    callback: function () {
-                        listObject.refresh();
-                    }
-                }
+    const actionButtons = {};
+    if (search === true || search === undefined) {
+        actionButtons.search = {
+            isVisible: true,
+            callback: function () {
+                listObject.showSearchModal();
             }
-    );
+        };
+    }
+    if (refresh === true || refresh === undefined) {
+        actionButtons.refresh = {
+            isVisible: true,
+            callback: function () {
+                listObject.refresh();
+            }
+        };
+    }
+    const listViewId = z4m.content.getParentViewId(listObject.element);
+    if (actionButtons.hasOwnProperty('search') || actionButtons.hasOwnProperty('refresh')) {
+        z4m.action.registerView(listViewId, actionButtons);
+    }
     // Add the filter buttons memorized into the local storage
     addTagFromLocalStorage();
-    if (!z4m.navigation.isPageToBeReloaded()) {
-        // 'Display view' events are handled for refreshing the list
-        const afterViewDisplayEventName = z4m.navigation.events.afterViewDisplayName
-                + '.znetdkmobile_list_' + z4m.content.getParentViewId(listObject.element);
+    // 'Display view' events are handled for refreshing the list
+    const isFirst = listObject.element[0] === listObject.element.closest('.zdk-view').find('ul[data-zdk-load]')[0];
+    if (!z4m.navigation.isPageToBeReloaded() && isFirst) {
+        const afterViewDisplayEventName = z4m.navigation.events.afterViewDisplayName + '.z4m_list_' + listViewId;
         $('body').off(afterViewDisplayEventName);
         $('body').on(afterViewDisplayEventName, function (event, viewId) {
-            var thisViewId = z4m.content.getParentViewId(listObject.element);
-            if (thisViewId === viewId) {
+            if (listViewId === viewId) {
                 listObject.refresh();
             }
         });
     }
     // 'Click' Events of the Remove filter buttons are handled for refreshing the list
     if (search === true || search === undefined) {
-        listObject.element.parent().on('click.znetdkmobile_list', '.search-filter-container .remove', function () {
+        listObject.element.parent().on('click.z4m_list', '.search-filter-container .remove', function () {
             var searchTag = $(this).closest('.search-tag'),
                 filterContainer = $(this).closest('.search-filter-container');
             // The tag is cleared into the local storage
@@ -3589,7 +3616,7 @@ z4m.list.applyFilterAndSortCriterium = function (filterValue,
         if (filterContainer.length === 0) {
             filterContainer = $(this.searchModalId).find('.search-filter-container').clone();
             filterContainer.removeClass(z4m.hideClass);
-            filterContainer.insertBefore(this.element);
+            filterContainer.prependTo(this.element.parent());
         }
         // Display keyword filters
         if (filterValue !== '') {
@@ -3709,7 +3736,7 @@ z4m.list.loadNewDataPage = function () {
         return false; // No more rows to load
     }
     // Scroll events are handled for loading data pages (infinite scroll)
-    var eventName = this.events.onContentScrollName + '.znetdkmobile_list';
+    var eventName = this.events.onContentScrollName + '.z4m_list';
     if (nextPage === 1) { // First page to load so no scroll event handled
         this.element.off(eventName);
     }
@@ -3727,6 +3754,8 @@ z4m.list.loadNewDataPage = function () {
             if (nextPage === 1) {
                 // Rows are removed first
                 $this.element.find('li').remove();
+                // 'Show next results' link removed
+                removeShowNextRowsLink();
             }
             if (response.rows.length > 0) {
                 $this.setTotalRowCount(response.total);
@@ -3745,15 +3774,21 @@ z4m.list.loadNewDataPage = function () {
                 if (nextPage === 1 && response.total > $this.rowsPerPage) {
                     // Data pagination enabled, data pages are loaded on scroll
                     handleScrollEvents();
+                    // Display of the 'Show next results' link
+                    addShowNextRowsLink();
+                } else if (response.total <= $this.element.find('li').length) {
+                    // No more rows to load, 'show next results' link is removed
+                    removeShowNextRowsLink();
                 }
             } else if (nextPage === 1) {
                 // No result found
                 $this.element.append($this.noRowMessage);
             }
             // The total number of rows is displayed on the horizontal menu item
-            z4m.navigation.addRowCountToHorizontalMenuItem(
-                    response.total,
-                    z4m.content.getParentViewId($this.element));
+            if ($this.displayRowCountInMenuTab) {
+                z4m.navigation.addRowCountToHorizontalMenuItem(
+                    response.total, z4m.content.getParentViewId($this.element));
+            }
             // Callback function called if defined
             if (typeof $this.loadedCallback === 'function') {
                 $this.loadedCallback.call($this, response.rows.length, nextPage);
@@ -3773,17 +3808,36 @@ z4m.list.loadNewDataPage = function () {
                 return newRowAsElement;
             }
             function handleScrollEvents() {
-                $this.element.on(eventName, function () {
-                    var windowHeight = $(window).height(),
-                            documentHeight = $(document).height(),
-                            scrollBarPosition = $(window).scrollTop(),
-                            newPageLevel = windowHeight + scrollBarPosition + $this.heightDiffForNewPage,
-                            lastDocumentHeight = $this.getLastDocumentHeight();
-                    if (newPageLevel > documentHeight && lastDocumentHeight < documentHeight) {
-                        $this.loadNewDataPage();
-                        $this.setLastDocumentHeight(documentHeight);
-                    }
+                if ($this.infiniteScroll) {
+                    $this.element.on(eventName, function () {
+                        var windowHeight = $(window).height(),
+                                documentHeight = $(document).height(),
+                                scrollBarPosition = $(window).scrollTop(),
+                                newPageLevel = windowHeight + scrollBarPosition + $this.heightDiffForNewPage,
+                                lastDocumentHeight = $this.getLastDocumentHeight();
+                        if (newPageLevel > documentHeight && lastDocumentHeight < documentHeight) {
+                            $this.loadNewDataPage();
+                            $this.setLastDocumentHeight(documentHeight);
+                        }
+                    });
+                }
+            }
+            function addShowNextRowsLink() {
+                const newEl = $($this.nextRowsLinkTemplateId).contents().filter('div').clone();
+                $this.element.after(newEl);
+                newEl.find('a').on('click.z4m_list', function(event){
+                    event.preventDefault();
+                    let docHeight = $(document).height();
+                    $this.loadNewDataPage();
+                    $this.setLastDocumentHeight(docHeight);
                 });
+            }
+            function removeShowNextRowsLink() {
+                const linkContainer = $this.element.next('.show-next-rows');
+                if (linkContainer.length === 1) {
+                    linkContainer.find('a').off('click.z4m_list');
+                    linkContainer.remove();
+                }
             }
         }
     });
@@ -3870,7 +3924,7 @@ z4m.list.setModal = function (modalElementId, isFormModifiable, onAdd, onEdit) {
         );
     }
     // Set Edit action
-    var eventName = this.events.afterClickEditButtonName + '.znetdkmobile_list';
+    var eventName = this.events.afterClickEditButtonName + '.z4m_list';
     this.element.off(eventName);
     this.element.on(eventName, function (event, rowId) {
         var modal = z4m.modal.make(modalElementId),
@@ -3915,18 +3969,21 @@ z4m.list.showSearchModal = function () {
     var $this = this,
             modal = z4m.modal.make(this.searchModalId),
             innerForm = modal.getInnerForm(),
+            captionEl = $(this.searchModalId).find('label .caption'),
             keywordInput = $(this.searchModalId).find('input[name=keyword]'),
             sortInputs = $(this.searchModalId).find('.sort-criterium'),
             sortDropdown = sortInputs.find('select[name=sortfield]');
     // The search field is set by default 'required'
     keywordInput.prop('required', true);
-
+    captionEl.html(typeof this.searchKeywordCaption === 'string'
+        ? this.searchKeywordCaption : '');
     if (this.isAutocompleteOnSearchEnabled) {
         keywordInput.removeData('item');
-        z4m.autocomplete.make(this.searchModalId + ' input[name=keyword]', {
+        const searchAutocomplete = z4m.autocomplete.make(this.searchModalId + ' input[name=keyword]', {
             controller: this.remoteActions.autocomplete.controller,
             action: this.remoteActions.autocomplete.action
         }, onSuggestionSelected);
+        searchAutocomplete.minStringLength = this.searchKeywordMinStringLengh;
     } else {
         // The search field is set with HTML5 attribute 'autocomplete' on if
         // the custom autocomplete feature is disabled
@@ -4052,8 +4109,7 @@ z4m.list.setCustomSortCriteria = function (sortCriteria, defaultSortCriterium) {
  * modal dialog
  */
 z4m.list.events.handleEdit = function () {
-    var $this = this,
-            eventName = 'click.znetdkmobile_list';
+    var $this = this, eventName = 'click.z4m_list';
     z4m.content.getContainer().on(eventName, 'ul[data-zdk-load] a.edit', function (event) {
         var listElement = $(this).closest('ul'),
                 rowElement = $(this).closest('li'),
@@ -4072,18 +4128,17 @@ z4m.list.events.handleEdit = function () {
  * This method is used to simulate the infinite scroll mechanism
  */
 z4m.list.events.handleScroll = function () {
-    var $this = this,
-            eventName = 'scroll.znetdkmobile_list';
+    var $this = this, eventName = 'scroll.z4m_list';
     $(window).on(eventName, function () {
         var displayedView = z4m.content.getDisplayedView();
         if (displayedView.length !== 1) {
             return false;
         }
         var listElement = displayedView.find('ul[data-zdk-load]');
-        if (listElement.length !== 1) {
+        if (listElement.length === 0) {
             return false;
         }
-        listElement.triggerHandler($this.onContentScrollName);
+        listElement.eq(0).triggerHandler($this.onContentScrollName);
     });
 };
 
@@ -4091,8 +4146,8 @@ z4m.list.events.handleScroll = function () {
 
 /**
  * Instantiate a new autocomplete object from the specified input field element
- * @param {String} inputSelector The selector of the input field as a jQuery
- * text selector
+ * @param {jQuery|String} inputElementSelector The selector of the input field
+ * or the input element as a jQuery object.
  * @param {Object} controllerAction The controller and the action to call
  * remotely to retrieve the autocompletion suggestions
  * @param {function} onSelect A function to call back when a suggestion has been
@@ -4103,9 +4158,10 @@ z4m.list.events.handleScroll = function () {
  * @returns {Object|null} The instantiated autocomplete object or null if the
  * instantiation failed
  */
-z4m.autocomplete.make = function (inputSelector, controllerAction,
+z4m.autocomplete.make = function (inputElementSelector, controllerAction,
         onSelect, renderCallback) {
-    var inputElement = $(inputSelector);
+    var inputElement = inputElementSelector instanceof jQuery
+            ? inputElementSelector : $(inputElementSelector);
     if (inputElement.length !== 1) {
         z4m.log.error('Autocomplete element is empty or multiple!');
         return null;
@@ -4144,12 +4200,11 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
             action: controllerAction.action
         }
     };
-    var list = autocompleteObject.element.next('ul.autocomplete'),
-            timeout;
+    var list = autocompleteObject.element.next('ul.autocomplete'), timeout = null;
     if (list.length === 1) {
         list.remove();
     }
-    list = $(autocompleteObject.listTemplate);
+    list = $(autocompleteObject.listTemplateId).contents().filter('ul').clone();
     autocompleteObject.element.after(list);
 
     _registerInputEvents();
@@ -4158,7 +4213,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
 
     // PRIVATE METHODS
     function _registerInputEvents() {
-        var eventName = 'input.znetdkmobile_autocomplete';
+        var eventName = 'input.z4m_autocomplete';
         autocompleteObject.element.off(eventName);
         autocompleteObject.element.on(eventName, function (event) {
             var queryString = $(this).val();
@@ -4166,36 +4221,37 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
             if (queryString.length < autocompleteObject.minStringLength) {
                 return; // Number of characters insufficient
             }
-            if (timeout) {
-                window.clearTimeout(timeout);
+            if (timeout === null) {
+                timeout = window.setTimeout(async function () {
+                    await _showSuggestions(queryString);
+                    timeout = null;
+                }, autocompleteObject.delay);
             }
-            timeout = window.setTimeout(function () {
-                _showSuggestions(queryString);
-            }, autocompleteObject.delay);
         });
     }
     function _showSuggestions(queryString) {
-        _removeSuggestions();
-        if (!_isRequestRequired(queryString)) {
-            return; // Useless request, no result for the previous query string
-        }
-        if (_showCachedSuggestions(queryString)) {
-            return; // Suggestions stored in cache are shown
-        }
-        z4m.ajax.request({
-            control: controllerAction.controller,
-            action: controllerAction.action,
-            data: {query: queryString},
-            callback: function (response) {
-                if (autocompleteObject.element.is(':focus') && response.length > 0) {
-                    _addSuggestionsToList(response, queryString);
-                    _addToCacheData(response, queryString);
-                    list.removeClass(z4m.hideClass);
-                    _registerClickOutOfTheAutocomplete();
-                    _registerKeyboardAction();
-                }
-                _setPreviousQueryString(queryString, response.length);
+        return new Promise(function(resolve) {
+            if (!_isRequestRequired(queryString)// Useless request, no result for the previous query string
+                    || _showCachedSuggestions(queryString)) {// Suggestions stored in cache are shown
+                resolve();
+                return;
             }
+            z4m.ajax.request({
+                control: controllerAction.controller,
+                action: controllerAction.action,
+                data: {query: queryString},
+                callback: function (response) {
+                    if (autocompleteObject.element.is(':focus') && response.length > 0) {
+                        _addSuggestionsToList(response, queryString);
+                        _addToCacheData(response, queryString);
+                        list.removeClass(z4m.hideClass);
+                        _registerClickOutOfTheAutocomplete();
+                        _registerKeyboardAction();
+                    }
+                    _setPreviousQueryString(queryString, response.length);
+                    resolve();
+                }
+            });
         });
     }
     function _removeSuggestions() {
@@ -4211,7 +4267,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
                 return false; // Break
             }
             var itemLabel = this.label,
-                item = $(autocompleteObject.itemTemplate),
+                item = $(autocompleteObject.itemTemplateId).contents().filter('li').clone(),
                 escapedQueryString = queryString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'),
                 htmlLabel = itemLabel.replace(new RegExp(escapedQueryString, 'gi'), '<strong>$&</strong>');
             if (typeof renderCallback === 'function') {
@@ -4291,7 +4347,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
         }
     }
     function _registerSelectSuggestionEvents() {
-        var eventName = 'click.znetdkmobile_autocomplete';
+        var eventName = 'click.z4m_autocomplete';
         list.off(eventName);
         list.on(eventName, 'li', function () {
             var item = $(this).data('item'),
@@ -4309,7 +4365,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
         });
     }
     function _registerClickOutOfTheAutocomplete(unregisterOnly) {
-        var eventName = 'click.znetdkmobile_autocomplete_close';
+        var eventName = 'click.z4m_autocomplete_close';
         $(document).off(eventName);
         if (unregisterOnly === true) {
             return false;
@@ -4320,7 +4376,7 @@ z4m.autocomplete.make = function (inputSelector, controllerAction,
         return true;
     }
     function _registerKeyboardAction(unregisterOnly) {
-        var eventName = 'keydown.znetdkmobile_autocomplete';
+        var eventName = 'keydown.z4m_autocomplete';
         autocompleteObject.element.off(eventName);
         if (unregisterOnly === true) {
             return false;
@@ -4445,7 +4501,7 @@ z4m.install.showInstallableMessage = function(onlyIfAutomaticDisplayEnabled) {
         return false;
     }
     // Click button events
-    messageEl.find('button').off('click.znetdkmobile_install').on('click.znetdkmobile_install', function(){
+    messageEl.find('button').off('click.z4m_install').on('click.z4m_install', function(){
         if ($(this).hasClass('yes')) {
             z4m.install.installApp(z4m.install.hideInstallableMessage);
         } else if ($(this).hasClass('no')) {
@@ -4521,7 +4577,7 @@ z4m.install.installApp = function(onSuccess) {
  * z4m.install.installApp() method.
  */
 z4m.install.events.handleBeforeInstallPrompt = function() {
-    $(window).on('beforeinstallprompt.znetdkmobile_install', function(event) {
+    $(window).on('beforeinstallprompt.z4m_install', function(event) {
         // Prevent Chrome 67 and earlier from automatically showing the prompt
         event.preventDefault();
         if (typeof event.originalEvent === 'object'

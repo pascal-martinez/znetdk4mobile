@@ -1,0 +1,161 @@
+/**
+ * ZnetDK, Starter Web Application for rapid & easy development
+ * See official website https://mobile.znetdk.fr 
+ * Copyright (C) 2019 Pascal MARTINEZ (contact@znetdk.fr)
+ * License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
+ * --------------------------------------------------------------------
+ * ZnetDK 4 Mobile W3CSS dark theme 
+ * Last update: 10/15/2024
+ */
+:root {
+    color-scheme: dark;
+}
+body {
+    --z4m-dark-primary:#8fceff;
+    --z4m-dark-secondary:#ffca7f;
+    --z4m-dark:#121212;
+    --z4m-dark-01:#1D1D1D;
+    --z4m-dark-02:#212121;
+    --z4m-dark-03:#242424;
+    --z4m-dark-04:#272727;
+    --z4m-dark-06:#2C2C2C;
+    --z4m-dark-08:#2E2E2E;
+    --z4m-dark-12:#333333;
+    --z4m-dark-16:#353535;
+    --z4m-dark-24:#383838;
+    --z4m-green:#A0D2A0;
+    --z4m-red:#FFA28D;
+    --z4m-blue:#8FCBF7;
+    --z4m-yellow:#FFF9C4;
+    --z4m-orange:#FFCD80;
+    --z4m-blue-grey:#AFBCC2;
+    /*--z4m-white:var(--z4m-dark-04);*/
+    --z4m-dark-grey:var(--z4m-dark-16);
+    --z4m-light-grey:var(--z4m-dark-12);
+    --z4m-amber:#ffe082;
+    --z4m-aqua:#d9fffe;
+    --z4m-brown:#bcaaa4;
+    --z4m-cyan:#80deea;
+    --z4m-indigo:#9fa8da;
+    --z4m-deep-orange:#ffab91;
+    --z4m-pink:#f48fb0;
+    --z4m-purple:#ce93d8;
+    --z4m-deep-purple:#b39ddb;
+    --z4m-teal:#80cbc3;
+}
+.w3-theme-l5{color:#fff!important;background-color:var(--z4m-dark)!important}
+.w3-theme-l4{color:#fff!important;background-color:var(--z4m-dark-01)!important}
+.w3-theme-l3{color:#fff!important;background-color:var(--z4m-dark-02)!important}
+.w3-theme-l2{color:#fff!important;background-color:var(--z4m-dark-03)!important}
+.w3-theme-l1{color:#fff!important;background-color:var(--z4m-dark-04)!important}
+.w3-theme-d1{color:#fff!important;background-color:var(--z4m-dark-06)!important}
+.w3-theme-d2{color:#fff!important;background-color:var(--z4m-dark-08)!important}
+.w3-theme-d3{color:#fff!important;background-color:var(--z4m-dark-12)!important}
+.w3-theme-d4{color:#fff!important;background-color:var(--z4m-dark-16)!important}
+.w3-theme-d5{color:#fff!important;background-color:var(--z4m-dark-24)!important}
+.w3-theme-light{color:#fff!important;background-color:var(--z4m-dark)!important}
+.w3-theme-dark{color:#fff!important;background-color:var(--z4m-dark-04)!important}
+.w3-theme-action{color:#000!important;background-color:var(--z4m-dark-secondary)!important}
+.w3-theme{color:#fff!important;background-color:var(--z4m-dark-12)!important}
+.w3-text-theme{color:var(--z4m-dark-primary)!important}
+.w3-border-theme{border-color:var(--z4m-dark-primary)!important}
+.w3-hover-theme:hover{color:#fff!important;background-color:var(--z4m-dark-24)!important}
+.w3-hover-text-theme:hover{color:var(--z4m-dark-primary)!important}
+.w3-hover-border-theme:hover{border-color:var(--z4m-dark-primary)!important}
+
+#zdk-footer.w3-theme {color:#fff!important;background-color:var(--z4m-dark-04)!important}
+
+.w3-button:hover{color:#fff!important;background-color:var(--z4m-dark-16)!important}
+
+.w3-modal {background-color: rgba(100,100,100,0.5)}
+
+a.w3-theme, button.w3-theme {color:#000!important;background-color:var(--z4m-dark-primary)!important}
+
+#zdk-content img {filter: brightness(.8) contrast(1.2)}
+
+/* Form */
+.w3-input.w3-border,.w3-select.w3-border{border-color: #858585!important}
+.w3-input,.w3-select,input.w3-input[type=search]~ul{background-color: #3B3B3B;}
+
+/* Default border */
+/*
+.w3-border,.w3-border-top,.w3-border-bottom,.w3-border-left,.w3-border-right,
+.w3-topbar,.w3-bottombar,.w3-leftbar,.w3-rightbar{border-color: var(--z4m-dark-24)!important}
+*/
+
+/* Other elements */
+mark{background:var(--z4m-yellow)}
+.w3-code{background-color:var(--z4m-dark);border-left-color:var(--z4m-green)}
+.w3-codespan{color:var(--z4m-red);background-color:var(--z4m-dark-06)}
+.w3-sidebar{background-color:var(--z4m-dark)}
+.w3-modal-content{background-color:var(--z4m-dark)}
+
+/*.w3-table-all{border-color:var(--z4m-dark-24)}*/
+.w3-table-all tr:nth-child(even){color:#fff;background-color:var(--z4m-dark-06)}
+.w3-table-all tr:nth-child(odd){color:#fff;background-color:var(--z4m-dark)}
+.w3-striped tbody tr:nth-child(even) {color:#fff;background-color: var(--z4m-dark-12)}
+.w3-hoverable tbody tr:hover,.w3-ul.w3-hoverable li:hover {background-color: var(--z4m-dark-16)!important}
+/*.w3-ul li,.w3-bordered tr,.w3-table-all tr{border-bottom-color: var(--z4m-dark-24)!important}*/
+
+.w3-dropdown-hover:first-child,.w3-dropdown-click:hover{background-color:var(--z4m-dark-16);color:#fff}
+.w3-dropdown-hover:hover > .w3-button:first-child,
+.w3-dropdown-click:hover > .w3-button:first-child{background-color:var(--z4m-dark-16);color:#fff}
+.w3-dropdown-content{color:#fff;background-color:var(--z4m-dark-04)}
+
+/* W3CSS Colors override for best WCAG legibility */
+.w3-green,.w3-hover-green:hover{color:#000!important;background-color:var(--z4m-green)!important}
+.w3-red,.w3-hover-red:hover{color:#000!important;background-color:var(--z4m-red)!important}
+.w3-blue,.w3-hover-blue:hover{color:#000!important;background-color:var(--z4m-blue)!important}
+.w3-yellow,.w3-hover-yellow:hover{color:#000!important;background-color:var(--z4m-yellow)!important}
+.w3-orange,.w3-hover-orange:hover{color:#000!important;background-color:var(--z4m-orange)!important}
+.w3-blue-grey,.w3-hover-blue-grey:hover,.w3-blue-gray,.w3-hover-blue-gray:hover{color:#000!important;background-color:var(--z4m-blue-grey)!important}
+/*.w3-white,.w3-hover-white:hover{color:#000!important;background-color:var(--z4m-white)!important}*/
+.w3-dark-grey,.w3-hover-dark-grey:hover,.w3-dark-gray,.w3-hover-dark-gray:hover{color:#fff!important;background-color:var(--z4m-dark-grey)!important}
+.w3-light-grey,.w3-hover-light-grey:hover,.w3-light-gray,.w3-hover-light-gray:hover{color:#FFF!important;background-color: var(--z4m-light-grey)!important}
+.w3-amber,.w3-hover-amber:hover{color:#000!important;background-color:var(--z4m-amber)!important}
+.w3-aqua,.w3-hover-aqua:hover{color:#000!important;background-color:var(--z4m-aqua)!important}
+.w3-brown,.w3-hover-brown:hover{color:#000!important;background-color:var(--z4m-brown)!important}
+.w3-cyan,.w3-hover-cyan:hover{color:#000!important;background-color:var(--z4m-cyan)!important}
+.w3-indigo,.w3-hover-indigo:hover{color:#000!important;background-color:var(--z4m-indigo)!important}
+.w3-deep-orange,.w3-hover-deep-orange:hover{color:#000!important;background-color:var(--z4m-deep-orange)!important}
+.w3-pink,.w3-hover-pink:hover{color:#000!important;background-color:var(--z4m-pink)!important}
+.w3-purple,.w3-hover-purple:hover{color:#000!important;background-color:var(--z4m-purple)!important}
+.w3-deep-purple,.w3-hover-deep-purple:hover{color:#000!important;background-color:var(--z4m-deep-purple)!important}
+.w3-teal,.w3-hover-teal:hover{color:#000!important;background-color:var(--z4m-teal)!important}
+
+.w3-text-amber,.w3-hover-text-amber:hover{color:var(--z4m-amber)!important}
+.w3-text-aqua,.w3-hover-text-aqua:hover{color:var(--z4m-aqua)!important}
+.w3-text-blue,.w3-hover-text-blue:hover{color:var(--z4m-blue)!important}
+.w3-text-brown,.w3-hover-text-brown:hover{color:var(--z4m-brown)!important}
+.w3-text-cyan,.w3-hover-text-cyan:hover{color:var(--z4m-cyan)!important}
+.w3-text-blue-grey,.w3-hover-text-blue-grey:hover,.w3-text-blue-gray,.w3-hover-text-blue-gray:hover{color:var(--z4m-blue-grey)!important}
+.w3-text-green,.w3-hover-text-green:hover{color:var(--z4m-green)!important}
+.w3-text-indigo,.w3-hover-text-indigo:hover{color:var(--z4m-indigo)!important}
+.w3-text-orange,.w3-hover-text-orange:hover{color:var(--z4m-orange)!important}
+.w3-text-deep-orange,.w3-hover-text-deep-orange:hover{color:var(--z4m-deep-orange)!important}
+.w3-text-pink,.w3-hover-text-pink:hover{color:var(--z4m-pink)!important}
+.w3-text-purple,.w3-hover-text-purple:hover{color:var(--z4m-purple)!important}
+.w3-text-deep-purple,.w3-hover-text-deep-purple:hover{color:var(--z4m-deep-purple)!important}
+.w3-text-red,.w3-hover-text-red:hover{color:var(--z4m-red)!important}
+.w3-text-teal,.w3-hover-text-teal:hover{color:var(--z4m-teal)!important}
+.w3-text-yellow,.w3-hover-text-yellow:hover{color:var(--z4m-yellow)!important}
+.w3-text-dark-grey,.w3-hover-text-dark-grey:hover,.w3-text-dark-gray,.w3-hover-text-dark-gray:hover{color:#FFF!important}
+
+.w3-border-amber,.w3-hover-border-amber:hover{border-color:var(--z4m-amber)!important}
+.w3-border-aqua,.w3-hover-border-aqua:hover{border-color:var(--z4m-aqua)!important}
+.w3-border-blue,.w3-hover-border-blue:hover{border-color:var(--z4m-blue)!important}
+.w3-border-brown,.w3-hover-border-brown:hover{border-color:var(--z4m-brown)!important}
+.w3-border-cyan,.w3-hover-border-cyan:hover{border-color:var(--z4m-cyan)!important}
+.w3-border-blue-grey,.w3-hover-border-blue-grey:hover,.w3-border-blue-gray,.w3-hover-border-blue-gray:hover{border-color:var(--z4m-blue-grey)!important}
+.w3-border-green,.w3-hover-border-green:hover{border-color:var(--z4m-green)!important}
+.w3-border-indigo,.w3-hover-border-indigo:hover{border-color:var(--z4m-indigo)!important}
+.w3-border-orange,.w3-hover-border-orange:hover{border-color:var(--z4m-orange)!important}
+.w3-border-deep-orange,.w3-hover-border-deep-orange:hover{border-color:var(--z4m-deep-orange)!important}
+.w3-border-pink,.w3-hover-border-pink:hover{border-color:var(--z4m-pink)!important}
+.w3-border-purple,.w3-hover-border-purple:hover{border-color:var(--z4m-purple)!important}
+.w3-border-deep-purple,.w3-hover-border-deep-purple:hover{border-color:var(--z4m-deep-purple)!important}
+.w3-border-red,.w3-hover-border-red:hover{border-color:var(--z4m-red)!important}
+.w3-border-teal,.w3-hover-border-teal:hover{border-color:var(--z4m-teal)!important}
+.w3-border-yellow,.w3-hover-border-yellow:hover{border-color:var(--z4m-yellow)!important}
+
+

@@ -18,49 +18,50 @@
  * --------------------------------------------------------------------
  * ZnetDK Core profiles view for mobile
  *
- * File version: 1.8
- * Last update: 02/15/2024
+ * File version: 1.9
+ * Last update: 10/22/2024
  */
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <!-- Header -->
-<div id="mzdk-profile-list-header" class="w3-row w3-text-theme w3-theme-light w3-hide-small w3-hide-medium w3-border-bottom w3-border-theme">
+<div id="mzdk-profile-list-header" class="w3-row <?php echo $color['content']; ?> w3-hide-small w3-hide-medium w3-border-bottom <?php echo $color['list_border_bottom']; ?>">
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_TABLE_COL_PROFILE_NAME; ?></b></div>
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_TABLE_COL_PROFILE_DESC; ?></b></div>
     <div class="w3-col l6 w3-padding-small"><b><?php echo LC_TABLE_COL_MENU_ITEMS; ?></b></div>
 </div>
 <!-- List of Profiles -->
 <ul id="mzdk-profile-list" class="w3-ul w3-hide w3-margin-bottom" data-zdk-load="profiles:all">
-    <li class="w3-border-theme w3-hover-light-grey" data-id="{{profile_id}}">
+    <li class="<?php echo $color['list_border_bottom']; ?> w3-hover-light-grey" data-id="{{profile_id}}">
         <div class="w3-row w3-stretch">
             <a class="edit" href="javascript:void(0)">
                 <div class="w3-col s12 m6 l3 w3-padding-small">
-                    <span class="w3-text-theme w3-large"><strong>{{profile_name}}</strong></span>
+                    <span class="w3-large"><strong>{{profile_name}}</strong></span>
                 </div>
                 <div class="w3-col s12 m6 l3 w3-padding-small">
                     <span>{{profile_description}}</span>
                 </div>
                 <div class="w3-col s12 m12 l6 w3-padding-small">
                     <span class="has-menu-items-{{has_menu_items}}">
-                        <i class="w3-text-theme fa fa-sitemap fa-lg"></i>&nbsp;
+                        <i class="<?php echo $color['icon']; ?> fa fa-sitemap fa-lg"></i>&nbsp;
                         <span class="menu-items">{{menu_items}}</span>
                     </span>
                 </div>
             </a>
         </div>
     </li>
-    <li><h3 class="w3-red w3-center"><i class="fa fa-frown-o"></i>&nbsp;<?php echo LC_MSG_INF_NO_RESULT_FOUND; ?></h3></li>
+    <li><h3 class="<?php echo $color['msg_error']; ?> w3-center w3-stretch"><i class="fa fa-frown-o"></i>&nbsp;<?php echo LC_MSG_INF_NO_RESULT_FOUND; ?></h3></li>
 </ul>
 <!-- Modal dialog for adding and editing a Profile -->
 <div id="mzdk-profile-modal" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-key fa-lg"></i>
                 <span class="title"></span>
             </h4>
         </header>
-        <form class="w3-container w3-theme-light" data-zdk-load="profiles:detail" data-zdk-submit="profiles:save">
+        <form class="w3-container <?php echo $color['modal_content']; ?>" data-zdk-load="profiles:detail" data-zdk-submit="profiles:save">
             <input type="hidden" name="profile_id">
             <div class="w3-section">
                 <label><b><?php echo LC_TABLE_COL_PROFILE_NAME; ?></b>
@@ -75,17 +76,17 @@
             </div>
             <!-- Submit button -->
             <p class="w3-padding"></p>
-            <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
+            <button class="w3-button w3-block <?php echo $color['btn_submit']; ?> w3-section w3-padding" type="submit">
                 <i class="fa fa-save fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_SAVE; ?>
             </button>
         </form>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-padding-16 w3-border-top <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CANCEL; ?>
             </button>
-            <button type="button" class="remove w3-button w3-theme-action">
+            <button type="button" class="remove w3-button <?php echo $color['btn_action']; ?>">
                 <i class="fa fa-trash fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_REMOVE; ?>
             </button>

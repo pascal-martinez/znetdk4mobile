@@ -18,31 +18,32 @@
 * --------------------------------------------------------------------
 * Core Http Forgotten password view
 *
-* File version: 1.1
-* Last update: 11/17/2022
+* File version: 1.2
+* Last update: 10/30/2024
 */
-if (CFG_PAGE_LAYOUT === 'mobile') : ?>
+if (CFG_PAGE_LAYOUT === 'mobile') : 
+    $color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME; ?>
         <div id="mzdk_forgot_password_dialog" class="w3-modal">
             <div class="w3-modal-content w3-card-4">
-                <header class="w3-container w3-theme-d5">
+                <header class="w3-container <?php echo $color['modal_header']; ?>">
                     <span class="close w3-button w3-xlarge w3-hover-theme w3-display-topright"><i class="fa fa-times-circle fa-lg"></i></span>
                     <h4>
                         <i class="fa fa-unlock-alt fa-lg"></i>
                         <span class="title"><?php echo LC_FORM_TITLE_NEW_PASSWORD_REQUEST; ?></span>
                     </h4>
                 </header>
-                <form class="w3-container w3-theme-light" data-zdk-submit="forgotpassword:requestpassword">
+                <form class="w3-container <?php echo $color['modal_content']; ?>" data-zdk-submit="forgotpassword:requestpassword">
                     <div class="w3-section">
                         <label class="zdk-required"><b><?php echo LC_FORM_LBL_USER_EMAIL; ?></b></label>
                         <input class="w3-input w3-border w3-margin-bottom" type="email" name="email" placeholder="<?php echo LC_FORM_NEW_PASSWORD_REQUEST_PLACEHOLDER; ?>" maxlength="100" required>
-                        <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
+                        <button class="w3-button w3-block <?php echo $color['btn_submit']; ?> w3-section w3-padding" type="submit">
                             <i class="fa fa-check fa-lg"></i>&nbsp;
                             <?php echo LC_BTN_VALIDATE; ?>
                         </button>
                     </div>
                 </form>
                 <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-                    <button type="button" class="cancel w3-button w3-red">
+                    <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                         <i class="fa fa-close fa-lg"></i>&nbsp;
                         <?php echo LC_BTN_CANCEL; ?>
                     </button>

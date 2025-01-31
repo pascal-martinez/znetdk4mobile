@@ -1,3 +1,137 @@
+ZnetDK 3.4.0, 2025-01-30
+------------------------
+- CHANGE (ZnetDK 4 Mobile only): when the z4m.message.ask() modal dialog is
+  displayed, the focus is set by default to the "No" button.
+- CHANGE (ZnetDK 4 Mobile only): new 'z4m.list.displayRowCountInMenuTab' 
+  property to disable the display of a Data List total row count in the
+  horizontal menu tab. This property is useful for example in case a data list
+  is declared in a modal dialog.
+- CHANGE (ZnetDK 4 Mobile only): when a critical error occurs while submitting a
+  form, the error is now displayed directly in the form. In the previous
+  version, the critical error was displayed in the view in an error panel and
+  could be hidden by the modal dialog containing the form.
+- CHANGE (ZnetDK 4 Mobile only): when searching items in a Data list, a minimum
+  of three letters must now be entered in the "Search keyword" field to get
+  suggestions. This number of letters to get suggestions can be customized
+  through the new 'z4m.list.searchKeywordMinStringLengh' property.
+- CHANGE (ZnetDK 4 Mobile only): when searching for users, a caption is now
+  displayed below the "Searched keyword" label to indicate what user information
+  is being searched for.
+- CHANGE (ZnetDK 4 Mobile only): a caption text can now be set via the
+  z4m.list.searchKeywordCaption property to be displayed below the label of the
+  "Searched keyword" field in the data list search window.
+- CHANGE (ZnetDK 4 Mobile only): the z4m.autocomplete.make() method now also
+  accepts an input element as jQuery object for the first argument. In previous
+  version, only a selector of the input element was accepted.
+- CHANGE (ZnetDK 4 Mobile only): when a JS error is detected while processing
+  the response of a controller action, the stack property of the error, if set,
+  is displayed in the browser console to get more information about the origin
+  of the error. The JSON response is also traced in the browser console.
+- CHANGE (ZnetDK 4 Mobile only): the z4m.form.showError() method accepts now
+  an input name with its position specified as suffix separated by a colon
+  (for example 'my_input:5') to show an error message for the nth input 
+  when exists multiple times in a form with the same name.
+- CHANGE (ZnetDK 4 Mobile only): now the CSS class 'zdk-required' can be applied
+  to any HTML element to add an asterisk to an input label.
+- CHANGE (ZnetDK 4 Mobile only): 'My account' title added to the user panel
+  modal and 'Search' title added to the search modal.
+- CHANGE (ZnetDK 4 Mobile only): new 'z4m-theme-light.css' stylesheet to display
+  the application in a light color theme. New 'z4m-theme-dark.css' stylesheet to
+  display the application in a dark color theme.
+- CHANGE (ZnetDK 4 Mobile only): the red color is no longer applied to the menu
+  item bottom border when selected. Instead, the theme border color is used, 
+  both for the vertical side menu and the horizontal tab menu.
+- CHANGE (ZnetDK 4 Mobile only): new CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME PHP 
+  constant to customize the W3CSS color classes applied to App UI. This constant
+  can be useful to restore the color assignment applied up to version 3.3 of 
+  ZnetDK 4 Mobile.
+- CHANGE (ZnetDK 4 Mobile only): the color CSS class applied to the app's banner
+  is changed to 'w3-theme-d2' instead of 'w3-theme'.
+- CHANGE (ZnetDK 4 Mobile only): the color CSS class applied to the header of 
+  the modal dialogs is changed to 'w3-theme-dark' instead of 'w3-theme-d5'.
+- CHANGE (all): JS libraries to be loaded by the web browser are now inserted
+  into the body of the APP page before the extra HTML code injected via the
+  'extra_hmtl.php' script (feature added in version 3.2).
+- CHANGE (ZnetDK 4 mobile only): new z4m.list.infiniteScroll property to
+  disable the list infinite scroll. When this property is set to false, after
+  displaying the first 20 items, the next items are no longer displayed by
+  scrolling the page, but only by clicking the "Show next results" button below
+  the last item in the list.
+- BUG FIXING (ZnetDK 4 Mobile only) : when mutliple Data list existed for the
+  same displayed view (for example when a second Data list were added to a modal
+  dialog displayed above the view), only the last Data lists were refreshed when
+  clicking the horizontal menu item of the concerned view. Now, only the first
+  Data list is refreshed.
+- BUG FIXING (ZnetDK 4 Mobile only) : when mutliple Data list existed for the
+  same displayed view, the action buttons initially shown for the view could be
+  hidden after instantiating the next Data lists.
+- BUG FIXING (ZnetDK 4 Mobile only): when calling z4m.form.setReadOnly() method,
+  property for inputs of type 'radio' and 'checkbox' was set to 'readonly'
+  instead of 'disabled'.
+- BUG FIXING (ZnetDK 4 Mobile only): the z4m.autocomplete component could
+  sometimes display the same suggestions twice.
+- BUG FIXING (all): in PHP 8.4, error "Constant E_STRICT is deprecated in ...
+  ErrorHandler.php on line 155.
+- BUG FIXING (all): in PHP 8.4, error "E_DEPRECATED - fputcsv(): the $escape
+  parameter must be provided as its default value will change - ... Response.php
+  (470)".
+- BUG FIXING (all): in PHP 8.4, error "E_DEPRECATED - ZDKException::__construct
+  (): Implicitly marking parameter $previous as nullable is deprecated, the
+  explicit nullable type must be used instead - ... ZDKException.php(42)".
+- BUG FIXING (all): both table and column names are now surrounded by backticks 
+  in the DAO class to avoid errors when these names match a MySQL reserved words
+  or contain forbidden characters.
+- BUG FIXING (ZnetDK 4 Mobile only): on a large screen, horizontal menu items
+  that overflowed to the right were hidden instead of being displayed below.
+- BUG FIXING (ZnetDK 4 Mobile only): search criteria and sort tags displayed
+  when searching for users were incorrectly displayed under the list header.
+- BUG FIXING (ZnetDK 4 Mobile only): the length of the "No results found"
+  message, displayed when no rows were found for user and profile lists, was
+  shorter than the width of the list.
+- BUG FIXING (ZnetDK 4 Mobile only): the vertical menu close button was not
+  properly right aligned.
+- BUG FIXING (ZnetDK 4 Mobile only): for a better WCAG legibility, the user
+  'w3-theme-l2' W3CSS class applied to the 'Installation', 'Uninstallation' and
+  'My user rights' views is replaced by the 'w3-theme' class.
+- BUG FIXING (ZnetDK 4 Mobile only): for a better WCAG legibility, the colors of
+  the default ZnetDK 4 Mobile color theme are darken.
+- BUG FIXING (ZnetDK 4 Mobile only): for a better WCAG legibility, the color CSS
+  class applied to the app's menu selected item is changed to 'w3-theme-l3'
+  instead of 'w3-theme-l2'.
+- BUG FIXING (ZnetDK 4 Mobile only): for a better WCAG legibility, the color CSS
+  class applied to the app's horizontal menu is changed to 'w3-theme-l4' instead
+  of 'w3-theme-l3'.
+- BUG FIXING (ZnetDK 4 Mobile only): for a better WCAG legibility, the
+  'w3-text-theme' CSS class is no longer applied to the list header of the user
+  and profile lists and to the user and profile names.
+- BUG FIXING (ZnetDK 4 mobile only): for a better WCAG legibility, the default
+  W3CSS theme set through the CFG_MOBILE_W3CSS_THEME PHP constant is no longer 
+  'resources/w3css/themes/w3-theme-blue.css'. It is now replaced by the theme
+  named 'resources/w3css/themes/z4m-theme.css'.
+- BUG FIXING (ZnetDK 4 mobile only): for a better WCAG legibility, the W3CSS
+  green, blue, blue grey and red colors used to display messages (see
+  z4m.messages.add() JS method) are darken.
+- BUG FIXING (all): if the network connection IP address changed, when 
+  refreshing the user list, the error "Operation not authorized" (HTTP error
+  403) was displayed instead of the login window to renew the user session (HTTP
+  error 401).
+- BUG FIXING (all): if two tabs were opened in the same web browser and the user
+  logged out from one tab, the error "Operation not allowed" was displayed in
+  the second tab when the same user logged out again.
+- BUG FIXING (ZnetDK 4 mobile only): CSS z-index value is increased to 5 for 
+  the left side menu (previous z-index value was 4) and to 6 for the modal 
+  overlay (previous z-index value was 5 for the w3-modal CSS class).
+- BUG FIXING (ZnetDK 4 mobile only): the Security::action_login() controller's 
+  action could not be overloaded on Linux by the application or a module. 
+- BUG FIXING (ZnetDK 4 mobile only): only 20 rows were displayed in a list 
+  instantiated through the z4m.list.make() method on large screens configured
+  with high resolution. Now a "Show next results" button is displayed to allow
+  the user to view the next lines in the case where no scroll bar is displayed 
+  when the 20 first items are fully displayed in the viewport.
+- BUG FIXING (ZnetDK 4 mobile only): the color CSS class for the Add action
+  button, initially set to 'w3-red', is changed to 'w3-theme-action'.
+
+
 ZnetDK 3.3.0, 2024-08-19
 ------------------------
 - CHANGE (all): login throttling applied during 60 seconds after 5 login

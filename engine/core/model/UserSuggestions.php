@@ -19,7 +19,7 @@
 * Core DAO : suggestions of keywords for searching users 
 *
 * File version: 1.0
-* Last update: 04/14/2018
+* Last update: 12/15/2024
 */
 namespace model;
 
@@ -31,14 +31,14 @@ class UserSuggestions extends \DAO
 {
     protected function initDaoProperties() {
         $this->useCoreDbConnection();
-        $this->query = "SELECT DISTINCT suggestion FROM ("
-            . "SELECT login_name AS suggestion FROM zdk_users "
-            . "WHERE LOWER(login_name) LIKE LOWER(?) "
-            . "UNION SELECT user_name AS suggestion FROM zdk_users "
-            . "WHERE LOWER(user_name) LIKE LOWER(?)"
-            . "UNION SELECT profile_name AS suggestion FROM zdk_profiles "
-            . "WHERE LOWER(profile_name) LIKE LOWER(?)"
-            . ") AS suggestions";
+        $this->query = "SELECT DISTINCT suggestion FROM (
+            SELECT login_name AS suggestion FROM zdk_users
+            WHERE login_name LIKE ?
+            UNION SELECT user_name AS suggestion FROM zdk_users
+            WHERE user_name LIKE ?
+            UNION SELECT profile_name AS suggestion FROM zdk_profiles
+            WHERE profile_name LIKE ?
+            ) AS suggestions";
         $this->setSortCriteria('suggestion');
     }
 

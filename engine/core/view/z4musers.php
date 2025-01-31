@@ -18,24 +18,29 @@
  * --------------------------------------------------------------------
  * ZnetDK Core users view for mobile
  *
- * File version: 1.11
- * Last update: 02/15/2024
+ * File version: 1.12
+ * Last update: 12/16/2024
  */
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <!-- Filter by status -->
-<form id="mzdk-user-list-filter" class="w3-padding w3-panel w3-theme-l2">
-    <div class="w3-cell w3-left">
-        <span class="w3-margin-right"><i class="fa fa-list"></i>&nbsp;<b><?php echo LC_FORM_LBL_USER_STATUS; ?></b></span>
-        <input id="mzdk-user-list-filter-status-enabled" class="w3-radio" type="radio" value="1" name="status_filter" checked>
-        <label for="mzdk-user-list-filter-status-enabled"><?php echo LC_FORM_LBL_USER_STATUS_ENABLED; ?></label>&nbsp;&nbsp;
-        <input id="mzdk-user-list-filter-status-disabled" class="w3-radio" type="radio" value="0" name="status_filter">
-        <label for="mzdk-user-list-filter-status-disabled"><?php echo LC_FORM_LBL_USER_STATUS_DISABLED; ?></label>&nbsp;&nbsp;
-        <input id="mzdk-user-list-filter-status-archived" class="w3-radio" type="radio" value="-1" name="status_filter">
-        <label for="mzdk-user-list-filter-status-archived"><?php echo LC_FORM_LBL_USER_STATUS_ARCHIVED; ?></label>
-    </div>
+<form id="mzdk-user-list-filter" class="w3-padding w3-section <?php echo $color['filter_bar']; ?>" style="min-height:52px">
+    <i class="fa fa-list"></i>&nbsp;<b><?php echo LC_FORM_LBL_USER_STATUS; ?></b>
+    <label class="w3-mobile w3-padding">
+        <input class="w3-radio" type="radio" value="1" name="status_filter" checked>
+        <?php echo LC_FORM_LBL_USER_STATUS_ENABLED; ?>
+    </label>
+    <label class="w3-mobile w3-padding">
+        <input class="w3-radio" type="radio" value="0" name="status_filter">
+        <?php echo LC_FORM_LBL_USER_STATUS_DISABLED; ?>
+    </label>
+    <label class="w3-mobile w3-padding">
+        <input class="w3-radio" type="radio" value="-1" name="status_filter">
+        <?php echo LC_FORM_LBL_USER_STATUS_ARCHIVED; ?>
+    </label>
 </form>
 <!-- Header -->
-<div id="mzdk-user-list-header" class="w3-row w3-text-theme w3-theme-light w3-hide-small w3-hide-medium w3-border-bottom w3-border-theme">
+<div id="mzdk-user-list-header" class="w3-row <?php echo $color['content']; ?> w3-hide-small w3-hide-medium w3-border-bottom <?php echo $color['list_border_bottom']; ?>">
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_TABLE_COL_USER; ?></b></div>
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_FORM_LBL_USER_EMAIL . ' / ' . LC_FORM_LBL_USER_PHONE; ?></b></div>
     <div class="w3-col l3 w3-padding-small"><b><?php echo LC_FORM_LBL_USER_STATUS; ?></b></div>
@@ -44,60 +49,56 @@
 <!-- List of Users -->
 <ul id="mzdk-user-list" class="w3-ul w3-hide w3-margin-bottom"
         data-zdk-load="users:all" data-zdk-autocomplete="users:suggestions">
-    <li class="w3-border-theme w3-hover-light-grey" data-id="{{user_id}}">
+    <li class="<?php echo $color['list_border_bottom']; ?> <?php echo $color['list_row_hover']; ?>" data-id="{{user_id}}">
         <div class="w3-row w3-stretch">
             <a class="edit" href="javascript:void(0)">
                 <div class="w3-col s12 m6 l3 w3-padding-small">
-                    <div class="w3-text-theme w3-large"><strong>{{user_name}}</strong></div>
-                    <span class="w3-tag w3-theme-d1">{{login_name}}</span>
+                    <div class="w3-large"><strong>{{user_name}}</strong></div>
+                    <span class="w3-tag <?php echo $color['tag']; ?>">{{login_name}}</span>
                     <span class="is-hidden{{notes_exist}}"><i>{{notes}}</i></span>
                 </div>
             </a>
             <div class="w3-col s12 m6 l3 w3-padding-small">
-                <a href="mailto:{{user_email}}">
-                    <i class="w3-text-theme fa fa-envelope fa-lg"></i>&nbsp;
-                    <span>{{user_email}}</span>
-                </a>
+                <i class="<?php echo $color['icon']; ?> fa fa-envelope fa-lg"></i>
+                <a href="mailto:{{user_email}}">{{user_email}}</a>
                 <div class="phone is-hidden{{user_phone}}">
-                    <a href="tel:{{user_phone}}">
-                        <i class="w3-text-theme fa fa-phone-square fa-lg"></i>&nbsp;
-                        <span>{{user_phone}}</span>
-                    </a>
+                    <i class="<?php echo $color['icon']; ?> fa fa-phone-square fa-lg"></i>
+                    <a href="tel:{{user_phone}}">{{user_phone}}</a>
                 </div>
             </div>
             <div class="w3-col s12 m6 l3 w3-padding-small">
-                <div class="w3-tag user-enabled-{{user_enabled}} w3-red"></div>
+                {{user_enabled_label}}
                 <div class="expiration-date">
-                    <i class="w3-text-theme fa fa-calendar-o fa-lg"></i>&nbsp;
-                    <span class="expired-{{has_expired}}">{{expiration_date_locale}}</span>
+                    <i class="<?php echo $color['icon']; ?> fa fa-calendar-o fa-lg"></i>&nbsp;
+                    {{expiration_date_display}}
                 </div>
             </div>
             <div class="w3-col s12 m12 l3 w3-padding-small">
-                <span class="menu-access-{{full_menu_access}} w3-tag w3-theme-d5">{{menu_access}}</span>
+                <span class="menu-access-{{full_menu_access}} w3-tag <?php echo $color['tag']; ?> w3-round-xlarge">{{menu_access}}</span>
                 <span class="has-profiles-{{has_profiles}}">&nbsp;
-                    <i class="w3-text-theme fa fa-key fa-lg"></i>&nbsp;
+                    <i class="<?php echo $color['icon']; ?> fa fa-key fa-lg"></i>&nbsp;
                     <span class="user-profiles">{{user_profiles}}</span>
                 </span>
             </div>
         </div>
     </li>
-    <li><h3 class="w3-red w3-center"><i class="fa fa-frown-o"></i>&nbsp;<?php echo LC_MSG_INF_NO_RESULT_FOUND; ?></h3></li>
+    <li><h3 class="<?php echo $color['msg_error']; ?> w3-center w3-stretch"><i class="fa fa-frown-o"></i>&nbsp;<?php echo LC_MSG_INF_NO_RESULT_FOUND; ?></h3></li>
 </ul>
 <!-- Modal dialog for adding and editing a User -->
 <div id="mzdk-user-modal" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-user fa-lg"></i>
                 <span class="title"></span>
             </h4>
         </header>
-        <form class="w3-container w3-theme-light" data-zdk-load="users:detail" data-zdk-submit="users:save">
+        <form class="w3-container <?php echo $color['modal_content']; ?>" data-zdk-load="users:detail" data-zdk-submit="users:save">
             <input type="hidden" name="user_id">
             <div class="w3-section">
                 <!-- Identity -->
-                <h3 class="w3-border-top w3-text-theme w3-border-theme">
+                <h3 class="w3-border-bottom <?php echo $color['form_title']; ?> <?php echo $color['form_title_border_bottom']; ?>">
                     <i class="fa fa-id-badge fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_IDENTITY; ?>
                 </h3>
@@ -115,7 +116,7 @@
                 </label>
                 <!-- Connection -->
                 <br>
-                <h3 class="w3-border-top w3-text-theme w3-border-theme">
+                <h3 class="w3-border-bottom <?php echo $color['form_title']; ?> <?php echo $color['form_title_border_bottom']; ?>">
                     <i class="fa fa-unlock-alt fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_CONNECTION; ?>
                 </h3>
@@ -130,7 +131,7 @@
                 </label>
                 <!-- User rights -->
                 <br>
-                <h3 class="w3-border-top w3-text-theme w3-border-theme">
+                <h3 class="w3-border-bottom <?php echo $color['form_title']; ?> <?php echo $color['form_title_border_bottom']; ?>">
                     <i class="fa fa-key fa-lg"></i>
                     <?php echo LC_FORM_FLD_USER_RIGHTS; ?>
                 </h3>
@@ -155,17 +156,17 @@
             </div>
             <!-- Submit button -->
             <p class="w3-padding"></p>
-            <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
+            <button class="w3-button w3-block <?php echo $color['btn_submit']; ?> w3-section w3-padding" type="submit">
                 <i class="fa fa-save fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_SAVE; ?>
             </button>
         </form>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-border-top w3-padding-16 <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CANCEL; ?>
             </button>
-            <button type="button" class="remove w3-button w3-theme-action">
+            <button type="button" class="remove w3-button <?php echo $color['btn_action']; ?>">
                 <i class="fa fa-trash fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_REMOVE; ?>
             </button>
@@ -183,34 +184,9 @@
     #mzdk-user-list .is-hidden {
         display: none;
     }
-    #mzdk-user-list .user-enabled-0 {
-        color: #fff!important;
-        background-color: #f44336!important;
-    }
-    #mzdk-user-list .user-enabled-0:after {
-        content: "<?php echo LC_FORM_LBL_USER_STATUS_DISABLED; ?>";
-    }
-    #mzdk-user-list .user-enabled-1 {
-        color: #fff!important;
-        background-color: #4CAF50!important;
-    }
-    #mzdk-user-list .user-enabled-1:after {
-        content: "<?php echo LC_FORM_LBL_USER_STATUS_ENABLED; ?>";
-    }
-    #mzdk-user-list .user-enabled--1 {
-        color: #fff!important;
-        background-color: #000!important;
-    }
-    #mzdk-user-list .user-enabled--1:after {
-        content: "<?php echo LC_FORM_LBL_USER_STATUS_ARCHIVED; ?>";
-    }
     #mzdk-user-list .phone,
     #mzdk-user-list .expiration-date {
         margin-top: 6px;
-    }
-    #mzdk-user-list .expired-1 {
-        font-weight: bold;
-        color: #f44336;
     }
     #mzdk-user-list .menu-access-0 {
         display: none;
@@ -240,7 +216,25 @@
         var z4muserList = znetdkMobile.list.make('#mzdk-user-list');
         z4muserList.beforeInsertRowCallback = function(rowData) {
             rowData.notes_exist = rowData.notes.length > 0 ? 'yes' : '';
+            let userEnabledColor = 'w3-green';
+            let userEnabledLabel = '<?php echo LC_FORM_LBL_USER_STATUS_ENABLED; ?>';
+            if (rowData.user_enabled === '0') {
+                userEnabledColor = 'w3-red';
+                userEnabledLabel = '<?php echo LC_FORM_LBL_USER_STATUS_DISABLED; ?>';
+            } else if (rowData.user_enabled === '-1') {
+                userEnabledColor = 'w3-black';
+                userEnabledLabel = '<?php echo LC_FORM_LBL_USER_STATUS_ARCHIVED; ?>';
+            }
+            rowData.user_enabled_label = '<div class="w3-tag w3-round-xlarge ' 
+                    + userEnabledColor + '">' + userEnabledLabel + '</div>';
+            const hasExpiredClass = rowData.has_expired === '1' ? ' class="w3-tag w3-red"' : '';
+            const expirationDate = rowData.has_expired === '1' ? '<i class="fa fa-exclamation"></i> <b>' 
+                    + rowData.expiration_date_locale + '</b>' : rowData.expiration_date_locale;
+            rowData.expiration_date_display = '<span' + hasExpiredClass + '>' 
+                    + expirationDate + '</span>';
         };
+        z4muserList.searchKeywordCaption = '<i class="w3-small"> <i class="fa fa-info"></i> '
+            + "<?php echo LC_FORM_SEARCH_KEYWORD_CAPTION; ?>" + '</i>';
         z4muserList.beforeSearchRequestCallback = function(requestData) {
             var filters = {};
             filters.status = $('#mzdk-user-list-filter input[name=status_filter]:checked').val();

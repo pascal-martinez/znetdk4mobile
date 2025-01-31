@@ -18,11 +18,11 @@
  * --------------------------------------------------------------------
  * Core version of ZnetDK 
  *
- * File version: 3.3.0
- * Last update: 08/19/2024
+ * File version: 3.4.0
+ * Last update: 01/30/2025
  */
 
 /**
  * Version installed of ZnetDK
  */
-define('ZNETDK_VERSION', '3.3.0');
+define('ZNETDK_VERSION', '3.4.0');

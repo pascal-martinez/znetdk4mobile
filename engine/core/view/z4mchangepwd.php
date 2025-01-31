@@ -18,20 +18,21 @@
  * --------------------------------------------------------------------
  * ZnetDK Core "Change password" view for mobile
  *
- * File version: 1.0
- * Last update: 06/03/2024
+ * File version: 1.1
+ * Last update: 10/19/2024
  */
+$color = CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME;
 ?>
 <div id="zdk-changepwd-modal" class="w3-modal">
     <div class="w3-modal-content w3-card-4">
-        <header class="w3-container w3-theme-d5">
-            <a class="close w3-button w3-xlarge w3-hover-theme w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
+        <header class="w3-container <?php echo $color['modal_header']; ?>">
+            <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
             <h4>
                 <i class="fa fa-unlock-alt fa-lg"></i>
                 <span class="title"><?php echo LC_FORM_TITLE_CHANGE_PASSWORD; ?></span>
             </h4>
         </header>
-        <form class="w3-container w3-theme-light" data-zdk-submit="security:login">
+        <form class="w3-container <?php echo $color['modal_content']; ?>" data-zdk-submit="Security:login">
             <input type="hidden" name="access" value="private">
             <div class="w3-section">
                 <label>
@@ -69,14 +70,14 @@
                 <ul class="pwd-match w3-ul w3-margin-bottom">
                     <li class="w3-text-red"><i class="fa fa-times"></i> <b><?php echo LC_FORM_LBL_PASSWORDS_MUST_MATCH; ?></b></li>
                 </ul>
-                <button class="w3-button w3-block w3-green w3-section w3-padding" type="submit">
+                <button class="w3-button w3-block <?php echo $color['btn_submit']; ?> w3-section w3-padding" type="submit">
                     <i class="fa fa-save fa-lg"></i>&nbsp;
                     <?php echo LC_BTN_SAVE; ?>
                 </button>
             </div>
         </form>
-        <div class="w3-container w3-border-top w3-border-theme w3-padding-16 w3-theme-l4">
-            <button type="button" class="cancel w3-button w3-red">
+        <div class="w3-container w3-padding-16 w3-border-top <?php echo $color['modal_footer_border_top']; ?> <?php echo $color['modal_footer']; ?>">
+            <button type="button" class="cancel w3-button <?php echo $color['btn_cancel']; ?>">
                 <i class="fa fa-close fa-lg"></i>&nbsp;
                 <?php echo LC_BTN_CANCEL; ?>
             </button>

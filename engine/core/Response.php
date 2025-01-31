@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core API for the definition of the HTTP response data
  *
- * File version: 1.15
- * Last update: 02/16/2024
+ * File version: 1.16
+ * Last update: 12/06/2024
  */
 
 /**
@@ -467,7 +467,7 @@ class Response {
         $data = $this->dataToDownloadAsCsv;
         $out = fopen('php://output', 'w');
         foreach ($data as $value) {
-            fputcsv($out, \Convert::valuesToAnsi($value), LC_LOCALE_CSV_SEPARATOR);
+            fputcsv($out, \Convert::valuesToAnsi($value), LC_LOCALE_CSV_SEPARATOR, "\"", "");
         }
         fclose($out);
     }

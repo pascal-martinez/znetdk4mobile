@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core parameters of the applications
 *
-* File version: 1.16
-* Last update: 06/02/2024
+* File version: 1.17
+* Last update: 10/19/2024
 */
 
 /** Page layout chosen for the application.
@@ -238,7 +238,7 @@ define('CFG_DEFAULT_PWD_VALIDITY_PERIOD',6);
 
 /** Regular expression used to check globally if a new entered password is valid
  * @return string|NULL Regular expression for new password checking.
- * If NULL, no global checking is carried out (see indivual checking PHP 
+ * If NULL, no global checking is carried out (see indivual checking PHP
  * constants starting by CFG_CHECK_PWD_*).
  * For example:
  * '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!*+.\-_\/;@#\?%\$&\'"=,:]{8,}$/'
@@ -288,7 +288,7 @@ define('CFG_CHECK_PWD_NUMBER_REGEXP', '[0-9]');
  */
 define('CFG_CHECK_PWD_SPECIAL_REGEXP', NULL);
 
-/** Number of attempts allowed to user to type in his password successfully 
+/** Number of attempts allowed to user to type in his password successfully
  * before their account being disabled.
  * @return integer Number of login attempts allowed to user. If is 0, account is
  * never disabled.
@@ -423,7 +423,49 @@ define('CFG_THEME','znetdk');
 /** Relative path or URL of the W3CSS theme file
  * @return string Set by default to the 'w3-theme-blue.css' W3.CSS blue theme
  */
-define('CFG_MOBILE_W3CSS_THEME','resources/w3css/themes/w3-theme-blue.css');
+define('CFG_MOBILE_W3CSS_THEME','resources/w3css/themes/z4m-theme.css');
+
+/**
+ * Is dark theme enabled?
+ * @return boolean If TRUE, dark theme is enabled
+ */
+define('CFG_MOBILE_W3CSS_THEME_IS_DARK', FALSE);
+
+/** W3CSS theme color scheme
+ * @return array W3CSS color classes applied to UI areas and components
+ */
+define('CFG_MOBILE_W3CSS_THEME_COLOR_SCHEME', [
+    'banner' => 'w3-theme-d2', 'footer' => 'w3-theme',
+    'footer_border_top' => 'w3-border-theme',
+    'content' => 'w3-theme-light',
+    'vertical_nav_menu' => 'w3-theme-l4','horizontal_nav_menu' => 'w3-theme-l4',
+    'nav_menu_hover' => 'w3-hover-theme',
+    'nav_menu_select' => 'w3-theme-l3', 'nav_menu_close' => 'w3-text-theme',
+    'nav_menu_bar_select' => 'w3-border-theme',
+    'install' => 'w3-light-gray', 'install_border' => 'w3-border-dark-gray',
+    'install_txt' => 'w3-text-dark-gray',
+    'btn_action' => 'w3-theme-action', 'btn_refresh' => 'w3-green',
+    'btn_search' => 'w3-blue', 'btn_yes' => 'w3-green', 'btn_no' => 'w3-red',
+    'btn_scrollup' => 'w3-light-grey', 'btn_next_rows' => 'w3-theme-action',
+    'btn_hover' => 'w3-hover-theme',
+    'btn_submit' => 'w3-green', 'btn_cancel' => 'w3-red',
+    'btn_logout' => 'w3-orange', 'search_criterium' => 'w3-blue',
+    'search_sort' => 'w3-yellow',
+    'msg_critical' => 'w3-blue-grey', 'msg_error' => 'w3-red',
+    'msg_warn' => 'w3-yellow', 'msg_info' => 'w3-blue',
+    'msg_success' => 'w3-green',
+    'modal_header' => 'w3-theme-dark',
+    'modal_content' => 'w3-theme-light',
+    'modal_footer' => 'w3-theme-l4',
+    'modal_footer_border_top' => 'w3-border-theme',
+    'autocomplete_hover' => 'w3-hover-theme',
+    'autocomplete_select' => 'w3-theme-dark',
+    'list_row_hover' => 'w3-hover-light-grey', 'filter_bar' => 'w3-theme',
+    'list_border_bottom' => 'w3-border-theme',
+    'tag' => 'w3-theme', 'icon' => 'w3-text-theme',
+    'form_title' => 'w3-text-theme',
+    'form_title_border_bottom' => 'w3-border-theme'
+]);
 
 /**
  * Relative path or URL of the CSS font file to include into the header of the
@@ -569,7 +611,7 @@ define('CFG_REQUEST_VARIABLE_FILTERING_LEVEL', 'HIGH');
 define('CFG_EXEC_PHP_SCRIPT_AFTER_ACTION_DONE', NULL);
 
 /**
- * Specifies whether to load the JS dependencies from the head tag or at the end 
+ * Specifies whether to load the JS dependencies from the head tag or at the end
  * of the body tag.
  * @return boolean TRUE to load the JS dependencies from the head tag, otherwise
  * FALSE (by default) to load them at the end of the body tag.

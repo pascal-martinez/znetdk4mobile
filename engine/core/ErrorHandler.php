@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Error handler of the application
  *
- * File version: 1.3
- * Last update: 01/28/2024
+ * File version: 1.4
+ * Last update: 12/22/2024
  */
 
 /**
@@ -143,7 +143,7 @@ class ErrorHandler {
             case E_USER_ERROR: return 'E_USER_ERROR';
             case E_USER_WARNING: return 'E_USER_WARNING';
             case E_USER_NOTICE: return 'E_USER_NOTICE';
-            case E_STRICT: return 'E_STRICT';
+            case /*E_STRICT*/2048: return 'E_STRICT';
             case E_RECOVERABLE_ERROR: return 'E_RECOVERABLE_ERROR';
             case E_DEPRECATED: return 'E_DEPRECATED';
             case E_USER_DEPRECATED: return 'E_USER_DEPRECATED';
