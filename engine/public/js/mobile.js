@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * ZnetDK Javascript library for mobile page layout
  *
- * File version: 1.13
- * Last update: 01/17/2025
+ * File version: 1.14
+ * Last update: 06/29/2025
  */
 
 /* global FormData, BeforeInstallPromptEvent */
@@ -113,7 +113,9 @@ var znetdkMobile = {
     modal: {
         element: null,
         cssClass: 'w3-modal',
+        contentCssClass: 'w3-modal-content',
         closeOnSubmitSuccess: true,
+        modalStack: [],
         events: {
             beforeOpenName: 'beforeshow',
             afterOpenName: 'aftershow',
@@ -198,6 +200,7 @@ var znetdkMobile = {
     },
     autocomplete: {
         element: null,
+        uniqueId: 1,
         minStringLength: 1,
         delay: 300,
         maxNumberOfCachedItems: 0,
@@ -205,6 +208,7 @@ var znetdkMobile = {
         listTemplateId: '#zdk-autocomplete-tpl',
         itemTemplateId: '#zdk-autocomplete-item-tpl',
         prevQueryString: null,
+        lastSelectedItem: null,
         itemCache: [],
         remoteActions: {
             autocomplete: {
@@ -481,33 +485,34 @@ z4m.ajax.request = function (options) {
                             "' can't be parsed! HTTP status: " + response.status + ' ' + response.statusText;
                     errorSummary = 'Error parsing server response';
                 }
-                if (typeof options.errorCallback === "function"
+                if (response.status !== 401) {
+                    z4m.ajax.emptyRequestContext(); // Request context is emptied
+                    if (typeof options.errorCallback === "function"
                         && options.errorCallback(response) === false) {
-                    z4m.ajax.emptyRequestContext(); // Request context is emptied
-                    return;
-                }
-                if (response.status === 401 && isDisconnected === false) {
-                    // Show session timed out message as snack bar
-                    z4m.messages.showSnackbar(errorMsg, true);
-                    if (typeof appVersion === 'number' && typeof reloadSummary === 'string'
-                            && typeof reloadMsg === 'string'
-                            && parseInt($('body').data('appver')) < appVersion) {
-                        // New app's version, reloading is required
-                        reloadApp(reloadSummary, reloadMsg);
-                    } else {
-                        // Current request is queued for execution after authentication
-                        z4m.ajax.requestContext.push(options);
-                        if (z4m.ajax.requestContext.length === 1) {
-                            // Login dialog to renew user credentials displayed only once
-                            z4m.authentication.showLoginForm(true);
-                        }
+                        return;
                     }
-                } else if (response.status === 401 && isDisconnected === true) {
-                    // User is disconnected, redirect to login page
-                    reloadApp(errorSummary, errorMsg);
-                } else {
                     z4m.messages.add(errorLevel, errorSummary, errorMsg, false);
-                    z4m.ajax.emptyRequestContext(); // Request context is emptied
+                } else {
+                    if (isDisconnected === false) {
+                        // Show session timed out message as snack bar
+                        z4m.messages.showSnackbar(errorMsg, true);
+                        if (typeof appVersion === 'number' && typeof reloadSummary === 'string'
+                                && typeof reloadMsg === 'string'
+                                && parseInt($('body').data('appver')) < appVersion) {
+                            // New app's version, reloading is required
+                            reloadApp(reloadSummary, reloadMsg);
+                        } else {
+                            // Current request is queued for execution after authentication
+                            z4m.ajax.requestContext.push(options);
+                            if (z4m.ajax.requestContext.length === 1) {
+                                // Login dialog to renew user credentials displayed only once
+                                z4m.authentication.showLoginForm(true);
+                            }
+                        }
+                    } else {
+                        // User is disconnected, redirect to login page
+                        reloadApp(errorSummary, errorMsg);
+                    }
                 }
             },
             /**
@@ -1327,6 +1332,9 @@ z4m.messages.notify = function (title, message, buttonLabel, callback) {
             callback();
         }
     });
+    if (z4m.modal.modalStack.length > 0) {
+        modal.css('z-index', z4m.modal.getMostOnTopZIndex()+1);
+    }
     modal.show();
 };
 
@@ -1363,6 +1371,9 @@ z4m.messages.ask = function (title, question, buttons, callback) {
             callback($(this).hasClass('yes'));
         }
     });
+    if (z4m.modal.modalStack.length > 0) {
+        modal.css('z-index', z4m.modal.getMostOnTopZIndex()+1);
+    }
     modal.show();
     modal.find('button.no').trigger('focus');
 };
@@ -1446,7 +1457,7 @@ z4m.authentication.changePassword = function (login, oldPwd, msg) {
     const $this = this, isUserConnected = msg === undefined;
     z4m.modal.make(this.changePasswordFormId, this.changePasswordView, function(){
         const modal = this, form = this.getInnerForm();
-        form.init({login_name: login});
+        form.init({login_name: login, access: $this.readLocalLoginAccess()});
         if (oldPwd !== undefined) {
             form.setInputValue('password', oldPwd);
         }
@@ -1598,14 +1609,13 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
         });
     }
     function initRememberMeState() {
-        var accessValue = z4m.browser.readLocalData($this.rememberMeLocalStorageKey),
+        const accessValue = $this.readLocalLoginAccess(),
                 rememberMeElement = $('#zdk-login-modal-remember-me');
-        if (rememberMeElement.length === 1 && accessValue !== false) {
-            var accessElement = modal.getInnerForm(true).find('input[name=access]');
+        if (rememberMeElement.length === 1) {
+            const accessElement = modal.getInnerForm(true).find('input[name=access]');
             accessElement.val(accessValue);
             rememberMeElement.prop('checked', accessValue === 'private');
         }
-        return accessValue !== false;
     }
     function memorizeRememberMeState(loginWithEmail) {
         var accessValue = modal.getInnerForm().getInputValue('access');
@@ -1639,6 +1649,15 @@ z4m.authentication.showLoginForm = function (renewCredentials) {
             event.preventDefault();
         }).removeClass(z4m.hideClass);
     }
+};
+
+/**
+ * Returns the login access (public or private)
+ * @returns {String} Value 'private' or ''.
+ */
+z4m.authentication.readLocalLoginAccess = function() {
+    const accessValue = z4m.browser.readLocalData(this.rememberMeLocalStorageKey);
+    return accessValue === 'private' ? accessValue : '';    
 };
 
 /**
@@ -2231,6 +2250,10 @@ z4m.modal.make = function (modalElementSelector, viewName, onViewLoaded) {
         z4m.log.error('Modal CSS class missing!', modalElement);
         return null;
     }
+    if (modalElement.find('.' + z4m.modal.contentCssClass).length <= 0) {
+        z4m.log.error('Modal content CSS class missing!', modalElement);
+        return null;
+    }
     if (typeof onViewLoaded === 'function') {
         onViewLoaded.call(getNewObject(modalElement));
         return null;
@@ -2238,8 +2261,17 @@ z4m.modal.make = function (modalElementSelector, viewName, onViewLoaded) {
     return getNewObject(modalElement);
     // Returns new modal Object
     function getNewObject(modalElement) {
-        var modalObject = Object.create(z4m.modal);
+        const attributes = {role: 'dialog', 'aria-modal': 'true'},
+                modalObject = Object.create(z4m.modal);
         modalObject.element = modalElement;
+        let titleEl = modalElement.find('header .title');
+        if (titleEl.length === 1) {
+            if (titleEl.attr('id') === undefined) {
+                titleEl.attr('id', modalElement.attr('id') + '-title');
+            }
+            attributes['aria-labelledby'] = titleEl.attr('id');
+        }
+        modalElement.find('.' + z4m.modal.contentCssClass).attr(attributes);
         z4m.form.events.handleAllInvalid(modalElement.find('form'));// Form Input Invalid events
         return modalObject;
     }
@@ -2288,24 +2320,31 @@ z4m.modal.open = function (onSubmit, onClose, focusedInputName) {
     if (this.element.triggerHandler(this.events.beforeOpenName, [this]) === false) {
         return false;
     }
-    _registerCloseCallback(this, onClose);
+    const $this = this;
+    _registerCloseCallback(onClose);
     this.element.show();
-    _initForm(this, onSubmit);
+    _setZIndex();
+    _initForm(onSubmit);
     this.element.trigger(this.events.afterOpenName, [this]);
     return true;
     // Private functions
-    function _registerCloseCallback(modalObject, closeCallback) {
+    function _setZIndex() {        
+        if (z4m.modal.modalStack.length > 0) {            
+            $this.element.css('z-index', z4m.modal.getMostOnTopZIndex()+1);
+        }
+        z4m.modal.modalStack.push($this.element);
+    }
+    function _registerCloseCallback(closeCallback) {
         if (typeof closeCallback !== 'function') {
             return false;
         }
-        var eventName = modalObject.events.beforeUiModalCloseNane + '.z4m_modal';
-        modalObject.element.off(eventName);
-        modalObject.element.on(eventName, function () {
+        const eventName = $this.events.beforeUiModalCloseNane + '.z4m_modal';
+        $this.element.off(eventName).on(eventName, function () {
             return closeCallback();
         });
     }
-    function _initForm(modalObject, submitCallback) {
-        var form = modalObject.getInnerForm(true);
+    function _initForm(submitCallback) {
+        var form = $this.getInnerForm(true);
         if (form === false) {
             return false;
         }
@@ -2313,8 +2352,8 @@ z4m.modal.open = function (onSubmit, onClose, focusedInputName) {
             var returnedValue = typeof submitCallback === 'function'
                     ? submitCallback(response) : true;
             if (returnedValue !== false && response.success === true
-                    && modalObject.closeOnSubmitSuccess === true) {
-                modalObject.close();
+                    && $this.closeOnSubmitSuccess === true) {
+                $this.close();
             }
             return returnedValue;
         });
@@ -2324,7 +2363,6 @@ z4m.modal.open = function (onSubmit, onClose, focusedInputName) {
             formObject.setFocusOnFirstInput();
         }
     }
-
 };
 
 /**
@@ -2345,6 +2383,7 @@ z4m.modal.close = function (checkDataFormsModified) {
     var modalElement = this.element, $this = this;
     _areDataFormsModified(function(){
         modalElement.hide();
+        z4m.modal.modalStack.pop();
         modalElement.trigger(z4m.modal.events.afterCloseName, [$this]);
     });
     return true;
@@ -2370,6 +2409,26 @@ z4m.modal.close = function (checkDataFormsModified) {
             }
         });
     }
+};
+
+/**
+ * Returns the most on top modal element.
+ * @returns {jQuery|false} The most on top modal element or false if no modal
+ * is currently displayed.
+ */
+z4m.modal.getMostOnTop = function() {
+    return z4m.modal.modalStack.length > 0
+        ? z4m.modal.modalStack[z4m.modal.modalStack.length -1] : false;
+};
+
+/**
+ * Returns the most on top modal z-index value.
+ * @returns {int} The z-index value or -1 if no modal dialog is currently
+ * displayed 
+ */
+z4m.modal.getMostOnTopZIndex = function() {
+    return z4m.modal.getMostOnTop() !== false ?
+        parseInt(z4m.modal.getMostOnTop().css('z-index'), 10) : -1;
 };
 
 /**
@@ -2407,10 +2466,8 @@ z4m.modal.events.handleAllClose = function () {
         }
     });
     $(document).on('keydown.z4m_modal', function(event){
-        let modalEl = event.target.closest('.' + z4m.modal.cssClass);
-        modalEl = modalEl === null ? $('.' + z4m.modal.cssClass + ':visible') : $(modalEl);
-        if (modalEl.length === 1 && event.key === 'Escape') {
-            modalEl.find('header .close').trigger('click');
+        if (event.key === 'Escape' && z4m.modal.modalStack.length > 0) {
+            z4m.modal.getMostOnTop().find('header .close').trigger('click');
         }
     });
 };
@@ -4155,11 +4212,14 @@ z4m.list.events.handleScroll = function () {
  * @param {function} renderCallback Optional function called to customize the
  * display of each suggestion. This function is called with the suggestion's
  * data as parameter and must return the new label in text or HTML format.
+ * @param {function} onSuggestionsCallback Optional function called back when
+ * the suggestions are returned by the remote controller action. The number of
+ * suggestions found is passed as parameter.
  * @returns {Object|null} The instantiated autocomplete object or null if the
  * instantiation failed
  */
 z4m.autocomplete.make = function (inputElementSelector, controllerAction,
-        onSelect, renderCallback) {
+        onSelect, renderCallback, onSuggestionsCallback) {
     var inputElement = inputElementSelector instanceof jQuery
             ? inputElementSelector : $(inputElementSelector);
     if (inputElement.length !== 1) {
@@ -4206,26 +4266,66 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
     }
     list = $(autocompleteObject.listTemplateId).contents().filter('ul').clone();
     autocompleteObject.element.after(list);
-
+    _setInputAttr();
     _registerInputEvents();
     _registerSelectSuggestionEvents();
     return autocompleteObject;
 
     // PRIVATE METHODS
+    function _setInputAttr() {
+        const existingInputId = inputElement.attr('id'),
+            inputId = existingInputId === undefined 
+                ? 'z4m-autocomplete-input-' + z4m.autocomplete.uniqueId : existingInputId,
+                listId = 'z4m-autocomplete-list-' + z4m.autocomplete.uniqueId;
+        inputElement.attr({id: inputId, role: 'combobox', 'aria-autocomplete': 'list',
+            'aria-expanded': 'false', 'aria-controls': listId});
+        list.attr({id: listId, 'aria-label': _getInputLabel()});
+        z4m.autocomplete.uniqueId++;
+        function _getInputLabel() {
+            let labelEl = inputElement.closest('label');
+            if (labelEl.length <= 0) {
+                labelEl = $('label[for="' + inputElement.attr('id') + '"]');
+            }
+            return labelEl.length === 1 ? labelEl.text().trim() : '';
+        }
+    }
     function _registerInputEvents() {
-        var eventName = 'input.z4m_autocomplete';
-        autocompleteObject.element.off(eventName);
-        autocompleteObject.element.on(eventName, function (event) {
+        const inputEventName = 'input.z4m_autocomplete';
+        autocompleteObject.element.off(inputEventName);
+        autocompleteObject.element.on(inputEventName, function () {
             var queryString = $(this).val();
-            _removeSuggestions();
+            if (!queryString.length) {
+                _removeSuggestions();
+            }
+            if (queryString !== autocompleteObject.lastSelectedItem) {
+                autocompleteObject.lastSelectedItem = null;
+            }
             if (queryString.length < autocompleteObject.minStringLength) {
                 return; // Number of characters insufficient
             }
-            if (timeout === null) {
-                timeout = window.setTimeout(async function () {
+            if (timeout !== null) {
+                window.clearTimeout(timeout);
+            }
+            timeout = window.setTimeout(async function () {
+                if (queryString === autocompleteObject.element.val()) {
                     await _showSuggestions(queryString);
-                    timeout = null;
-                }, autocompleteObject.delay);
+                }
+                timeout = null;
+            }, autocompleteObject.delay);
+        });
+        const focusEventName = 'focus.z4m_autocomplete';
+        autocompleteObject.element.off(focusEventName);
+        autocompleteObject.element.on(focusEventName, function () {
+            const queryString = $(this).val();
+            if (queryString !== autocompleteObject.lastSelectedItem) {
+                autocompleteObject.lastSelectedItem = null;
+            }
+            if (!autocompleteObject.element.prop('readonly')
+                    && !autocompleteObject.element.prop('disabled')
+                    && list.hasClass(z4m.hideClass)
+                    && queryString.length >= autocompleteObject.minStringLength
+                    && queryString !== autocompleteObject.lastSelectedItem) {
+                _showSuggestions(queryString);
             }
         });
     }
@@ -4241,12 +4341,16 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
                 action: controllerAction.action,
                 data: {query: queryString},
                 callback: function (response) {
-                    if (autocompleteObject.element.is(':focus') && response.length > 0) {
-                        _addSuggestionsToList(response, queryString);
-                        _addToCacheData(response, queryString);
-                        list.removeClass(z4m.hideClass);
-                        _registerClickOutOfTheAutocomplete();
-                        _registerKeyboardAction();
+                    _removeSuggestions();
+                    if (autocompleteObject.element.is(':focus')
+                            && autocompleteObject.element.val() === queryString) {
+                        if (response.length > 0) {
+                            _addSuggestionsToList(response, queryString);
+                            _addToCacheData(response, queryString);
+                        }
+                        if (typeof onSuggestionsCallback === 'function') {
+                            onSuggestionsCallback.call(autocompleteObject.element, response.length);
+                        }
                     }
                     _setPreviousQueryString(queryString, response.length);
                     resolve();
@@ -4257,11 +4361,13 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
     function _removeSuggestions() {
         list.empty();
         list.addClass(z4m.hideClass);
+        inputElement.attr('aria-expanded', 'false');
+        inputElement.removeAttr('aria-activedescendant');
         _registerClickOutOfTheAutocomplete(true);
         _registerKeyboardAction(true);
     }
     function _addSuggestionsToList(response, queryString) {
-        $.each(response, function () {
+        $.each(response, function (idx) {
             if (this.label === undefined) {
                 z4m.log.warn("'label' property is missing in autocomplete suggestions!", this, 'error');
                 return false; // Break
@@ -4280,8 +4386,13 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
             }
             item.html(htmlLabel);
             item.data('item', this);
+            item.attr('id', list.attr('id') + '-item-' + idx);
             list.append(item);
         });
+        _registerClickOutOfTheAutocomplete();
+        _registerKeyboardAction();
+        list.removeClass(z4m.hideClass);
+        inputElement.attr('aria-expanded', 'true');
     }
     /**
      * Memorizes the previous query string
@@ -4322,8 +4433,8 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
     function _showCachedSuggestions(queryString) {
         for (let i=0; i < autocompleteObject.itemCache.length; i++) {
             if (autocompleteObject.itemCache[i].queryString === queryString) {
+                _removeSuggestions();
                 _addSuggestionsToList(autocompleteObject.itemCache[i].listOfItems, queryString);
-                list.removeClass(z4m.hideClass);
                 return true;
             }
         }
@@ -4357,6 +4468,7 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
             }
             if (doSelection !== false) {
                 autocompleteObject.element.val(item.label);
+                autocompleteObject.lastSelectedItem = item.label;
             }
             _removeSuggestions();
             if (autocompleteObject.cacheLifetime === 'selection') {
@@ -4371,7 +4483,9 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
             return false;
         }
         $(document).on(eventName, ':not(.autocomplete)', function () {
-            _removeSuggestions();
+            if (event.target !== autocompleteObject.element[0]) {
+                _removeSuggestions();
+            }
         });
         return true;
     }
@@ -4382,41 +4496,58 @@ z4m.autocomplete.make = function (inputElementSelector, controllerAction,
             return false;
         }
         autocompleteObject.element.on(eventName, function (event) {
-            if (event.keyCode === 40) { // DOWN key is pressed
+            if (event.code === 'ArrowDown') {
                 _setItemActive('down');
-            } else if (event.keyCode === 38) { // UP key is pressed
-                _setItemActive('up');
-            } else if (event.keyCode === 13) { // ENTER key is pressed
                 event.preventDefault();
+            } else if (event.code === 'ArrowUp') {
+                _setItemActive('up');
+                event.preventDefault();
+            } else if (event.code === 'Enter') {
                 list.find('li.' + autocompleteObject.selectedItemCssClass).click();
-            } else if (event.keyCode === 9) { // TAB key is pressed
+                event.preventDefault();
+            } else if (event.code === 'Tab') {
                 _removeSuggestions();
+            } else if (event.code === 'Escape') {
+                _removeSuggestions();
+                event.stopPropagation();
             }
         });
     }
     function _setItemActive(direction) {
-        var selectedItem = list.find('li.' + autocompleteObject.selectedItemCssClass);
-        if (selectedItem.length === 0) { // No item selected
-            list.find('li').first().addClass(autocompleteObject.selectedItemCssClass);
-        } else if (direction === 'up') {
-            let prevItem = selectedItem.prev();
-            selectedItem.removeClass(autocompleteObject.selectedItemCssClass);
-
-            if (prevItem.length === 1) {
-                prevItem.addClass(autocompleteObject.selectedItemCssClass);
-            } else {
-                list.find('li').last().addClass(autocompleteObject.selectedItemCssClass);
-            }
-        } else if (direction === 'down') {
-            let nextItem = selectedItem.next();
-            selectedItem.removeClass(autocompleteObject.selectedItemCssClass);
-            if (nextItem.length === 1) {
-                nextItem.addClass(autocompleteObject.selectedItemCssClass);
-            } else {
-                list.find('li').first().addClass(autocompleteObject.selectedItemCssClass);
+        const selectedItem = list.find('li.' + autocompleteObject.selectedItemCssClass);
+        selectedItem.removeAttr('aria-selected');
+        selectedItem.removeClass(autocompleteObject.selectedItemCssClass);
+        let newSelectedItem = list.find('li').first();
+        if (selectedItem.length > 0) {
+            if (direction === 'up') {
+                let prevItem = selectedItem.prev();
+                newSelectedItem = prevItem.length === 1 ? prevItem : list.find('li').last();
+            } else if (direction === 'down') {
+                let nextItem = selectedItem.next();
+                newSelectedItem = nextItem.length === 1 ? nextItem : list.find('li').first();
             }
         }
+        newSelectedItem.attr('aria-selected', 'true');
+        newSelectedItem.addClass(autocompleteObject.selectedItemCssClass);
+        inputElement.attr('aria-activedescendant', newSelectedItem.attr('id'));
     }
+};
+
+/**
+ * Check if the current autocomplete field value has been selected from
+ * suggestions or not.
+ * @returns {undefined|Boolean} Value true if the current value is a suggestion,
+ * false otherwise. If this method is not called from an object returned by the
+ * z4m.autocomplete.make() method, undefined is returned instead and an error
+ * is shown in the browser console.
+ */
+z4m.autocomplete.isSuggestion = function() {
+    if (this.element instanceof jQuery === false) {
+        z4m.log.error('Autocomplete is not instantiated!');
+        return;
+    }
+    return this.element.val().length >= this.minStringLength
+            && this.element.val() === this.lastSelectedItem;
 };
 
 //*********************** SERVICE WORKER PUBLIC METHODS ************************

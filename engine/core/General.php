@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core General purpose API
  *
- * File version: 1.18
- * Last update: 08/03/2024
+ * File version: 1.19
+ * Last update: 04/11/2025
  */
 
 /**
@@ -549,17 +549,22 @@ Class General {
      * processing picture.
      * @return boolean TRUE if the picture is too big to be processed, otherwise
      * FALSE
+     * @throws ZDKException Unable to get image size (GEN-010)
      */
     static public function isPictureTooBig($filePath, $tweakFactor = 2) {
         $imageInfo = getimagesize($filePath);
-        $channels = key_exists('channel', $imageInfo) ? $imageInfo['channels'] : 1;
-        $K64 = 65536;    // number of bytes in 64K
-        $memoryRequired = round(
-            ($imageInfo[0] * $imageInfo[1] * $imageInfo['bits'] * $channels
-                / 8 + $K64) * $tweakFactor);
-        $usedMemory = memory_get_usage();
-        $memoryLimit = intval(ini_get('memory_limit'))*1048576;
-        return $usedMemory + $memoryRequired > $memoryLimit;
+        if (is_array($imageInfo) && key_exists(0, $imageInfo) 
+                && key_exists(1, $imageInfo) && key_exists('bits', $imageInfo)) {
+            $channels = key_exists('channel', $imageInfo) ? $imageInfo['channels'] : 1;
+            $K64 = 65536;    // number of bytes in 64K
+            $memoryRequired = round(
+                ($imageInfo[0] * $imageInfo[1] * $imageInfo['bits'] * $channels
+                    / 8 + $K64) * $tweakFactor);
+            $usedMemory = memory_get_usage();
+            $memoryLimit = intval(ini_get('memory_limit'))*1048576;
+            return $usedMemory + $memoryRequired > $memoryLimit;
+        }
+        throw new ZDKException("GEN-010: unable to get image size.");
     }
 
     /**

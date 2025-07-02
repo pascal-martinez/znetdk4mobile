@@ -6,8 +6,8 @@
  License GNU GPL http://www.gnu.org/licenses/gpl-3.0.html GNU GPL
  =============================================================================
  ZnetDK 'mobile' page layout
- File version: 1.12
- Last update: 12/15/2024
+ File version: 1.13
+ Last update: 06/23/2025
 -->
 <?php /**
  * Input variables >>
@@ -74,8 +74,14 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
                             <i class="fa fa-navicon w3-xxlarge" aria-hidden="true" title="<?php echo LC_BTN_SHOW_MENU; ?>"></i>
                         </a>
                         <!-- Application Title -->
-                        <span class="banner-title-small w3-large w3-hide-large"><?php echo LC_HEAD_TITLE; ?></span>
-                        <span class="banner-title-large w3-left w3-padding w3-xlarge w3-hide-small w3-hide-medium"><?php echo LC_HEAD_TITLE; ?></span>
+                        <span class="banner-title-small w3-large w3-hide-large">
+                            <img class="title-logo" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="<?php echo strip_tags(LC_HEAD_TITLE); ?>">
+                            <?php echo LC_HEAD_TITLE; ?>
+                        </span>
+                        <span class="banner-title-large w3-left w3-padding w3-xlarge w3-hide-small w3-hide-medium">
+                            <img class="title-logo" src="<?php echo LC_HEAD_IMG_LOGO; ?>" alt="<?php echo strip_tags(LC_HEAD_TITLE); ?>">
+                            <?php echo LC_HEAD_TITLE; ?>
+                        </span>
                     </div>
                     <!-- Connected user buttons -->
                     <div class="w3-col s2 m3 l7 w3-hide" id="zdk-connection-area" data-zdk-login="<?php echo $loginName; ?>"
@@ -143,17 +149,13 @@ require ZNETDK_ROOT . CFG_MOBILE_FAVICON_CODE_FILENAME; ?>
 <?php if (CFG_AUTHENT_REQUIRED === TRUE) : ?>
         <!-- Login form -->
         <div id="zdk-login-modal" class="w3-modal">
-            <div class="w3-modal-content w3-card-4">
-                <header class="w3-container <?php echo $color['modal_header']; ?>">
-                    <a class="close w3-button w3-xlarge <?php echo $color['btn_hover']; ?> w3-display-topright" href="javascript:void(0)" aria-label="<?php echo LC_BTN_CLOSE; ?>"><i class="fa fa-times-circle fa-lg" aria-hidden="true" title="<?php echo LC_BTN_CLOSE; ?>"></i></a>
-                    <h4>
-                        <i class="fa fa-unlock-alt fa-lg"></i>
-                        <span class="title"><?php echo LC_FORM_TITLE_LOGIN; ?></span>
-                    </h4>
+            <div class="w3-modal-content w3-card-4 <?php echo $color['modal_content']; ?>">
+                <header class="w3-padding-32 w3-center">
+                    <i class="user-icon fa fa-user-circle-o w3-text-theme"></i>
                 </header>
-                <form class="w3-container <?php echo $color['modal_content']; ?>" data-zdk-submit="Security:login">
+                <form class="w3-container" data-zdk-submit="Security:login">
                     <input type="hidden" name="access" value="<?php echo CFG_SESSION_DEFAULT_MODE; ?>">
-                    <div class="w3-section">
+                    <div class="w3-margin-bottom">
                         <label>
                             <b><?php echo LC_FORM_LBL_LOGIN_ID; ?></b>
                             <input id="zdk-login-id" class="w3-input w3-border w3-margin-bottom" type="text" name="login_name" autocomplete="username" required>
@@ -275,30 +277,30 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
         <a id="zdk-mobile-action-search" class="zdk-mobile-action w3-hide w3-btn w3-circle w3-ripple w3-xlarge <?php echo $color['btn_search']; ?> w3-card-4" href="javascript:void(0)" aria-label="<?php echo LC_BTN_SEARCH; ?>"><i class="fa fa-search" aria-hidden="true" title="<?php echo LC_BTN_SEARCH; ?>"></i></a>
         <!-- Notification dialog -->
         <div id="zdk-notification-modal" class="w3-modal">
-            <div class="w3-modal-content w3-card-4 <?php echo $color['modal_content']; ?>">
+            <div class="w3-modal-content w3-card-4 <?php echo $color['modal_content']; ?>" role="dialog" aria-modal="true" aria-labelledby="zdk-notification-modal-title" aria-describedby="zdk-notification-modal-desc">
                 <header class="w3-container <?php echo $color['modal_header']; ?>">
-                    <h4>
+                    <h4 id="zdk-notification-modal-title">
                         <i class="fa fa-info-circle fa-lg"></i>
                         <span class="title">&nbsp;</span>
                     </h4>
                 </header>
                 <div class="w3-container">
-                    <p class="message"></p>
+                    <p id="zdk-notification-modal-desc" class="message"></p>
                     <button class="w3-container w3-button w3-block <?php echo $color['btn_action']; ?> <?php echo $color['btn_hover']; ?> w3-section w3-padding" type="button"><?php echo LC_BTN_OK; ?></button>
                 </div>
             </div>
         </div>
         <!-- Confirmation dialog -->
         <div id="zdk-confirmation-modal" class="w3-modal">
-            <div class="w3-modal-content w3-card-4 <?php echo $color['modal_content']; ?>">
+            <div class="w3-modal-content w3-card-4 <?php echo $color['modal_content']; ?>" role="dialog" aria-modal="true" aria-labelledby="zdk-confirmation-modal-title" aria-describedby="zdk-confirmation-modal-desc">
                 <header class="w3-container <?php echo $color['modal_header']; ?>">
-                    <h4>
+                    <h4 id="zdk-confirmation-modal-title">
                         <i class="fa fa-question-circle fa-lg"></i>
                         <span class="title">&nbsp;</span>
                     </h4>
                 </header>
                 <div class="w3-container">
-                    <p class="message" data-default-msg="<?php echo LC_MSG_ASK_CANCEL_CHANGES; ?>"></p>
+                    <p id="zdk-confirmation-modal-desc" class="message" data-default-msg="<?php echo LC_MSG_ASK_CANCEL_CHANGES; ?>"></p>
                     <div class="w3-section">
                         <button class="yes w3-button <?php echo $color['btn_yes']; ?>" type="button"><i class="fa fa-check fa-lg"></i>&nbsp;<span class="label" data-default-label="<?php echo LC_BTN_YES; ?>"></span></button>
                         <button class="no w3-button <?php echo $color['btn_no']; ?> w3-right" type="button"><i class="fa fa-times fa-lg"></i>&nbsp;<span class="label" data-default-label="<?php echo LC_BTN_NO; ?>"></span></button>
@@ -335,10 +337,10 @@ if (CFG_FORGOT_PASSWORD_ENABLED === TRUE && !UserSession::isAuthenticated(TRUE))
             </div>
         </template>
         <template id="zdk-autocomplete-tpl">
-            <ul class="autocomplete w3-ul w3-card w3-hoverable w3-hide"></ul>
+            <ul class="autocomplete w3-ul w3-card w3-hoverable w3-hide" role="listbox"></ul>
         </template>
         <template id="zdk-autocomplete-item-tpl" data-select="<?php echo $color['autocomplete_select']; ?>">
-            <li class="<?php echo $color['autocomplete_hover']; ?>"></li>
+            <li class="<?php echo $color['autocomplete_hover']; ?>" role="option"></li>
         </template>
 <?php self::renderDependencies('js');
 self::renderExtraHtmlCode(); ?>

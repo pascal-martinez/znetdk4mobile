@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core parameters of the applications
 *
-* File version: 1.17
-* Last update: 10/19/2024
+* File version: 1.18
+* Last update: 04/17/2025
 */
 
 /** Page layout chosen for the application.
@@ -84,14 +84,17 @@ define('CFG_MOBILE_INSTALL_MESSAGE_DISPLAY_AUTO', TRUE);
  */
 define('CFG_NON_MOBILE_PWA_ENABLED', FALSE);
 
+/** Relative path of the ZnetDK log directory */
+define('CFG_ZNETDK_LOG_DIR','engine'. DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR);
+
 /** Relative path of the ZnetDK errors log file */
-define('CFG_ZNETDK_ERRLOG','engine'. DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'errors.log');
+define('CFG_ZNETDK_ERRLOG', CFG_ZNETDK_LOG_DIR . 'errors.log');
 
 /** Relative path of the ZnetDK system log file */
-define('CFG_ZNETDK_SYSLOG','engine'. DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'system.log');
+define('CFG_ZNETDK_SYSLOG', CFG_ZNETDK_LOG_DIR . 'system.log');
 
 /** Relative path of users directory connected to ZnetDK */
-define('CFG_ZNETDK_LOGIN_LOG_DIR', 'engine'. DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'login');
+define('CFG_ZNETDK_LOGIN_LOG_DIR', CFG_ZNETDK_LOG_DIR . 'login');
 
 /** Relative path of the jQuery Javascript file */
 define('CFG_JQUERY_JS','resources/jquery/jquery-1.12.4.min.js');
@@ -409,7 +412,7 @@ define('CFG_THEME_ZNETDK_DIR','engine/public/themes');
  */
 define('CFG_THEME_DIR','applications/'.ZNETDK_APP_NAME.'/public/themes');
 
-/** Relative path of the directory where are stored the electronic documents
+/** Absolute path of the directory where are stored the electronic documents
  *  @return string For example '/home/www/znetdk/applications/default/documents'
  */
 define('CFG_DOCUMENTS_DIR',ZNETDK_APP_ROOT . DIRECTORY_SEPARATOR . 'documents');

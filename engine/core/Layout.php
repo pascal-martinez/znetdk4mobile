@@ -18,8 +18,8 @@
  * --------------------------------------------------------------------
  * Core Layout controller
  *
- * File version: 1.12
- * Last update: 06/09/2024 
+ * File version: 1.13
+ * Last update: 06/24/2025 
  */
 
 /**
@@ -90,7 +90,7 @@ Class Layout {
         } elseif (\Parameters::isAuthenticationRequired()) {
             if ($controller === 'resetpwd' || CFG_IS_IN_MAINTENANCE === TRUE) { 
                 // Disconnection is forced
-                UserSession::clearUserSession();
+                UserSession::clearUserSession(TRUE);
             }
             $loginName = \UserSession::getLoginName();
             try {

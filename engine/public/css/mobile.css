@@ -17,8 +17,8 @@
  * --------------------------------------------------------------------
  * Mobile layout view styles
  *
- * File version: 1.7
- * Last update: 11/10/2024
+ * File version: 1.8
+ * Last update: 05/27/2025
  */
 
 /* GENERAL */
@@ -127,8 +127,18 @@ body > h1 {
     left: 48px;
     top: 1px;
 }
+#zdk-header img.title-logo {
+    max-height: 40px;
+    display: none;
+}
+#zdk-header .banner-title-small > img.title-logo {
+    max-height: 30px;
+}
 .banner-title-large {
     width: 100%;
+}
+#zdk-header .is-disconnected > img.title-logo {
+    display: inline;
 }
 .banner-title-small.no-connection {
     width: 85%;
@@ -242,7 +252,14 @@ footer {
 }
 
 /* AUTHENTICATION DIALOGS */
-#zdk-login-modal .w3-modal-content,
+#zdk-login-modal .w3-modal-content {
+    max-width: 420px;
+}
+
+#zdk-login-modal header .user-icon {
+    font-size: 148px;
+}
+
 #zdk-changepwd-modal .w3-modal-content,
 #zdk-userpanel-modal .w3-modal-content {
     max-width: 600px;

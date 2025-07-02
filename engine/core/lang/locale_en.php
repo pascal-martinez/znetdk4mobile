@@ -18,8 +18,8 @@
 * --------------------------------------------------------------------
 * Core english translations of the application
 *
-* File version: 1.22
-* Last update: 12/15/2024
+* File version: 1.23
+* Last update: 05/26/2025
 */
 
 /* General PHP localization settings (used by the PHP 'setlocale' function) */
@@ -303,9 +303,9 @@ define('LC_MSG_INF_USERREMOVED',"User removed.");
 define('LC_MSG_INF_USER_PROFILE_STORED',"Profile saved.");
 define('LC_MSG_INF_USER_PROFILE_REMOVED',"Profile removed.");
 define('LC_MSG_INF_REQUEST_PWD_RESET_PROCESSED', 'If that email address is in our database, we will send you an email to reset your password.');
-define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Your temporary password has been sent to you by email.<br><a href="%1">Clic here</a> to login.');
-define('LC_MSG_INF_LOGOUT','<h3>Logout succeed.</h3><p><a href="">Clic here</a> to login again.</p>');
-define('LC_MSG_INF_CANCEL_LOGIN','<h3>Login canceled.</h3><p><a href="">Clic here</a> to login.</p>');
+define('LC_MSG_INF_PWD_RESET_PROCESSED', 'Your temporary password has been sent to you by email.<br><a href="%1">Click here</a> to login.');
+define('LC_MSG_INF_LOGOUT','<h3>Logout succeed.</h3><p><a href="">Click here</a> to login again.</p>');
+define('LC_MSG_INF_CANCEL_LOGIN','<h3>Login canceled.</h3><p><a href="">Click here</a> to login.</p>');
 define('LC_MSG_INF_SAVE_RECORD','The record has been saved successfully.');
 define('LC_MSG_INF_REMOVE_RECORD','The record has been removed successfully.');
 define('LC_MSG_INF_SELECT_LIST_ITEM','For multiple selection, hold the <Control> key pressed while clicking on an item of the list.');

@@ -18,7 +18,7 @@
 * --------------------------------------------------------------------
 * Core DAO : suggestions of keywords for searching users 
 *
-* File version: 1.0
+* File version: 1.1
 * Last update: 12/15/2024
 */
 namespace model;

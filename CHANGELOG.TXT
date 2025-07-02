@@ -1,3 +1,67 @@
+ZnetDK 3.5, 2025-06-30
+------------------------
+- CHANGE (all): when user logs out, the session is now totally deleted.
+- CHANGE (ZnetDK 4 Mobile only): ARIA attributes added to the z4m.autocomplete
+  input field widget.
+- CHANGE (ZnetDK 4 Mobile only): ARIA attributes added to the z4m.modal
+  modal dialog widget.
+- CHANGE (ZnetDK 4 Mobile only): W3.CSS is updated to version 5.02.
+- CHANGE (all): new \DAO::addCondition() method to add a SQL condition to the
+  SQL query.
+- CHANGE (all): when DAO::remove() method is called with a null row ID value,
+  rows are now removed taking in account the sorting order previously set via
+  the DAO::setSortCriteria() method.
+- CHANGE (ZnetDK 4 Mobile only): App's logo displayed on the left of the banner
+  title when the login form is displayed and when user is logged out.
+- CHANGE (ZnetDK 4 Mobile only): new z4m.autocomplete.isSuggestion() method to
+  know if the current z4m.autocomplete input field's value has been selected
+  from the list of suggestions or not.
+- CHANGE (ZnetDK 4 Mobile only): new z4m.autocomplete.lastSelectedItem property
+  to get the label of the last selected suggestion.
+- CHANGE (ZnetDK 4 Mobile only): now when suggestions are displayed for a
+  z4m.autocomplete input field, the Escape key closes the suggestion list.
+- CHANGE (ZnetDK 4 Mobile only): suggestions are now shown when a
+  z4m.autocomplete input field gains focus if no suggestion has been yet 
+  selected and the number of entered characters is higher or equal to the
+  minimum length set for the 'minStringLength' property.
+- CHANGE (ZnetDK 4 Mobile only): new optional argument 'onSuggestionsCallback'
+  added to the 'z4m.autocomplete.make()' method to get the number of suggestions
+  found for the last entered query string.
+- CHANGE (ZnetDK 4 Mobile only): an icon symbolizing a user is now displayed in
+  the header of the login dialog box.
+- BUG FIXING (ZnetDK 4 Mobile only): after changing the password, the user's
+  session was set to 'public' (see CFG_SESSION_DEFAULT_MODE constant) even if
+  the user checked the 'Remember me?' option when logging in.
+- BUG FIXING (ZnetDK 4 Mobile only): confirmation and notification modal dialogs
+  displayed via the z4m.messages.ask() and z4m.messages.notify() methods could
+  be positioned in the background of the last shown modal dialog.
+- BUG FIXING (ZnetDK 4 Mobile only): when the user session was destroyed while
+  submitting a form, the error message was displayed directly in the form and
+  not in a modal dialog to reload the application. 
+- BUG FIXING (ZnetDK 4 Mobile only): Modal dialog was not closed when pressing
+  Esc key if multiple modal dialogs were open in the background.
+- BUG FIXING (all): bad English translation of the verb 'click' for constants
+  LC_MSG_INF_PWD_RESET_PROCESSED, LC_MSG_INF_LOGOUT and LC_MSG_INF_CANCEL_LOGIN.
+- BUG FIXING (all): when calling DAO::getResult() method, the error message
+  "E_WARNING - Undefined array key... - engine/core/DAO.php(105)" was shown 
+  if a date type column set for the $dateColumns property was missing in the
+  rows fetched in database.
+- BUG FIXING (all): error "E_WARNING - key_exists() expects parameter 2 to be
+  array, bool given - engine/core/General.php(555)" when calling the
+  General::isPictureTooBig() ZnetDK method. The ZDKException "GEN-010" is now
+  thrown instead when the getimagesize() PHP function does not return an array.
+- BUG FIXING (ZnetDK 4 Mobile only): the z4m.autocomplete component did not
+  consider characters entered beyond the minimum number of characters required
+  (minStringLength) to look for suggestions.
+- BUG FIXING (ZnetDK 4 Mobile only): the z4m.autocomplete component no longer
+  sends AJAX requests for retrieving suggestions if the query string has changed
+  during the waiting delay (300 ms by default).
+- BUG FIXING (ZnetDK 4 Mobile only): when cache was enabled for the 
+  z4m.autocomplete component (property maxNumberOfCachedItems > 0), displayed
+  suggestions could be duplicated. In addition, the suggestions could not be
+  selected using keyboard and the suggestions remained displayed when leaving 
+  the autocomplete field.
+
 ZnetDK 3.4.0, 2025-01-30
 ------------------------
 - CHANGE (ZnetDK 4 Mobile only): when the z4m.message.ask() modal dialog is

@@ -9,7 +9,7 @@
 ?>
 
 <div class="w3-container w3-center w3-theme-l4 w3-padding-64" style="margin:-1px  -16px 0px -16px;">
-    <img class="w3-padding-16" src="<?php echo ZNETDK_ROOT_URI . 'engine/public/images/logoznetdk.svg'; ?>" width="150" alt="ZnetDK logo">
+    <img class="w3-padding-16" src="<?php echo LC_HEAD_IMG_LOGO; ?>" width="150" alt="ZnetDK logo">
     <h1 class="w3-margin w3-jumbo w3-text-theme">ZnetDK 4 Mobile</h1>
     <h3 class="w3-xlarge">Starter Web Application...</h3>
 </div>

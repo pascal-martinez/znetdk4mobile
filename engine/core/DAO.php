@@ -19,8 +19,8 @@
  * --------------------------------------------------------------------
  * Core Data Access Object API
  *
- * File version: 1.15
- * Last update: 11/06/2024
+ * File version: 1.16
+ * Last update: 06/22/2025
  */
 abstract class DAO {
 
@@ -102,7 +102,9 @@ abstract class DAO {
     private function addLocalizedDateColumns(&$row) {
         if (is_array($row) && is_array($this->dateColumns)) {
             foreach ($this->dateColumns as $column) {
-                $row[$column . '_locale'] = \Convert::W3CtoLocaleDate($row[$column]);
+                if (key_exists($column, $row)) {
+                    $row[$column . '_locale'] = \Convert::W3CtoLocaleDate($row[$column]);
+                }
             }
         }
     }
@@ -343,6 +345,28 @@ abstract class DAO {
     }
 
     /**
+     * Adds a condition to the SQL query. 
+     * @param string $condition For example 'my_col1 = ? AND my_col2 = ?'.
+     * @param array $values The values corresponding to the question marks in
+     * the condition.
+     */
+    protected function addCondition(string $condition, array $values) {
+        if (!is_array($values) || count($values) === 0) {
+            $message = "DAO-014: the values argument is not an array or is an empty array.";
+            \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
+            throw new \ZDKException($message);
+        }
+        if (substr_count($condition, '?') !== count($values)) {
+            $message = "DAO-015: the number of question marks in the condition does not match the number of specified values.";
+            \General::writeErrorLog('ZNETDK ERROR', $message, TRUE);
+            throw new \ZDKException($message);
+        }
+        $this->filterClause = $this->filterClause === FALSE
+            ? "WHERE {$condition}" : "{$this->filterClause} AND {$condition}";
+        $this->filterValues = array_merge($this->filterValues, $values);
+    }
+    
+    /**
      * Sets one or several values as criteria for the filter defined for the DAO.
      * <br>The values are passed in parameters of the method.<br>
      * The order of the values passed to the method must be the same than
@@ -357,10 +381,12 @@ abstract class DAO {
     }
 
     /**
-     * Sets the sort criteria to apply to the data returned by the method
-     * getResult().
+     * Sets the sort criteria to apply to the rows returned by the method
+     * getResult() and to the rows removed by the remove() method when called
+     * without row ID.
      * @param string $sortCriteria Column name of the table from which the data
-     * have to be sorted.
+     * have to be sorted without the 'ORDER BY' prefix.
+     * For example: 'my_col1 DESC, my_col2' 
      */
     public function setSortCriteria($sortCriteria) {
         if (is_string($sortCriteria) && $sortCriteria !== '') {
@@ -646,15 +672,17 @@ abstract class DAO {
         } elseif (isset($rowID)) {
             $filterClause = 'WHERE ' . $this->IdColumnName . ' = ?';
             $filterValues = array($rowID);
+            $sortClause = '';
         } else {
             $filterClause = $this->filterClause;
             $this->replaceTablePrefixesToQuery($filterClause);
             $filterValues = $this->filterValues;
+            $sortClause = is_string($this->sortClause) ? ' ' . $this->sortClause : '';
         }
         $sql = $this->isTableAliasRequired($filterClause)
             ? 'DELETE ' . $this->tableAlias . ' FROM `' . $this->getTableName() . '` AS ' . $this->tableAlias
             : 'DELETE FROM `' . $this->getTableName() . '`';
-        $sql .= ' ' . $filterClause;
+        $sql .= ' ' . $filterClause . $sortClause;
         /* Execute SQL statement */
         $dbConnection = $this->getDbConnection();
         if ($autocommit) {

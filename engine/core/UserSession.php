@@ -19,10 +19,11 @@
  * --------------------------------------------------------------------
  * Core User session API
  *
- * File version: 1.14
- * Last update: 08/07/2024
+ * File version: 1.15
+ * Last update: 06/30/2025
  */
 Class UserSession {
+
     static private $customVarPrefix = "zdkcust-";
 
     /**
@@ -46,8 +47,7 @@ Class UserSession {
      * session, otherwise the value found.
      */
     static private function getValue($variable) {
-        if (!isset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME])
-                || !isset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME][$variable])) {
+        if (!isset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]) || !isset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME][$variable])) {
             return NULL;
         } else {
             return $_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME][$variable];
@@ -169,7 +169,7 @@ Class UserSession {
     /**
      * Checks if the current user's session ID matches the session ID tracked
      * when user logged in for the last time.
-     * @return boolean TRUE is session IDs match or if no login name is
+     * @return boolean TRUE if session IDs match or if no login name is
      * currently stored in session or if authentication is not required and
      * sessions are not limited to a login name per user.
      */
@@ -193,20 +193,6 @@ Class UserSession {
     }
 
     /**
-     * Clears the custom variables added to the user session
-     */
-    static private function clearCustomValues() {
-        $prefixLength = strlen(self::$customVarPrefix);
-        $sessionKeys = array_keys($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]);
-        foreach($sessionKeys as $key) {
-           $prefix = substr($key,0,$prefixLength);
-           if ($prefix === self::$customVarPrefix) {
-               unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME][$key]);
-           }
-        }
-    }
-
-    /**
      * Returns the sanitized value specified in parameter
      * @param mixed $value Value to sanitize
      * @return mixed Sanitized value
@@ -223,6 +209,7 @@ Class UserSession {
             return \General::sanitize($value, 'default', FILTER_FLAG_STRIP_LOW);
         }
     }
+
     /**
      * Sanitizes the values of the array preserving without encoding the codes
      * @param array $array Array containing the values to sanitize
@@ -260,7 +247,7 @@ Class UserSession {
                 } else {
                     $message = LC_MSG_WARN_SESS_TIMOUT;
                 }
-            } else { // Private acess : user session never times out
+            } else { // Private access: user session never times out
                 return TRUE;
             }
         } else { // User not authenticated
@@ -271,15 +258,12 @@ Class UserSession {
         } else {
             $summary = LC_FORM_TITLE_LOGIN;
             $response = new \Response(FALSE);
-            $response->is_disconnected = is_null(self::getValue('login_name'))
-                    || !$isTokenValid || !$isLastLoginSessionId;
-            if ($response->is_disconnected === FALSE
-                    && ($appVersion = self::getApplicationVersion()) !== FALSE) {
+            $response->is_disconnected = is_null(self::getValue('login_name')) || !$isTokenValid || !$isLastLoginSessionId;
+            if ($response->is_disconnected === FALSE && ($appVersion = self::getApplicationVersion()) !== FALSE) {
                 $response->appver = $appVersion;
                 $response->reload_summary = LC_MSG_WARN_NEW_VERSION_SUMMARY;
                 $response->reload_msg = LC_MSG_WARN_NEW_VERSION_MSG;
-            } elseif ($response->is_disconnected === TRUE
-                    && \Request::getMethod() === 'POST') {
+            } elseif ($response->is_disconnected === TRUE && \Request::getMethod() === 'POST') {
                 $summary = LC_MSG_WARN_LOGGED_OUT_SUMMARY;
                 $message = LC_MSG_WARN_LOGGED_OUT_MSG;
             }
@@ -447,9 +431,7 @@ Class UserSession {
      * @param string $loginName Login of the user
      */
     static public function setAuthentHasFailed($loginName) {
-        if (!is_null(self::getValue('nbr_of_failed_authent'))
-                && !is_null(self::getValue('user_failed_authent'))
-                && self::getValue('user_failed_authent') === $loginName) {
+        if (!is_null(self::getValue('nbr_of_failed_authent')) && !is_null(self::getValue('user_failed_authent')) && self::getValue('user_failed_authent') === $loginName) {
             self::setValue('nbr_of_failed_authent', self::getValue('nbr_of_failed_authent') + 1);
         } else {
             self::setValue('nbr_of_failed_authent', 1);
@@ -462,10 +444,8 @@ Class UserSession {
      * @return boolean TRUE if the user failed to authenticate 3 times or more
      */
     static public function isMaxNbrOfFailedAuthentReached() {
-        $isPositiveInteger = is_int(CFG_NBR_FAILED_AUTHENT)
-                && CFG_NBR_FAILED_AUTHENT > 0;
-        if ($isPositiveInteger 
-                && self::getNbrOfFailedAuthent() >= CFG_NBR_FAILED_AUTHENT) {
+        $isPositiveInteger = is_int(CFG_NBR_FAILED_AUTHENT) && CFG_NBR_FAILED_AUTHENT > 0;
+        if ($isPositiveInteger && self::getNbrOfFailedAuthent() >= CFG_NBR_FAILED_AUTHENT) {
             return TRUE;
         } else {
             return FALSE;
@@ -481,9 +461,8 @@ Class UserSession {
         unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_failed_authent']);
     }
 
-
     /**
-     * Update data in user's session from user informations when user 
+     * Update data in user's session from user informations when user
      * authentication succeeded.
      * @param array $userInfos User informations read from database.
      * @param string $accessMode Value 'public' or 'private'.
@@ -522,27 +501,26 @@ Class UserSession {
         }
         if ($accessMode === 'public') {
             self::setValue('last_time_access', new \DateTime("now"));
-        } elseif (!is_null(self::getValue ('last_time_access'))) {
+        } elseif (!is_null(self::getValue('last_time_access'))) {
             unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['last_time_access']);
         }
     }
 
     /**
      * Clears all the current user information stored in session
+     * @param boolean $preserveLang When TRUE, the language is kept in session
+     * and the session is not destroyed.
      */
-    static public function clearUserSession() {
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['login_name']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_id']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_name']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_email']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['user_profiles']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['full_menu_access']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['last_time_access']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['ip_address']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['application_uri']);
-        unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME]['ui_token']);
-        self::clearCustomValues();
-        self::resetAuthentHasFailed();
+    static public function clearUserSession($preserveLang = FALSE) {
+        $lang = self::getLanguage();
+        $_SESSION = [];
+        if ($preserveLang === TRUE && !is_null($lang)) {
+            self::setLanguage($lang);
+        } elseif (session_status() === PHP_SESSION_ACTIVE) {
+            ErrorHandler::suspend(); // Avoid E_WARNING - session_destroy(): Trying to destroy uninitialized session
+            session_destroy();
+            ErrorHandler::restart();
+        }
     }
 
     /**
@@ -558,7 +536,7 @@ Class UserSession {
      */
     static public function setCustomValue($variableName, $value, $sanitize = FALSE) {
         if (isset($variableName) && isset($value)) {
-            $sessionVar = 'zdkcust-'.$variableName;
+            $sessionVar = 'zdkcust-' . $variableName;
             self::setValue($sessionVar, $sanitize ? self::getCleanedValue($value) : $value);
             return TRUE;
         }
@@ -573,10 +551,9 @@ Class UserSession {
      * @return mixed Value read in session for the specified variable
      */
     static public function getCustomValue($variableName, $sanitize = FALSE) {
-        $sessionVar = 'zdkcust-'.$variableName;
+        $sessionVar = 'zdkcust-' . $variableName;
         if (!is_null(self::getValue($sessionVar))) {
-            return $sanitize ? self::getCleanedValue(self::getValue($sessionVar))
-                    : self::getValue($sessionVar);
+            return $sanitize ? self::getCleanedValue(self::getValue($sessionVar)) : self::getValue($sessionVar);
         } else {
             return NULL;
         }
@@ -589,7 +566,7 @@ Class UserSession {
      * otherwise
      */
     static public function removeCustomValue($variableName) {
-        $sessionVar = 'zdkcust-'.$variableName;
+        $sessionVar = 'zdkcust-' . $variableName;
         if (!is_null(self::getValue($sessionVar))) {
             unset($_SESSION[\General::getAbsoluteURI() . ZNETDK_APP_NAME][$sessionVar]);
             return TRUE;
@@ -652,5 +629,4 @@ Class UserSession {
         }
         return FALSE;
     }
-
 }
